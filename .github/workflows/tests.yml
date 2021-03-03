@@ -27,12 +27,12 @@ jobs:
           conda install pytest flake8
           python -m pip install -e .
 
-      - name: lint
-        shell: bash -l {0}
-        run: |
-          flake8 eastlake
-
       - name: test
         shell: bash -l {0}
         run: |
           pytest -vvs eastlake
+
+      - name: lint
+        shell: bash -l {0}
+        run: |
+          flake8 eastlake
