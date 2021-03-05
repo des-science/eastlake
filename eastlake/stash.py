@@ -124,7 +124,7 @@ class Stash(dict):
 
     def save(self, filename, overwrite=True):
         if not overwrite:
-            if os.isfile(filename):
+            if os.path.isfile(filename):
                 raise IOError("overwrite is False and output file exists")
         with open(filename, "wb") as f:
             pickle.dump(self, f, protocol=2)
