@@ -1,5 +1,6 @@
 import os
 import pytest
+import tempfile
 
 from ..stash import Stash
 
@@ -175,7 +176,17 @@ def test_stash_get_filepaths():  # test from line 88-123.
                 assert res == arguments[i][j]
 
 
-# def test_stash_save():
+def test_stash_io():
+    with tempfile.TemporaryDirectory() as tmpdir:
+        pth = os.path.join(tmpdir, "blah.pkl")
+        # write stash to disk
+        
+        # read stash back
+        
+        # check that they are equal
+        assert stash1 == stash2
+        # assert np.array_equal(np.array([1, 2]), np.array([1, 2]))
+        # assert np.allclose(np.array([1, 2]), np.array([1, 2]))
 
 
 # def test_stash_load():
