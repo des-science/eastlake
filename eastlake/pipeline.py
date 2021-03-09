@@ -19,14 +19,9 @@ from collections import OrderedDict
 import copy
 import glob
 import json
-from .megamixer import ImSimMegaMixer
 from .steps import *
-from .test_steps import *
-from .postprocess_steps import *
-from .desy3cols_step import DESY3Cols
 from .utils import get_logger, safe_mkdir
 from .stash import Stash
-from .newish_metacal import NewishMetcalRunner
 
 #for timing
 from timeit import default_timer as timer
@@ -41,22 +36,14 @@ STEP_CLASSES = OrderedDict( [ ('galsim', GalSimRunner),
                               ('swarp', SWarpRunner),
                               ('sextractor', SExtractorRunner),
                               ('meds', MEDSRunner),
-                              ('mof', MOFRunner),
-                              ('mcal', McalRunner),
                               ('single_band_swarp', SingleBandSwarpRunner),
-                              ('sof', SOFRunner),
                               ('true_detection', TrueDetectionRunner),
-                              ('truth_test', TruthTest),
-                              ('sex_truth_test', SExtractorTruthTest),
-                              ('cm_truth_test', CmTruthTest),
-                              ('coadd_noise_test', CoaddNoiseTest),
                               ('delete_images', DeleteImages),
                               ('all_tile_cats', AllTileCats),
                               ('delete_meds', DeleteMeds),
-                              ('desy3cols', DESY3Cols),
-                              ('newish_metacal', NewishMetcalRunner),] )
+                            ] )
 
-DEFAULT_STEPS = ["galsim", "swarp", "sextractor", "meds", "mof", "mcal"]
+DEFAULT_STEPS = ["galsim", "swarp", "sextractor", "meds"]
 
 class Pipeline(object):
     def __init__( self, steps, base_dir, logger=None, verbosity=1, log_file=None, name="pipeline", config=None,
