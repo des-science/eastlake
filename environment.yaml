@@ -18,7 +18,6 @@ dependencies:
   - h5py
   - cfitsio
   - ngmix=1.3
-  - ngmixer
   - meds
   - metadetect
   - piff
