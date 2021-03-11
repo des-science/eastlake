@@ -39,7 +39,6 @@ STEP_CLASSES = OrderedDict( [ ('galsim', GalSimRunner),
                               ('single_band_swarp', SingleBandSwarpRunner),
                               ('true_detection', TrueDetectionRunner),
                               ('delete_images', DeleteImages),
-                              ('all_tile_cats', AllTileCats),
                               ('delete_meds', DeleteMeds),
                             ] )
 
