@@ -1,0 +1,11 @@
+#Testing e2e-008
+
+template: e2e-008.yaml
+
+pipeline.steps: [galsim, single_band_swarp, swarp, sextractor, meds, delete_images, mcal, delete_meds]
+
+image.nobjects.nstars: 100
+image.nobjects.use_all_stars: False
+image.nobjects.ngalaxies: 900
+
+output.grid_objects: True
