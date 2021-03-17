@@ -78,6 +78,7 @@ class Step(object):
     Each step has a name, a config dict, and a logger
     It also has an execute function which is called by the Pipeline instance.
     """
+
     def __init__(self, config, base_dir, name=None, logger=None,
                  verbosity=None, log_file=None):
         self.name = name

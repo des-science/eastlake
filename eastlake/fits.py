@@ -2,8 +2,10 @@ import astropy.io.fits as pyfits
 from galsim import Image, GalSimIncompatibleValuesError, GalSimValueError
 from galsim.fits import _parse_compression, _add_hdu, _write_file
 
-#The below function is copied from galsim.fits, but I've added a header argument
-#to allow saving with a header
+# The below function is copied from galsim.fits, but I've added a header argument
+# to allow saving with a header
+
+
 def writeMulti(image_list, file_name=None, dir=None, hdu_list=None, clobber=True,
                compression='auto', header_list=None):
     """Write a Python list of images to a multi-extension FITS file.
@@ -28,7 +30,7 @@ def writeMulti(image_list, file_name=None, dir=None, hdu_list=None, clobber=True
         raise GalSimValueError("Cannot write complex Images to a fits file. "
                                "Write image.real and image.imag separately.", image_list)
 
-    file_compress, pyfits_compress = _parse_compression(compression,file_name)
+    file_compress, pyfits_compress = _parse_compression(compression, file_name)
 
     if file_name and hdu_list is not None:
         raise GalSimIncompatibleValuesError(
@@ -40,13 +42,13 @@ def writeMulti(image_list, file_name=None, dir=None, hdu_list=None, clobber=True
     if hdu_list is None:
         hdu_list = pyfits.HDUList()
 
-    for i,image in enumerate(image_list):
+    for i, image in enumerate(image_list):
         if isinstance(image, Image):
             hdu = _add_hdu(hdu_list, image.array, pyfits_compress)
             if image.wcs:
                 image.wcs.writeToFitsHeader(hdu.header, image.bounds)
             if header_list is not None:
-                hdu.header.extend( header_list[i] )
+                hdu.header.extend(header_list[i])
         else:
             # Assume that image is really an HDU.  If not, this should give a reasonable error
             # message.  (The base type of HDUs vary among versions of pyfits, so it's hard to

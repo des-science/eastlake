@@ -1,13 +1,7 @@
 from __future__ import print_function, absolute_import
 import os
-import subprocess
-import copy
 
-import fitsio
-import numpy as np
-
-from ..step import Step, run_and_check
-from ..stash import Stash
+from ..step import Step
 
 
 class DeleteImages(Step):
@@ -22,8 +16,7 @@ class DeleteImages(Step):
         super(DeleteImages, self).__init__(
             config, base_dir, name=name, logger=logger, verbosity=verbosity,
             log_file=log_file)
-    
-        
+
         if "delete_coadd" not in self.config:
             self.config["delete_coadd"] = False
         if "delete_se" not in self.config:
@@ -37,41 +30,41 @@ class DeleteImages(Step):
 
         tilenames = stash["tilenames"]
         for tilename in tilenames:
-            tile_info = stash["tile_info"][tilename]
             if tilename in self.config["save_tilenames"]:
                 continue
-            #Firstly coadd stuff
+
+            # Firstly coadd stuff
             if self.config["delete_coadd"]:
-                self.logger.error("deleting coadd images for tile %s"%tilename)
-                #First check for a detection coadd, weight, mask and seg
+                self.logger.error("deleting coadd images for tile %s" % tilename)
+                # First check for a detection coadd, weight, mask and seg
                 for key in ["det_image_file", "det_weight_file", "det_mask_file"]:
                     filename = stash.get_filepaths(key, tilename, keyerror=False)
                     if filename is not None:
                         if os.path.isfile(filename):
-                            self.logger.error("removing file %s"%filename)
+                            self.logger.error("removing file %s" % filename)
                             os.remove(filename)
                         else:
-                            self.logger.error("file %s not found"%filename)
+                            self.logger.error("file %s not found" % filename)
                     else:
-                        self.logger.error("key %s not present"%key)
+                        self.logger.error("key %s not present" % key)
 
-                #Now the per-band coadds
+                # Now the per-band coadds
                 for band in stash["bands"]:
                     coadd_file = stash.get_filepaths("coadd_file", tilename, band=band,
                                                      keyerror=False)
                     if (coadd_file is not None):
                         if os.path.isfile(coadd_file):
                             os.remove(coadd_file)
-                        
-                    #Also check for seg file
+
+                    # Also check for seg file
                     if self.config["delete_seg"]:
                         seg_file = stash.get_filepaths("seg_file", tilename, band=band,
                                                        keyerror=False)
                         if (seg_file is not None):
                             if os.path.isfile(seg_file):
-                                self.logger.error("removing file %s"%seg_file)
+                                self.logger.error("removing file %s" % seg_file)
 
-                    #Also check for bkg and bkg-rms files
+                    # Also check for bkg and bkg-rms files
                     bkg_file = coadd_file.replace(".fits", "bkg.fits")
                     if os.path.isfile(bkg_file):
                         os.remove(bkg_file)
@@ -79,14 +72,14 @@ class DeleteImages(Step):
                     if os.path.isfile(bkg_rms_file):
                         os.remove(bkg_rms_file)
 
-            #Secondly se stuff
+            # Secondly se stuff
             if self.config["delete_se"]:
-                self.logger.error("deleting se images for tile %s"%tilename)
+                self.logger.error("deleting se images for tile %s" % tilename)
 
                 for band in stash["bands"]:
-                    band_info = tile_info[band]
-                    img_files = stash.get_filepaths("img_files", tilename, band=band,
-                                                    keyerror=False)
+                    img_files = stash.get_filepaths(
+                        "img_files", tilename, band=band,
+                        keyerror=False)
                     if (img_files is not None):
                         for f in img_files:
                             if os.path.isfile(f):

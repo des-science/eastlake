@@ -111,9 +111,8 @@ class GalSimRunner(Step):
 
         if comm is not None:
             rank = comm.Get_rank()
-            size = comm.Get_size()
         else:
-            rank, size = 0, 1
+            rank = 0
 
         if new_params is not None:
             galsim.config.UpdateConfig(self.config, new_params)
@@ -127,7 +126,7 @@ class GalSimRunner(Step):
         if self.name not in stash:
             stash[self.name] = {}
 
-        #Get the tilename
+        # Get the tilename
         stash["tilenames"] = [config["output"]["tilename"]]
 
         galsim.config.Process(config, self.logger, except_abort=except_abort)
@@ -147,7 +146,8 @@ class GalSimRunner(Step):
         nbands = len(bands)
         tilenames = stash["tilenames"]
         tilename = tilenames[0]
-        assert len(tilenames)==1
+        assert len(tilenames) == 1
+        ntiles = 1
 
         self.logger.error(
             "Simulated tile %s in bands %s" % (
@@ -159,7 +159,7 @@ class GalSimRunner(Step):
         if "blacklist_file" in config["output"]:
             blacklist = Blacklist.from_file(config["output"]["blacklist_file"])
             stash["blacklist"] = blacklist.blacklist_data
-        
+
         # Add the PSF config
         stash["psf_config"] = config["psf"]
         # add draw_method if present
@@ -209,9 +209,9 @@ class GalSimRunner(Step):
                                 raise ValueError(
                                     "Unexpectedly found a zero line "
                                     "source list file %s" % filename)
-                            for l in lines:
+                            for ln in lines:
                                 ext = default_ext
-                                s = (l.strip()).split(" ")[0]
+                                s = (ln.strip()).split(" ")[0]
                                 if s[-1] == "]":
                                     ext = int(s[-2])
                                     s = s[:-3]
@@ -254,8 +254,8 @@ class GalSimRunner(Step):
                         desdata, desrun, tilename, bands[0])
                     stash["tile_info"][tilename]["tile_center"] = tile_center
 
-                    #if doing gridded objects, save the true position data
-                    #to a fits file
+                    # if doing gridded objects, save the true position data
+                    # to a fits file
                     if config['output'].get('grid_objects', False):
                         nobjects = config['image']['nobjects']
                         if isinstance(nobjects, int):
@@ -271,12 +271,14 @@ class GalSimRunner(Step):
                                     (object_sep/2. + object_sep * (i % nobj_per_row)))
                                 y_pos_list.append(
                                     object_sep/2. + object_sep * (i // nobj_per_row))
-                            #get coadd wcs
-                            coadd_file=get_orig_coadd_file(desdata,
-                                                          desrun,
-                                                          tilename,
-                                                           bands[0])
-                            coadd_wcs,coadd_origin=galsim.wcs.readFromFitsHeader(coadd_file)
+                            # get coadd wcs
+                            coadd_file = get_orig_coadd_file(
+                                desdata,
+                                desrun,
+                                tilename,
+                                bands[0],
+                            )
+                            coadd_wcs, coadd_origin = galsim.wcs.readFromFitsHeader(coadd_file)
                             world_pos_list = [
                                 coadd_wcs.toWorld(galsim.PositionD(x, y))
                                 for (x, y) in zip(x_pos_list, y_pos_list)]
@@ -293,9 +295,14 @@ class GalSimRunner(Step):
                             _pos_data['dec'] = np.array(dec_list, dtype=np.float64)
                             _pos_data['x'] = np.array(x_pos_list, dtype=np.float64)
                             _pos_data['y'] = np.array(y_pos_list, dtype=np.float64)
-                            truepos_filename = os.path.join(base_dir, "true_positions", "%s-truepositions.fits"%tilename)
+                            truepos_filename = os.path.join(
+                                base_dir,
+                                "true_positions",
+                                "%s-truepositions.fits" % tilename,
+                            )
                             safe_mkdir(os.path.dirname(truepos_filename))
-                            self.logger.error("writing true position data to %s"%truepos_filename)
+                            self.logger.error(
+                                "writing true position data to %s" % truepos_filename)
                             fitsio.write(truepos_filename, _pos_data, clobber=True)
                             stash.set_filepaths("truepositions_file",
                                                 truepos_filename,

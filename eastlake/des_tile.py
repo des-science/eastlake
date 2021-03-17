@@ -3,8 +3,6 @@ import os
 import numpy as np
 import yaml
 
-import fitsio
-
 from galsim.config.output import OutputBuilder
 from .fits import writeMulti
 import astropy.io.fits as pyfits
@@ -14,6 +12,7 @@ import shutil
 from collections import OrderedDict
 
 MODES = ["single-epoch", "coadd"]  # beast too?
+
 
 def _replace_desdata(pth, desdata):
     """Replace the NERSC DESDATA path if needed.
@@ -63,6 +62,7 @@ def get_orig_source_list_file(desdata, desrun, tilename, band):
         "%s_%s_fcut-flist-%s.dat" % (tilename, band, desrun))
     return source_file
 
+
 def get_source_list_files(base_dir, desrun, tilename, bands):
     """Build paths to source file lists for a set of tiles.
     Parameters
@@ -102,6 +102,7 @@ def get_source_list_files(base_dir, desrun, tilename, bands):
         source_list_files[band] = (
             im_list_file, wgt_list_file, msk_list_file, magzp_list_file)
     return source_list_files
+
 
 def get_bkg_path(image_path, desdata=None):
     """Get the background image path from the image path.
@@ -445,16 +446,19 @@ class ChipNoiseBuilder(galsim.config.NoiseBuilder):
                 var *= config["noise_fac"]
         return var
 
+
 class Blacklist(object):
     """A class for storing a blacklist - a list of images
     to be treated differently e.g. there may not exist a
     useful accompanying Piff file
     """
+
     def __init__(self, blacklist_data):
         self.blacklist_data = blacklist_data
+
     @classmethod
     def from_file(cls, blacklist_file):
-        #read the blacklist from the file
+        # read the blacklist from the file
         with open(os.path.expandvars(blacklist_file), "r") as f:
             blacklist_data = yaml.load(f, Loader=yaml.Loader)
         return cls(blacklist_data)
@@ -472,11 +476,11 @@ class Blacklist(object):
         is_blacklisted: bool
             whether or not the image is in the blacklist
         """
-        #Grab the exposure number and chip
-        #number from the image filename
+        # Grab the exposure number and chip
+        # number from the image filename
         img_file = os.path.basename(img_file)
-        #image files have the format
-        #"D<exp_num>_<band>_c<chip_num>_<other stuff>"
+        # image files have the format
+        # "D<exp_num>_<band>_c<chip_num>_<other stuff>"
         exp_num = int(img_file.split("_")[0][1:])
         chip_num = int(img_file.split("_")[2][1:])
         is_blacklisted = self.is_blacklisted(exp_num, chip_num)
@@ -488,6 +492,7 @@ class Blacklist(object):
         """
         is_blacklisted = (exp_num, chip_num) in self.blacklist_data
         return is_blacklisted
+
 
 class DESTileBuilder(OutputBuilder):
     """Implements the DESTile custom output type.
@@ -502,27 +507,30 @@ class DESTileBuilder(OutputBuilder):
     # TODO - write example YAML
     ```
     """
+
     def setup(self, config, base, file_num, logger):
         logger.debug("Start DESTileBuilder setup file_num=%d" % file_num)
 
-        # We'll be editing things in the config file by hand here, which circumvents GalSim's
-        # detection of when it is safe to reuse a current item.  The easiest fix is to just
+        # We'll be editing things in the config file by hand here, which
+        # circumvents GalSim's
+        # detection of when it is safe to reuse a current item.  The easiest
+        # fix is to just
         # wipe out all the saved current items now.
         galsim.config.RemoveCurrent(base)
 
         # Make sure tile_num, band_num, exp_num, chip_num are considered
         # valid index_keys
 
-
         for obj_type in ["gal", "star"]:
             if obj_type in base:
                 if "mag" in base[obj_type]:
                     if "flux" in base[obj_type]:
-                        raise ValueError("both flux and mag found for object type %s"%obj_type)
+                        raise ValueError(
+                            "both flux and mag found for object type %s" % obj_type)
                     mag = base[obj_type].pop("mag")
-                    base[obj_type]["flux"] = {"type" : "Eval",
-                                              "str" : "10**( 0.4 * (mag_zp - mag))",
-                                              "fmag" : mag}
+                    base[obj_type]["flux"] = {"type": "Eval",
+                                              "str": "10**( 0.4 * (mag_zp - mag))",
+                                              "fmag": mag}
 
         if "band_num" not in galsim.config.process.valid_index_keys:
             galsim.config.valid_index_keys += [
@@ -532,7 +540,7 @@ class DESTileBuilder(OutputBuilder):
                 "tile_start_obj_num", "nfiles", "tilename", "band",
                 "file_path", "desdata", "desrun", "object_type_list",
                 "is_blacklisted"
-                ]
+            ]
 
         # Now, if we haven't already, we need to read in some things which
         # determine what images to simulate
@@ -571,15 +579,15 @@ class DESTileBuilder(OutputBuilder):
 
         if "_tile_setup" not in config:
 
-            #The Tile class from .tile_setup collects a load
-            #of juicy information for each tile
+            # The Tile class from .tile_setup collects a load
+            # of juicy information for each tile
             tile_info = Tile.from_tilename(tilename, bands=bands)
 
-            #Here we just need to set a few more things
-            #like the name of the output files
+            # Here we just need to set a few more things
+            # like the name of the output files
             image_paths_from_desdata = [
-                    os.path.relpath(f, desdata)
-                    for f in tile_info["image_files"]]
+                os.path.relpath(f, desdata)
+                for f in tile_info["image_files"]]
             file_names_with_fz = [
                 os.path.join(base["base_dir"], f)
                 for f in image_paths_from_desdata]
@@ -587,11 +595,11 @@ class DESTileBuilder(OutputBuilder):
             output_file_names = [f[:-3] if f.endswith(".fits.fz") else f
                                  for f in file_names_with_fz]
 
-            #Now for the coadds
+            # Now for the coadds
             orig_coadd_files = tile_info["coadd_file_list"]
             coadd_paths_from_desdata = [
-                    os.path.relpath(f, desdata)
-                    for f in orig_coadd_files]
+                os.path.relpath(f, desdata)
+                for f in orig_coadd_files]
             coadd_paths_with_fz = [
                 os.path.join(base["base_dir"], f)
                 for f in coadd_paths_from_desdata]
@@ -601,22 +609,28 @@ class DESTileBuilder(OutputBuilder):
             config["_tile_setup"] = {}
             tile_setup = config["_tile_setup"]
             tile_setup.update(tile_info)
-            #also add output filenames
+            # also add output filenames
             tile_setup["output_file_list"] = output_file_names
             tile_setup["coadd_output_file_list"] = coadd_output_filenames
 
-            #Check if we're blacklisting stuff
+            # Check if we're blacklisting stuff
             if "blacklist_file" in config:
                 blacklist = Blacklist.from_file(config["blacklist_file"])
-                #Make a list of booleans, one for each simulated image, True if an image is blacklisted
-                is_blacklisted_list = [blacklist.img_file_is_blacklisted(os.path.basename(f))
-                                  for f in image_paths_from_desdata]
-                for i,is_blacklisted in enumerate(is_blacklisted_list):
+                # Make a list of booleans, one for each simulated image, True
+                # if an image is blacklisted
+                is_blacklisted_list = [
+                    blacklist.img_file_is_blacklisted(os.path.basename(f))
+                    for f in image_paths_from_desdata
+                ]
+                for i, is_blacklisted in enumerate(is_blacklisted_list):
                     if is_blacklisted:
-                        logger.info("PSF for output file %s is blacklisted"%(
+                        logger.info("PSF for output file %s is blacklisted" % (
                             output_file_names[i]))
-                    logger.info("%d/%d piff files for tile %s blacklisted"%(
-                        is_blacklisted_list.count(True), len(is_blacklisted_list), tilename))
+                    logger.info("%d/%d piff files for tile %s blacklisted" % (
+                        is_blacklisted_list.count(True),
+                        len(is_blacklisted_list),
+                        tilename,
+                    ))
                 tile_setup["is_blacklisted_list"] = is_blacklisted_list
         else:
             # use the cached value
@@ -830,26 +844,31 @@ class DESTileBuilder(OutputBuilder):
             raise ValueError("nobjects required for output type DESTile")
 
         nobjects = base['image']['nobjects']
-        #For DES sims, it's a bit awkward to get the total number of objects,
-        #since we may want to simulate e.g. a fixed number of stars from
-        #one catalog, and randomly sample a random number of galaxies from
-        #a different catalog. So allow the user to specify an nobjects
-        #type MixedNObjects, which has the following options:
-        #- ngalaxies: int
+        # For DES sims, it's a bit awkward to get the total number of objects,
+        # since we may want to simulate e.g. a fixed number of stars from
+        # one catalog, and randomly sample a random number of galaxies from
+        # a different catalog. So allow the user to specify an nobjects
+        # type MixedNObjects, which has the following options:
+        # - ngalaxies: int
         #    # of galaxies
-        #- use_all_stars: (bool)
+        # - use_all_stars: (bool)
         #    simulated all the stars in the input star catalog (default=True)
-        #- nstars: int
+        # - nstars: int
         #    if use_all_stars=False, simulate this many stars
-        if isinstance(nobjects, dict): #this should return True for both dict and OrderedDict
+        if isinstance(nobjects, dict):
+            # ^ this should return True for both dict and OrderedDict
             if base['image']['nobjects']['type'] == "MixedNObjects":
-                #First get the number of galaxies. Either this will be an int, in which case
-                #ParseValue will work straightaway, or a random variable, in which case we'll
-                #need to initalize the rng and then try ParseValue again.
+                # First get the number of galaxies. Either this will be an int, in
+                # which case
+                # ParseValue will work straightaway, or a random variable, in which
+                # case we'll
+                # need to initalize the rng and then try ParseValue again.
                 try:
-                    ngalaxies = galsim.config.ParseValue(nobjects, 'ngalaxies', base, int)[0]
+                    ngalaxies = galsim.config.ParseValue(
+                        nobjects, 'ngalaxies', base, int)[0]
                 except TypeError:
-                    seed = galsim.config.ParseValue(base['image'], 'random_seed', base, int)[0]
+                    seed = galsim.config.ParseValue(
+                        base['image'], 'random_seed', base, int)[0]
                     try:
                         assert (isinstance(seed, int) and (seed != 0))
                     except AssertionError as e:
@@ -859,19 +878,19 @@ class DESTileBuilder(OutputBuilder):
                         raise(e)
                     base['rng'] = galsim.BaseDeviate(seed)
                     ngalaxies = galsim.config.ParseValue(nobjects, 'ngalaxies',
-                                                    base, int)[0]
-                    logger.error("simulating %d galaxies"%ngalaxies)
+                                                         base, int)[0]
+                    logger.error("simulating %d galaxies" % ngalaxies)
                 if nobjects.get("use_all_stars", True):
-                    #Now the stars. In this case
-                    #use all the stars in the star input catalog. We need
-                    #to process the inputs to find this number. The below
-                    #is adapted from galsim.config.input.ProcessInputNObjects
+                    # Now the stars. In this case
+                    # use all the stars in the star input catalog. We need
+                    # to process the inputs to find this number. The below
+                    # is adapted from galsim.config.input.ProcessInputNObjects
                     galsim.config.input.SetupInput(base, logger=logger)
                     key = 'desstar'
                     field = base['input'][key]
                     loader = galsim.config.input.valid_input_types[key]
                     if (key in base['_input_objs'] and
-                        base['_input_objs']['desstar'+'_safe'][0]):
+                            base['_input_objs']['desstar'+'_safe'][0]):
                         star_input = base["_input_objs"][key][0]
                     else:
                         kwargs, safe = loader.getKwargs(field, base, logger)
@@ -879,26 +898,29 @@ class DESTileBuilder(OutputBuilder):
                         star_input = loader.init_func(**kwargs)
                     nstars = star_input.getNObjects()
                 elif 'nstars' in nobjects:
-                    #use_all_stars is False so check if nstars is specified and if
-                    #so use this many stars
+                    # use_all_stars is False so check if nstars is specified and if
+                    # so use this many stars
                     nstars = galsim.config.ParseValue(nobjects, 'nstars', base, int)[0]
                 else:
-                    #If use_all_stars is False, and nstars is not specified, then
-                    #set nstars to zero. No stars for you.
+                    # If use_all_stars is False, and nstars is not specified, then
+                    # set nstars to zero. No stars for you.
                     nstars = 0
-                logger.error("simulating %d stars"%nstars)
+                logger.error("simulating %d stars" % nstars)
                 nobj = nstars + ngalaxies
-                #Save an object_type_list as a base_eval_variable, this can be used
-                #with MixedScene to specify whether to draw a galaxy or star.
+                # Save an object_type_list as a base_eval_variable, this can be used
+                # with MixedScene to specify whether to draw a galaxy or star.
                 obj_type_list = ['star']*nstars + ['gal']*ngalaxies
                 base["object_type_list"] = obj_type_list
             else:
-                #If we're not using MixedNObjects, parse the nobjects as usual (as above
-                #we may need to initialize base['rng'] first.
+                # If we're not using MixedNObjects, parse the nobjects as usual
+                # (as above
+                # we may need to initialize base['rng'] first.
                 try:
-                    nobj = galsim.config.ParseValue(base['image'], 'nobjects', base, int)[0]
+                    nobj = galsim.config.ParseValue(
+                        base['image'], 'nobjects', base, int)[0]
                 except TypeError:
-                    seed = galsim.config.ParseValue(base['image'], 'random_seed', base, int)[0]
+                    seed = galsim.config.ParseValue(
+                        base['image'], 'random_seed', base, int)[0]
                     try:
                         assert (isinstance(seed, int) and (seed != 0))
                     except AssertionError as e:
@@ -907,15 +929,16 @@ class DESTileBuilder(OutputBuilder):
                             "output type DES_Tile")
                         raise(e)
                     base['rng'] = galsim.BaseDeviate(seed)
-                    nobj = galsim.config.ParseValue(base['image'], 'nobjects', base, int)[0]
+                    nobj = galsim.config.ParseValue(
+                        base['image'], 'nobjects', base, int)[0]
         else:
-            #if not a dict, should be an int (this will be checked below though).
+            # if not a dict, should be an int (this will be checked below though).
             nobj = nobjects
 
-        #Check that we now have an integer nobj
+        # Check that we now have an integer nobj
         try:
             assert isinstance(nobj, int)
-        except AssertionError as e:
+        except AssertionError:
             print("found non-integer nobj:", nobj)
         base['image']['nobjects'] = nobj
         logger.info(
@@ -1034,27 +1057,6 @@ class DESTileBuilder(OutputBuilder):
                            for p in world_pos_list]
                 dec_list = [(p.dec / galsim.degrees)
                             for p in world_pos_list]
-                """
-                # output a special file of the positions here
-                # used for true detection later
-                _pos_data = np.zeros(len(ra_list), dtype=[
-                    ('ra', 'f8'), ('dec', 'f8'), ('x', 'f8'), ('y', 'f8')])
-                _pos_data['ra'] = np.array(ra_list, dtype=np.float64)
-                _pos_data['dec'] = np.array(dec_list, dtype=np.float64)
-                _pos_data['x'] = np.array(x_pos_list, dtype=np.float64)
-                _pos_data['y'] = np.array(y_pos_list, dtype=np.float64)
-                for _band_ind in range(len(bands)):
-                    coadd_output_filename = os.path.normpath(tile_setup["coadd_output_file_list"][_band_ind])
-                    truepos_filename = coadd_output_filename.replace(
-                        '.fits', '_montara_truepositions.fits')
-                    safe_mkdir(os.path.dirname(truepos_filename))
-                    #logger.error("writing true positions to %s"%truepos_filename)
-                    #fitsio.write(truepos_filename, _pos_data, clobber=True)
-                    #try:
-                    #    fitsio.write(truepos_filename, _pos_data, clobber=True)
-                    #except IOError, OSError:
-                    #    logger.error("Writing true positions file returned an IOError. No idea why. Continuing regardless.")
-                """
 
                 # add positions to galsim
                 base["image"]["world_pos"] = {
@@ -1113,7 +1115,7 @@ class DESTileBuilder(OutputBuilder):
                     desdata, desrun, tilename, band)
                 with open(os.path.expandvars(source_list_file), 'r') as f:
                     lines = f.readlines()
-                    image_files = [l.strip() for l in lines if l.strip() != ""]
+                    image_files = [ln.strip() for ln in lines if ln.strip() != ""]
                     nfiles += len(image_files)
             elif mode == "coadd":
                 nfiles += 1
