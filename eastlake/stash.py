@@ -27,6 +27,7 @@ class Stash(dict):
         Set path from file_key for a given tilename
         and if appropriate a band
     """
+
     def __init__(self, base_dir, step_names, stash=None):
         self['base_dir'] = os.path.abspath(base_dir)
         self['step_names'] = step_names

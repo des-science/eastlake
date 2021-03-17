@@ -1,9 +1,11 @@
-#Tile setup
-import galsim
 import os
+import pickle
+
+import galsim
 import yaml
 import numpy as np
 from coord import CelestialCoord
+
 
 def _replace_desdata(pth, desdata):
     """Replace the NERSC DESDATA path if needed.
@@ -53,6 +55,7 @@ def get_orig_source_list_file(desdata, desrun, tilename, band):
         "%s_%s_fcut-flist-%s.dat" % (tilename, band, desrun))
     return source_file
 
+
 def get_orig_se_image_files_and_magzps(desdata, desrun, tilename, band):
     """Get list of paths to single-epoch image files
     for a given tilename and band.
@@ -71,7 +74,7 @@ def get_orig_se_image_files_and_magzps(desdata, desrun, tilename, band):
     image_files: list
         List of image files.
     """
-    #Get source list file
+    # Get source list file
     source_list_file = get_orig_source_list_file(desdata, desrun, tilename, band)
     # read in the DESDM dile list and patse the parts
     # we remove empty lines
@@ -79,10 +82,11 @@ def get_orig_se_image_files_and_magzps(desdata, desrun, tilename, band):
     # magnitude zero point
     with open(source_list_file, "r") as f:
         lines = f.readlines()
-    lines = [l.strip() for l in lines if l.strip() != ""]
-    image_files = [_replace_desdata(l.split()[0], desdata) for l in lines]
-    mag_zps = [float(l.split()[1]) for l in lines]
+    lines = [ln.strip() for ln in lines if ln.strip() != ""]
+    image_files = [_replace_desdata(ln.split()[0], desdata) for ln in lines]
+    mag_zps = [float(ln.split()[1]) for ln in lines]
     return image_files, mag_zps
+
 
 def get_source_list_files(base_dir, desrun, tilename, bands):
     """Build paths to source file lists for a set of tiles.
@@ -124,6 +128,7 @@ def get_source_list_files(base_dir, desrun, tilename, bands):
             im_list_file, wgt_list_file, msk_list_file, magzp_list_file)
     return source_list_files
 
+
 def get_piff_path(image_path):
     """Get the Piff path from the image path.
     Parameters
@@ -155,6 +160,7 @@ def get_piff_path(image_path):
 
     return piff_path
 
+
 def get_psfex_path(image_path, desdata=None):
     """Get the PSFEx path from the image path.
     Parameters
@@ -175,6 +181,7 @@ def get_psfex_path(image_path, desdata=None):
     pth = os.path.join(psfex_dir, psfex_filename)
     return _replace_desdata(pth, desdata)
 
+
 def get_psfex_path_coadd(coadd_path, desdata=None):
     """Get the coadd PSFEx path from the image path.
     Parameters
@@ -194,6 +201,7 @@ def get_psfex_path_coadd(coadd_path, desdata=None):
     psfex_filename = "%s_psfcat.psf" % (basename.split(".")[0])
     pth = os.path.join(psfex_dir, psfex_filename)
     return _replace_desdata(pth, desdata)
+
 
 def get_orig_coadd_file(desdata, desrun, tilename, band):
     """Get the path to the original coadd file.
@@ -226,27 +234,29 @@ def get_orig_coadd_file(desdata, desrun, tilename, band):
     # seem to find code to remake the tile lists
     return _replace_desdata(tile_data["coadd_image_url"], desdata)
 
+
 class Tile(dict):
     """
     Class for storing tile info
     """
+
     def __init__(self, tile_info):
         self.update(tile_info)
 
     @classmethod
     def from_tilename(cls, tilename, desrun='y3v02', desdata=None,
-                 bands=["g","r","i","z"]):
+                      bands=["g", "r", "i", "z"]):
 
         if desdata is None:
             desdata = os.environ["DESDATA"]
-        
+
         tile_data = {}
         tile_data["tilename"] = tilename
         tile_data["desrun"] = desrun
         tile_data["desdata"] = desdata
         tile_data["bands"] = bands
 
-        #Set up lists - useful for looping through in galsim
+        # Set up lists - useful for looping through in galsim
         band_list = []
         im_file_list = []
         mag_zp_list = []
@@ -260,14 +270,14 @@ class Tile(dict):
         coadd_psfex_file_list = []
         coadd_mag_zp_list = []
 
-        #Collect corners of all se images to get bounds for
-        #tile
+        # Collect corners of all se images to get bounds for
+        # tile
         se_image_corners_deg = {}
         all_corners = []
 
         # Get single-epoch image info for this tile
         for band in bands:
-            #Get the image files and mag zeropoints
+            # Get the image files and mag zeropoints
             image_files, mag_zps = get_orig_se_image_files_and_magzps(
                 tile_data["desdata"], tile_data["desrun"], tilename, band)
             im_file_list += image_files
@@ -293,27 +303,28 @@ class Tile(dict):
             coadd_center_dec = coadd_header["DEC_CENT"]*galsim.degrees
             coadd_center = CelestialCoord(ra=coadd_center_ra,
                                           dec=coadd_center_dec)
-            
-            #get corners in ra/dec for each image
-            #we'll use these to set the bounds in which to simulate
-            #objects
+
+            # get corners in ra/dec for each image
+            # we'll use these to set the bounds in which to simulate
+            # objects
             se_image_corners_deg[band] = []
             for f in image_files:
-                ext=1 if f.endswith(".fz") else 0
                 wcs, origin = galsim.wcs.readFromFitsHeader(f)
                 xsize, ysize = 2048, 4096
                 im_pos1 = origin
-                im_pos2 = origin + galsim.PositionD(xsize,0)
-                im_pos3 = origin + galsim.PositionD(xsize,ysize)
-                im_pos4 = origin + galsim.PositionD(0,ysize)
+                im_pos2 = origin + galsim.PositionD(xsize, 0)
+                im_pos3 = origin + galsim.PositionD(xsize, ysize)
+                im_pos4 = origin + galsim.PositionD(0, ysize)
                 corners = [wcs.toWorld(im_pos1),
                            wcs.toWorld(im_pos2),
                            wcs.toWorld(im_pos3),
                            wcs.toWorld(im_pos4)]
-                #wrap w.r.t coadd center - this should ensure things don't confusingly
-                #cross ra=0.
-                corners = [CelestialCoord(ra=c.ra.wrap(center=coadd_center.ra), dec=c.dec) for c in corners]
-                corners_deg = [(c.ra/galsim.degrees,c.dec/galsim.degrees) for c in corners]
+                # wrap w.r.t coadd center - this should ensure things don't confusingly
+                # cross ra=0.
+                corners = [CelestialCoord(ra=c.ra.wrap(
+                    center=coadd_center.ra), dec=c.dec) for c in corners]
+                corners_deg = [(c.ra/galsim.degrees, c.dec/galsim.degrees)
+                               for c in corners]
                 se_image_corners_deg[band].append(corners_deg)
                 all_corners += corners
 
@@ -332,36 +343,37 @@ class Tile(dict):
             # fill out indexing info for bands, tile_nums and tilenames
             band_list += band * len(image_files)
 
-
-        #The tile is 10000x10000 pixels, but the extent for images
-        #contributing can be 4096 greater in the + and - x-direction
-        #and 2048 pixels greater in the + and - y-direction.
+        # The tile is 10000x10000 pixels, but the extent for images
+        # contributing can be 4096 greater in the + and - x-direction
+        # and 2048 pixels greater in the + and - y-direction.
         tile_npix_x = 10000 + 4096*2
         tile_npix_y = 10000 + 2048*2
-        tile_dec_min = (coadd_center_dec/galsim.degrees - tile_npix_y/2 * coadd_header["CD2_2"])*galsim.degrees
-        tile_dec_max = (coadd_center_dec/galsim.degrees + tile_npix_y/2 * coadd_header["CD2_2"])*galsim.degrees
+        tile_dec_min = (coadd_center_dec/galsim.degrees - tile_npix_y /
+                        2 * coadd_header["CD2_2"])*galsim.degrees
+        tile_dec_max = (coadd_center_dec/galsim.degrees + tile_npix_y /
+                        2 * coadd_header["CD2_2"])*galsim.degrees
         tile_dec_ranges_deg = (tile_dec_min/galsim.degrees, tile_dec_max/galsim.degrees)
 
-        #Need to be careful with ra, since depending on convention it increases in 
-        #the opposite direction to pixel coordinates, and there may be issues with
-        #wrapping around 0.
+        # Need to be careful with ra, since depending on convention it increases in
+        # the opposite direction to pixel coordinates, and there may be issues with
+        # wrapping around 0.
         tile_ra_min = (coadd_center.ra/galsim.degrees
-                        - tile_npix_x/2 * coadd_header["CD1_1"]
+                       - tile_npix_x/2 * coadd_header["CD1_1"]
                        / np.cos(coadd_center_dec/galsim.radians))*galsim.degrees
         tile_ra_max = (coadd_center.ra/galsim.degrees
                        + tile_npix_x/2 * coadd_header["CD1_1"]
                        / np.cos(coadd_center_dec/galsim.radians))*galsim.degrees
-        
-        #make sure these are between coadd_center.ra-pi and coadd_center.ra+pi with the wrap function
+
+        # make sure these are between coadd_center.ra-pi and coadd_center.ra+pi with the wrap function
         tile_ra_min = tile_ra_min.wrap(center=coadd_center.ra)
         tile_ra_max = tile_ra_max.wrap(center=coadd_center.ra)
         tile_ra_ranges_deg = (tile_ra_min/galsim.degrees,
                               tile_ra_max/galsim.degrees)
-        #and set the ordering in tile_ra_ranges_deg according to which is larger
-        if tile_ra_ranges_deg[0]>tile_ra_ranges_deg[1]:
+        # and set the ordering in tile_ra_ranges_deg according to which is larger
+        if tile_ra_ranges_deg[0] > tile_ra_ranges_deg[1]:
             tile_ra_ranges_deg = (tile_ra_ranges_deg[1],
                                   tile_ra_ranges_deg[0])
-        
+
         coadd_wcs, origin = galsim.wcs.readFromFitsHeader(coadd_header)
         xmin, xmax, ymin, ymax = 1., 10000., 1., 10000.
         coadd_corners = [
@@ -370,32 +382,34 @@ class Tile(dict):
                 (xmin, ymin), (xmax, ymin),
                 (xmax, ymax), (xmin, ymax)]]
         coadd_corners_ra_deg = [c.ra.wrap(corners[0].ra) / galsim.degrees
-                          for c in coadd_corners]
+                                for c in coadd_corners]
         coadd_corners_dec_deg = [c.dec / galsim.degrees
-                           for c in coadd_corners]
-        coadd_corners_deg = [(ra,dec) for (ra,dec) in zip(coadd_corners_ra_deg,
-                                                          coadd_corners_dec_deg)]
-        coadd_ra_ranges_deg = (np.min(coadd_corners_ra_deg), np.max(coadd_corners_ra_deg))
-        coadd_dec_ranges_deg = (np.min(coadd_corners_dec_deg), np.max(coadd_corners_dec_deg))
+                                 for c in coadd_corners]
+        coadd_corners_deg = [(ra, dec) for (ra, dec) in zip(coadd_corners_ra_deg,
+                                                            coadd_corners_dec_deg)]
+        coadd_ra_ranges_deg = (np.min(coadd_corners_ra_deg),
+                               np.max(coadd_corners_ra_deg))
+        coadd_dec_ranges_deg = (np.min(coadd_corners_dec_deg),
+                                np.max(coadd_corners_dec_deg))
 
-        #As well as the coadd bounds in ra/dec, it's also useful to store the bounds
-        #of the single-epoch images which enter the tile, since we may wish to
-        #simulate objects across this larger area. Get this from the corners
-        #of the se images we collected above
+        # As well as the coadd bounds in ra/dec, it's also useful to store the bounds
+        # of the single-epoch images which enter the tile, since we may wish to
+        # simulate objects across this larger area. Get this from the corners
+        # of the se images we collected above
         all_corners_ra_deg = [c.ra.wrap(all_corners[0].ra) / galsim.degrees
-                             for c in all_corners]
+                              for c in all_corners]
         all_corners_dec_deg = [c.dec / galsim.degrees
-                           for c in all_corners]
+                               for c in all_corners]
         se_ra_ranges_deg = (np.min(all_corners_ra_deg), np.max(all_corners_ra_deg))
         se_dec_ranges_deg = (np.min(all_corners_dec_deg), np.max(all_corners_dec_deg))
 
-        #Also record area - useful if we want to generate objects with a given
-        #number density
-        ra0,ra1 = se_ra_ranges_deg[0], se_ra_ranges_deg[1]
-        dec0,dec1 = se_dec_ranges_deg[0], se_dec_ranges_deg[1]
+        # Also record area - useful if we want to generate objects with a given
+        # number density
+        ra0, ra1 = se_ra_ranges_deg[0], se_ra_ranges_deg[1]
+        dec0, dec1 = se_dec_ranges_deg[0], se_dec_ranges_deg[1]
         se_area = (ra1 - ra0)*(np.sin(dec1) - np.sin(dec0))
         tile_data["se_area"] = se_area
-        
+
         tile_data["tile_center"] = coadd_center
         tile_data["image_files"] = im_file_list
         tile_data["mag_zp_list"] = mag_zp_list
@@ -423,10 +437,9 @@ class Tile(dict):
         return cls(tile_data)
 
     def write(self, filename, overwrite=False):
-        #Write to a picke file
+        # Write to a picke file
         if os.path.exists(filename):
-            raise OSError("""output filename %d exists and
-overwrite is False""")
+            raise OSError("""output filename %d exists and overwrite is False""")
         with open(filename, "w") as f:
             pickle.dump(f, self)
 

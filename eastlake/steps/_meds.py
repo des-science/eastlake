@@ -68,9 +68,9 @@ class MEDSRunner(Step):
         if "stage_output" not in self.config:
             self.config["stage_output"] = False
         if "use_blacklist" not in self.config:
-            #We can blacklist some of the images
+            # We can blacklist some of the images
             self.config["use_blacklist"] = True
-            
+
     def clear_stash(self, stash):
         # If we continued the pipeline from a previous job record file,
         # mof_file entries can mess things up, so clear them
@@ -100,7 +100,7 @@ class MEDSRunner(Step):
             try:
                 assert self.config["use_blacklist"] is True
             except AssertionError as e:
-                self.logger.error("""Found the psf type DES_Piff, 
+                self.logger.error("""Found the psf type DES_Piff,
                 but use_blacklist is set to False. This will not stand""")
                 raise(e)
         if self.config["use_blacklist"]:
@@ -110,7 +110,7 @@ class MEDSRunner(Step):
                 self.logger.error("""use_blacklist is True, but no 'blacklist'
                 entry found in stash""")
                 raise(e)
-        
+
         # https://github.com/esheldon/meds/wiki/Creating-MEDS-Files-in-Python
         # Need to generate
         #  i) object_data structure
@@ -274,7 +274,7 @@ class MEDSRunner(Step):
                 # headers and WCS
                 coadd_header = fitsio.read_header(
                     coadd_file, coadd_ext)
-                #delete any None entries 
+                # delete any None entries
                 coadd_header.delete(None)
                 coadd_header = desmeds.util.fitsio_header_to_dict(
                     coadd_header)
@@ -299,18 +299,18 @@ class MEDSRunner(Step):
                     img_files = stash.get_filepaths(
                         "img_files", tilename, band=band)
 
-                    #Are we blacklisting?
+                    # Are we blacklisting?
                     if self.config["use_blacklist"]:
                         blacklist = Blacklist(stash["blacklist"])
-                        #keep only non-blacklisted files
+                        # keep only non-blacklisted files
                         is_blacklisted = [blacklist.img_file_is_blacklisted(f) for f in img_files]
-                        img_files = [f for (i,f) in enumerate(img_files) if not is_blacklisted[i]]
-                        wgt_files = [f for (i,f) in enumerate(img_data['wgt_files']) if not is_blacklisted[i]]
-                        msk_files = [f for (i,f) in enumerate(img_data['msk_files']) if not is_blacklisted[i]]
-                        mag_zps = [m for (i,m) in enumerate(img_data['mag_zps']) if not is_blacklisted[i]]
+                        img_files = [f for (i, f) in enumerate(img_files) if not is_blacklisted[i]]
+                        wgt_files = [f for (i, f) in enumerate(img_data['wgt_files']) if not is_blacklisted[i]]
+                        msk_files = [f for (i, f) in enumerate(img_data['msk_files']) if not is_blacklisted[i]]
+                        mag_zps = [m for (i, m) in enumerate(img_data['mag_zps']) if not is_blacklisted[i]]
                     else:
                         wgt_files, msk_files = img_data['wgt_files'], img_data['msk_files']
-                    
+
                     if self.config.get("sub_bkg", True):
                         bkg_filenames = [get_bkg_path(f) for f in img_files]
                         if bkg_filenames[0].endswith(".fits.fz"):
@@ -599,9 +599,9 @@ class MEDSRunner(Step):
                 d = os.path.dirname(os.path.normpath(meds_file))
                 safe_mkdir(d)
 
-                #If requested, we stage the file at $TMPDIR and then
-                #copy over when finished writing. This is a good idea
-                #on many systems, but maybe not all.
+                # If requested, we stage the file at $TMPDIR and then
+                # copy over when finished writing. This is a good idea
+                # on many systems, but maybe not all.
                 if self.config["stage_output"]:
                     tmpdir = os.environ.get("TMPDIR", None)
                     with StagedOutFile(meds_file, tmpdir=tmpdir) as sf:
@@ -614,7 +614,7 @@ class MEDSRunner(Step):
                         tilename, band, str(timedelta(seconds=t1-t0))))
 
             stash.set_filepaths("meds_files", meds_files, tilename)
-                                
+
         if pr is not None:
             pr.print_stats(sort='time')
         return 0, stash

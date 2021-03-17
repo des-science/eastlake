@@ -77,10 +77,10 @@ class SingleBandSwarpRunner(Step):
                     with open(orig_file_list, 'r') as f:
                         lines = f.readlines()
                     output_lines = []
-                    for l in lines:
-                        rel_str = _get_relpath(l.strip())
-                        if len(l.strip()) < len(rel_str):
-                            output_lines.append("%s\n" % l.strip())
+                    for ln in lines:
+                        rel_str = _get_relpath(ln.strip())
+                        if len(ln.strip()) < len(rel_str):
+                            output_lines.append("%s\n" % ln.strip())
                         else:
                             output_lines.append("%s\n" % rel_str)
                         assert (
@@ -109,7 +109,7 @@ class SingleBandSwarpRunner(Step):
                 # Zeropoints...
                 with open(magzp_list_file, 'r') as f:
                     lines = f.readlines()
-                mag_zp_list = [float(l) for l in lines]
+                mag_zp_list = [float(ln) for ln in lines]
                 # We need to scale images to all have common zeropoint
                 fscale_list = [
                     10**(0.4*(self.config["mag_zp_ref"]-mag_zp))
