@@ -187,8 +187,6 @@ def test_stash_io():
             loaded_stsh = stsh.load(pth, TEST_DIR + 'blah1', ["foo1", "bar1"])
             # check that they are equal
             assert loaded_stsh == stsh
-            # assert np.array_equal(np.array([1, 2]), np.array([1, 2]))
-            # assert np.allclose(np.array([1, 2]), np.array([1, 2]))
             # testing overwrite after the file is made.
             if not ow:
                 with pytest.raises(IOError) as e:
