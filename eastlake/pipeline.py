@@ -140,11 +140,10 @@ class Pipeline(object):
         if logger is None:
             logger = get_logger(name, verbosity, log_file=log_file)
 
-        try:
-            assert len(config) == 1
-        except AssertionError as e:
+        if len(config) != 1:
             print("Multiple documents in config file not supported, sorry.")
-            raise(e)
+            raise RuntimeError("Multiple documents in config file not supported, sorry.")
+
         config = config[0]
 
         # Process templates.

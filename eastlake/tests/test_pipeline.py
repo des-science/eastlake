@@ -4,10 +4,11 @@ import pytest
 import tempfile
 import logging
 from collections import OrderedDict
+from unittest import mock
 
 import galsim
 
-from ..steps import *
+from ..steps import GalSimRunner
 from ..step import Step
 from ..stash import Stash
 from ..pipeline import Pipeline, DEFAULT_STEPS
@@ -384,3 +385,40 @@ def test_pipeline_from_config_file():
         # assert pipe_conf.config['template'] == config_file_path
 
     # I dont know what to do for line 176-180.
+
+        # config_file_path = os.path.join(tmpdir, "cfg.yaml")
+        # with open(config_file_path, "w") as fp:
+        #     fp.write("---\n")
+        #     fp.write(CONFIG)
+        #     fp.write("...\n---\n")
+        #     fp.write(CONFIG)
+        #     fp.write("...\n")
+        #
+        # with pytest.raises(RuntimeError):
+        #     Pipeline.from_config_file(
+        #         config_file_path, base_dir, logger=None, verbosity=1,
+        #         log_file=None, name="pipeline", step_names=None, new_params=None,
+        #         record_file=None,
+        #     )
+
+
+@mock.patch("eastlake.pipeline.GalSimRunner")
+def test_pipeline_from_config_file_execute(galsim_step_mock):
+    galsim_step_mock.return_value.name = "galsim"
+    galsim_step_mock.return_value.execute_step.return_value = (1, 2)
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        config_file_path = os.path.join(tmpdir, "cfg.yaml")
+        with open(config_file_path, "w") as fp:
+            fp.write(CONFIG)
+
+        base_dir = tmpdir
+
+        pl = Pipeline.from_config_file(
+            config_file_path, base_dir, logger=None, verbosity=1,
+            log_file=None, name="pipeline", step_names=["galsim"], new_params=None,
+            record_file=None,
+        )
+
+        pl.execute()
+        galsim_step_mock.return_value.execute_step.assert_called()
