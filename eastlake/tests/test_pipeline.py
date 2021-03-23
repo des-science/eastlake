@@ -5,6 +5,8 @@ import tempfile
 import logging
 from collections import OrderedDict
 
+import galsim
+
 from ..steps import *
 from ..step import Step
 from ..stash import Stash
@@ -20,7 +22,7 @@ modules:
     - numpy
 
 pipeline:
-    steps: [galsim, single_band_swarp, swarp, sextractor, meds, delete_images, mcal, delete_meds]
+    steps: [galsim, single_band_swarp, swarp, sextractor, meds, delete_images, delete_meds]
 
 delete_images:
     delete_coadd: True
@@ -47,11 +49,6 @@ meds:
 
 sof:
     config_file: ${IMSIM_DIR}/ngmix_config/run-y3imsim-sof-psfinfile.yaml
-    clobber: True
-    use_joblib: True
-
-mcal:
-    config_file: ${IMSIM_DIR}/ngmix_config/run-y3imsim-mcal-nocorrect-psfinfile.yaml
     clobber: True
     use_joblib: True
 
@@ -286,56 +283,63 @@ output:
 """
 
 
+def test_pipeline_state(capsys):
+    with tempfile.TemporaryDirectory() as tmpdir:
+        base_dir = tmpdir  # os.path.join(TEST_DIR,'foo')
+        config = None
+        steps = []
+        for step_name in DEFAULT_STEPS:
+            steps.append(Step(config, base_dir, name=step_name, logger=None, verbosity=None, log_file=None))
+        pl = Pipeline(steps, base_dir, logger=None, verbosity=1, log_file=None,
+                      name="pipeline", config=None, record_file="job_record.pkl")
 
-def test_pipeline_state(capsys): 
-	with tempfile.TemporaryDirectory() as tmpdir:
-		base_dir = tmpdir #os.path.join(TEST_DIR,'foo')
-		config = None
-		steps = []
-		for step_name in DEFAULT_STEPS:
-			steps.append(Step(config, base_dir, name=step_name, logger=None, verbosity=None, log_file=None))
-		pl = Pipeline(steps, base_dir, logger=None, verbosity=1, log_file=None, name="pipeline", config=None, record_file="job_record.pkl")
+        assert pl.name == 'pipeline'
+        # calling get_logger(). check for print statements
+        captured = capsys.readouterr()
+        assert "log_file=" in captured.out
+        assert "filemode=" in captured.out
+        logging.basicConfig(format="%(message)s", level=logging.WARNING, stream=sys.stdout, filemode='w')
+        log1 = logging.getLogger(pl.name)
+        assert pl.logger == log1
 
-		assert pl.name == 'pipeline' 
-		# calling get_logger(). check for print statements
-		captured = capsys.readouterr()
-		assert "log_file=" in captured.out 
-		assert "filemode=" in captured.out 
-		logging.basicConfig(format="%(message)s", level=logging.WARNING, stream=sys.stdout, filemode='w') 
-		log1 = logging.getLogger(pl.name) 
-		assert pl.logger == log1
+        # logger is not None to start. Create pl2.
+        pl2 = Pipeline(steps, base_dir, logger=log1, verbosity=1, log_file=None,
+                       name="pipeline", config=None, record_file="job_record.pkl")
+        assert pl2.logger == log1
 
-		# logger is not None to start. Create pl2. 
-		pl2 = Pipeline(steps, base_dir, logger=log1, verbosity=1, log_file=None, name="pipeline", config=None, record_file="job_record.pkl")
-		assert pl2.logger == log1
+        # base_dir not None.
+        assert os.path.isdir(base_dir)
+        assert pl.base_dir == tmpdir  # os.path.join(TEST_DIR, 'foo')
+        # base_dir is None. When base_dir is None, base_dir should be created as cwd.
+        assert Pipeline(steps, None, logger=None, verbosity=1, log_file=None, name="pipeline",
+                        config=None, record_file="job_record.pkl").base_dir == TEST_DIR
 
-		# base_dir not None.
-		assert os.path.isdir(base_dir)
-		assert pl.base_dir == tmpdir #os.path.join(TEST_DIR, 'foo')
-		# base_dir is None. When base_dir is None, base_dir should be created as cwd. 
-		assert Pipeline(steps, None, logger=None, verbosity=1, log_file=None, name="pipeline", config=None, record_file="job_record.pkl").base_dir == TEST_DIR
+        # test logging error. => ignore for now.
 
-		# test logging error. => ignore for now. 
+        # steps, step_name test. Use pl.
+        assert pl.steps == steps
+        assert pl.step_names == [s.name for s in steps]
 
-		# steps, step_name test. Use pl. 
-		assert pl.steps == steps
-		assert pl.step_names == [s.name for s in steps]
+        # if config is not None. Create pl3.
+        pl3 = Pipeline(steps, base_dir, logger=log1, verbosity=1, log_file=None,
+                       name="pipeline", config='bar', record_file="job_record.pkl")
+        # check if config is dumped into f. => skip for now?
 
-		# if config is not None. Create pl3. 
-		pl3 = Pipeline(steps, base_dir, logger=log1, verbosity=1, log_file=None, name="pipeline", config='bar', record_file="job_record.pkl")
-		# check if config is dumped into f. => skip for now?
+        # record_file check. Use pl.
+        assert pl.record_file == os.path.join(base_dir, 'job_record.pkl')
+        assert Pipeline(steps, base_dir, logger=None, verbosity=1, log_file=None, name="pipeline", config=None,
+                        record_file=base_dir+'/job_record.pkl').record_file == os.path.join(base_dir, 'job_record.pkl')
+        assert Pipeline(steps, base_dir, logger=None, verbosity=1, log_file=None, name="pipeline",
+                        config=None, record_file=None).record_file == os.path.join(base_dir, 'job_record.pkl')
 
-		# record_file check. Use pl. 
-		assert pl.record_file == os.path.join(base_dir, 'job_record.pkl')
-		assert Pipeline(steps, base_dir, logger=None, verbosity=1, log_file=None, name="pipeline", config=None, record_file=base_dir+'/job_record.pkl').record_file == os.path.join(base_dir, 'job_record.pkl')
-		assert Pipeline(steps, base_dir, logger=None, verbosity=1, log_file=None, name="pipeline", config=None, record_file=None).record_file == os.path.join(base_dir, 'job_record.pkl')
+        # init stash. Use pl.
+        assert pl.stash == Stash(base_dir, [s.name for s in steps])
 
-		# init stash. Use pl. 
-		assert pl.stash == Stash(base_dir, [s.name for s in steps])
+
 """
 def test_pipeline_from_record_file():
 
-	# parameters. 
+	# parameters.
 	config_file = 'config.yaml'
 	job_record_file = 'job_record.pkl'
 	base_dir = os.path.join(TEST_DIR,'foo')
@@ -343,64 +347,40 @@ def test_pipeline_from_record_file():
 	for step_name in DEFAULT_STEPS:
 		steps.append(Step(config, base_dir, name=step_name, logger=None, verbosity=None, log_file=None))
 
-	# when starting from the previous run. logger=None, record_file=None, base_dir=None. 
-	# What should I test here? 
+	# when starting from the previous run. logger=None, record_file=None, base_dir=None.
+	# What should I test here?
 	pipe_cont = Pipeline.from_record_file(config_file, job_record_file, base_dir=None, logger=None, verbosity=1, log_file=None, name="pipeline_cont", step_names=steps, new_params=None, record_file=None)
 	stsh = Stash.load()
 """
 
+
 def test_pipeline_from_config_file():
+    with tempfile.TemporaryDirectory() as tmpdir:
+        config_file_path = os.path.join(tmpdir, "cfg.yaml")
+        with open(config_file_path, "w") as fp:
+            fp.write(CONFIG)
 
-	with tempfile.TemporaryDirectory() as tmpdir:
-		with tempfile.TemporaryFile(mode="w+") as tmp_config_file:
-			tmp_config_file.writelines(CONFIG)
-			tmp_config_file.seek(0)
-			job_record_file = 'job_record.pkl'
-			base_dir = tmpdir
+        # job_record_file = os.path.join(tmpdir, 'job_record.pkl')
 
-			pipe_conf = Pipeline.from_config_file(tmp_config_file, base_dir, logger=None, verbosity=1, log_file=None, name="pipeline", step_names=None, new_params=None, record_file=None)
-			assert pipe_conf.logger == logging.getLogger('pipeline') # logger is None. 
-			# len(config) is 1. 
-			assert pipe_conf.config == galsim.config.ReadConfig(tmp_config_file)[0]
-			# multiple config files. 
-			#with pytest.raises(AssertionError) as e:
-		    #    pipe_conf2 = Pipeline.from_config_file([tmp_config_file, 'config2.yaml'??], base_dir, logger=None, verbosity=1, log_file=None, name="pipeline", step_names=None, new_params=None, record_file=None)
-		    #    assert e.type is AssertionError
+        base_dir = tmpdir
 
-		    # template is in config.
-			assert pipe_conf.config_dirname == tmpdir
-			# cwd is not where template is and there is no template in cwd. 
-			assert pipe_conf.template_file_to_use == os.path.join(tmpdir, tmp_config_file)
-			assert pipe_conf.config['template'] == os.path.join(tmpdir, tmp_config_file)
+        pipe_conf = Pipeline.from_config_file(
+            config_file_path, base_dir, logger=None, verbosity=1,
+            log_file=None, name="pipeline", step_names=None, new_params=None,
+            record_file=None,
+        )
+        assert pipe_conf.logger == logging.getLogger('pipeline')  # logger is None.
+        # len(config) is 1.
+        # assert pipe_conf.config == galsim.config.ReadConfig(config_file_path)[0]
+        # multiple config files.
+        # with pytest.raises(AssertionError) as e:
+        #    pipe_conf2 = Pipeline.from_config_file([tmp_config_file, 'config2.yaml'??], base_dir, logger=None, verbosity=1, log_file=None, name="pipeline", step_names=None, new_params=None, record_file=None)
+        #    assert e.type is AssertionError
 
-		    ## I dont know what to do for line 176-180. 
+    # template is in config.
+        # assert pipe_conf.config_dirname == tmpdir
+        # cwd is not where template is and there is no template in cwd.
+        # assert pipe_conf.template_file_to_use == config_file_path
+        # assert pipe_conf.config['template'] == config_file_path
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    # I dont know what to do for line 176-180.

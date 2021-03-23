@@ -25,15 +25,16 @@ PANIC_STRING = "!!!!!!!!!!!!!!\nWTF*WTF*WTF*WTF*\n"
 THINGS_GOING_FINE = "****************\n=>=>=>=>=>=>=>=>\n"
 
 
-STEP_CLASSES = OrderedDict([('galsim', GalSimRunner),
-                            ('swarp', SWarpRunner),
-                            ('sextractor', SExtractorRunner),
-                            ('meds', MEDSRunner),
-                            ('single_band_swarp', SingleBandSwarpRunner),
-                            ('true_detection', TrueDetectionRunner),
-                            ('delete_images', DeleteImages),
-                            ('delete_meds', DeleteMeds),
-                            ])
+STEP_CLASSES = OrderedDict([
+    ('galsim', GalSimRunner),
+    ('swarp', SWarpRunner),
+    ('sextractor', SExtractorRunner),
+    ('meds', MEDSRunner),
+    ('single_band_swarp', SingleBandSwarpRunner),
+    ('true_detection', TrueDetectionRunner),
+    ('delete_images', DeleteImages),
+    ('delete_meds', DeleteMeds),
+])
 
 DEFAULT_STEPS = ["galsim", "swarp", "sextractor", "meds"]
 
