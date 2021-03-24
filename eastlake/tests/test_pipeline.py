@@ -5,13 +5,13 @@ import tempfile
 import logging
 from collections import OrderedDict
 from unittest import mock
-
+import yaml
 import galsim
 
-from ..steps import GalSimRunner
+from ..steps import GalSimRunner, SingleBandSwarpRunner
 from ..step import Step
 from ..stash import Stash
-from ..pipeline import Pipeline, DEFAULT_STEPS
+from ..pipeline import Pipeline, DEFAULT_STEPS, STEP_CLASSES
 
 
 TEST_DIR = os.getcwd()
@@ -23,7 +23,7 @@ modules:
     - numpy
 
 pipeline:
-    steps: [galsim, single_band_swarp, swarp, sextractor, meds, delete_images, delete_meds]
+    steps: [galsim, single_band_swarp]
 
 delete_images:
     delete_coadd: True
@@ -283,6 +283,78 @@ output:
                 fz_gal: { type: catalog_sampler_value, col: "$z_col" }
 """
 
+CONFIG_NOPL = """\
+modules:
+    - galsim.des
+    - galsim_extra
+    - montara
+    - numpy
+
+input:
+    # Use analytic galaxies with size and flux parameters that match the distribution seen
+    # in the COSMOS galaxies.
+    catalog_sampler:
+        file_name: /global/project/projectdirs/des/y3-image-sims/input_cosmos_v4.fits
+        cuts:
+            mag_i: [15., 25.]  #use only 15<mag_i<25. for now.
+            isgal: [1,] #select galaxies only since we're simulating stars separately.
+            mask_flags: [0,] #apply mask flags
+            bdf_hlr: [0.,5.]
+    desstar:
+        file_name:
+            type: FormattedStr
+            format: /global/cscratch1/sd/maccrann/DES/image_sims/star_cats_v0/stars-%s.fits
+            items:
+            - "$tilename"
+        mag_i_max: 25.
+    des_piff:
+        file_name: "$piff_path"
+
+output:
+    type: DESTile
+    nproc: 32
+    # The number of exposures to build
+    bands: [g,r,i,z]
+    desrun: y3v02
+    desdata: /global/project/projectdirs/des/y3-image-sims
+    noise_mode: from_weight
+    add_bkg: False
+    tilename: DES0003-3832
+    blacklist_file: /global/homes/m/maccrann/DES/y3-wl_image_sims/input/piff_stuff/blacklist400.yaml
+
+    #Save weight and badpix extensions too
+    badpixfromfits:
+        hdu: 1
+        mask_hdu: 2
+        mask_file: "$orig_image_path"
+    weight:
+        hdu: 2
+
+    truth:
+        #DESTile type fills in filename
+        columns:
+            num: obj_num
+            half_light_radius:
+                type: Eval
+                str: "0.0 if @current_obj_type=='star' else hlr"
+                fhlr: "@gal.items.0.half_light_radius"
+            g1: "$(@stamp.shear).g1"
+            g2: "$(@stamp.shear).g2"
+            g: "$truth_g"
+            beta: "$truth_beta"
+            obj_type: "@current_obj_type"
+            obj_type_index: "@current_obj_type_index"
+            band: "band"
+            mag_zp: "$mag_zp"
+            laigle_number:
+                type: Eval
+                str: "-1 if @current_obj_type=='star' else int(laigle_number)"
+                flaigle_number: { type: catalog_sampler_value, col: laigle_number }
+            z:
+                type: Eval
+                str: "-1. if @current_obj_type=='star' else z_gal"
+                fz_gal: { type: catalog_sampler_value, col: "$z_col" }
+"""
 
 def test_pipeline_state(capsys):
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -336,24 +408,26 @@ def test_pipeline_state(capsys):
         # init stash. Use pl.
         assert pl.stash == Stash(base_dir, [s.name for s in steps])
 
-
 """
 def test_pipeline_from_record_file():
 
-	# parameters.
-	config_file = 'config.yaml'
-	job_record_file = 'job_record.pkl'
-	base_dir = os.path.join(TEST_DIR,'foo')
-	steps = []
-	for step_name in DEFAULT_STEPS:
-		steps.append(Step(config, base_dir, name=step_name, logger=None, verbosity=None, log_file=None))
+    with tempfile.TemporaryDirectory() as tmpdir:
+        config_file_path = os.path.join(tmpdir, "cfg.yaml")  
+        job_record_file = os.path.join(tmpdir, 'job_record.pkl') 
+        with open(config_file_path, "w") as fp:
+            fp.write(CONFIG)
 
-	# when starting from the previous run. logger=None, record_file=None, base_dir=None.
-	# What should I test here?
-	pipe_cont = Pipeline.from_record_file(config_file, job_record_file, base_dir=None, logger=None, verbosity=1, log_file=None, name="pipeline_cont", step_names=steps, new_params=None, record_file=None)
-	stsh = Stash.load()
+        base_dir = tmpdir
+        step_names = []
+        for step_name in DEFAULT_STEPS:
+            step_names.append(Step(None, base_dir, name=step_name, logger=None, verbosity=None, log_file=None))
+
+    	# when starting from the previous run. logger=None, record_file=None, base_dir=None.
+    	# What should I test here?
+        pipe_cont = Pipeline.from_record_file(config_file_path, job_record_file, base_dir=None, logger=None, verbosity=1, log_file=None, name="pipeline_cont", step_names=step_names, new_params=None, record_file=None)
+        assert pipe_cont.stash == Stash.load(job_record_file, base_dir, step_names)
+        #assert pipe_cont == Pipeline(...)
 """
-
 
 def test_pipeline_from_config_file():
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -364,42 +438,70 @@ def test_pipeline_from_config_file():
         # job_record_file = os.path.join(tmpdir, 'job_record.pkl')
 
         base_dir = tmpdir
-
         pipe_conf = Pipeline.from_config_file(
             config_file_path, base_dir, logger=None, verbosity=1,
             log_file=None, name="pipeline", step_names=None, new_params=None,
             record_file=None,
         )
-        assert pipe_conf.logger == logging.getLogger('pipeline')  # logger is None.
+        with open(os.path.join(base_dir, "config.yaml"), "r") as f:
+            config = yaml.load(f, Loader=yaml.Loader)
+        assert pipe_conf.logger == logging.getLogger("pipeline")  # logger is None.
         # len(config) is 1.
-        # assert pipe_conf.config == galsim.config.ReadConfig(config_file_path)[0]
-        # multiple config files.
-        # with pytest.raises(AssertionError) as e:
-        #    pipe_conf2 = Pipeline.from_config_file([tmp_config_file, 'config2.yaml'??], base_dir, logger=None, verbosity=1, log_file=None, name="pipeline", step_names=None, new_params=None, record_file=None)
-        #    assert e.type is AssertionError
-
-    # template is in config.
-        # assert pipe_conf.config_dirname == tmpdir
-        # cwd is not where template is and there is no template in cwd.
-        # assert pipe_conf.template_file_to_use == config_file_path
-        # assert pipe_conf.config['template'] == config_file_path
-
-    # I dont know what to do for line 176-180.
-
+        # assert config == galsim.config.ReadConfig(config_file_path)[0]
+        
+        # SKIP FOR NOW. multiple configs in one file.
         # config_file_path = os.path.join(tmpdir, "cfg.yaml")
-        # with open(config_file_path, "w") as fp:
+        # with open(config_file_path, "a") as fp:
         #     fp.write("---\n")
         #     fp.write(CONFIG)
-        #     fp.write("...\n---\n")
-        #     fp.write(CONFIG)
-        #     fp.write("...\n")
-        #
+        
         # with pytest.raises(RuntimeError):
         #     Pipeline.from_config_file(
         #         config_file_path, base_dir, logger=None, verbosity=1,
         #         log_file=None, name="pipeline", step_names=None, new_params=None,
         #         record_file=None,
         #     )
+
+        # SKIP FOR NOW. template is in config. Line 157-172. 
+            # assert pipe_conf.config_dirname == tmpdir
+            # cwd is not where template is and there is no template in cwd.
+            # assert pipe_conf.template_file_to_use == config_file_path
+            # assert pipe_conf.config['template'] == config_file_path
+
+        # SKIP FOR NOW. new_params is not None. Line 177-178. 
+        # pipe_conf = Pipeline.from_config_file(
+        #     config_file_path, base_dir, logger=None, verbosity=1,
+        #     log_file=None, name="pipeline", step_names=None, new_params='foo',
+        #     record_file=None,
+        # )
+        # When new_params is not None, galsim.config.UpdateConfig() happens. No need to test anything?
+
+        # if 'pipeline' is not in config. Line 180-181. 
+        # step_names must exist if config['pipeline'] does not exist. 
+        # In that case, step_names in from_config_file arguments go through the rest to make steps list. -> TEST THIS LATER
+        config_nopl_path = os.path.join(tmpdir, "cfg_nopl.yaml")
+        with open(config_nopl_path, "w") as fp:
+            fp.write(CONFIG_NOPL)
+        nopipe_config = Pipeline.from_config_file(
+            config_nopl_path, base_dir, logger=None, verbosity=1,
+            log_file=None, name="pipeline", step_names=["galsim"], new_params=None,
+            record_file=None,
+        )
+        # loading up config,yaml that is saved on disk. 
+        with open(os.path.join(base_dir, "config.yaml"), "r") as f:
+            config_nopl = yaml.load(f, Loader=yaml.Loader)
+        assert config_nopl['pipeline'] == {'ntiles': 1}
+
+        # if step_names are None. config['pipeline'] must exist. 
+        # testing Line 182-216. Use pipe_conf as a default Pipeline class. 
+        assert pipe_conf.base_dir == os.path.abspath(base_dir)
+        # test line 197 later. This is when elements in step_names are not in config. 
+        # 'galsim' is going to be added to steps first, and then step_class(other steps) is going to be added.
+        # assumes step_class is not in step_config. skip line 203-208 and go to line 209.
+        #assert pipe_conf.steps == [GalSimRunner(config, base_dir, logger=logging.getLogger("pipeline")), SingleBandSwarpRunner(config, base_dir, logger=logging.getLogger("pipeline"), verbosity=1, name="single_band_swarp")]
+
+
+
 
 
 @mock.patch("eastlake.pipeline.GalSimRunner")
