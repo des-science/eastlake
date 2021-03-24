@@ -408,26 +408,46 @@ def test_pipeline_state(capsys):
         # init stash. Use pl.
         assert pl.stash == Stash(base_dir, [s.name for s in steps])
 
-"""
+
 def test_pipeline_from_record_file():
 
     with tempfile.TemporaryDirectory() as tmpdir:
+        base_dir = tmpdir
         config_file_path = os.path.join(tmpdir, "cfg.yaml")  
-        job_record_file = os.path.join(tmpdir, 'job_record.pkl') 
+        job_record_file_path = os.path.join(tmpdir, 'job_record.pkl') 
         with open(config_file_path, "w") as fp:
             fp.write(CONFIG)
+        
+        # making an example job record file. 
+        test_config = galsim.config.ReadConfig(config_file_path)[0]
+        test_logger = logging.getLogger("pipeline")
+        galsim_step = [GalSimRunner(test_config, base_dir, logger=test_logger)]
+        pipe_prev = Pipeline(
+            galsim_step, base_dir, logger=test_logger, verbosity=1, 
+            log_file=None, name="pipeline", config=test_config,
+            record_file=job_record_file_path,
+        )
+        pipe_prev._save_restart(False)
 
-        base_dir = tmpdir
-        step_names = []
-        for step_name in DEFAULT_STEPS:
-            step_names.append(Step(None, base_dir, name=step_name, logger=None, verbosity=None, log_file=None))
+        # step_names = []
+        # for step_name in DEFAULT_STEPS:
+        #     step_names.append(Step(None, base_dir, name=step_name, logger=None, verbosity=None, log_file=None))
 
     	# when starting from the previous run. logger=None, record_file=None, base_dir=None.
-    	# What should I test here?
-        pipe_cont = Pipeline.from_record_file(config_file_path, job_record_file, base_dir=None, logger=None, verbosity=1, log_file=None, name="pipeline_cont", step_names=step_names, new_params=None, record_file=None)
-        assert pipe_cont.stash == Stash.load(job_record_file, base_dir, step_names)
-        #assert pipe_cont == Pipeline(...)
-"""
+    	# step_names is None. Test when step_names is not None later. 
+        pipe_cont = Pipeline.from_record_file(
+            config_file_path, job_record_file_path , base_dir=None, 
+            logger=None, verbosity=1, log_file=None, name="pipeline_cont", 
+            step_names=None, new_params=None, record_file=None, 
+        )
+        # When step_names is None, step_names is created in from_config_file(). 
+        step_names = ["galsim", "single_band_swarp"]
+        stsh = Stash.load(job_record_file_path, base_dir, step_names)
+        assert pipe_cont.stash == stsh
+        
+        # Do I test line 122-123? stsh["env"] is empty. 
+        # Do I test line 124? assert pipe_cont == Pipeline(...)
+
 
 def test_pipeline_from_config_file():
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -498,16 +518,18 @@ def test_pipeline_from_config_file():
         # test line 197 later. This is when elements in step_names are not in config. 
         # 'galsim' is going to be added to steps first, and then step_class(other steps) is going to be added.
         # assumes step_class is not in step_config. skip line 203-208 and go to line 209.
-        #assert pipe_conf.steps == [GalSimRunner(config, base_dir, logger=logging.getLogger("pipeline")), SingleBandSwarpRunner(config, base_dir, logger=logging.getLogger("pipeline"), verbosity=1, name="single_band_swarp")]
-
-
+        assert isinstance(pipe_conf.steps[0], GalSimRunner)
+        assert isinstance(pipe_conf.steps[1], SingleBandSwarpRunner)
 
 
 
 @mock.patch("eastlake.pipeline.GalSimRunner")
-def test_pipeline_from_config_file_execute(galsim_step_mock):
+@mock.patch("eastlake.pipeline.SingleBandSwarpRunner")
+def test_pipeline_from_config_file_execute(galsim_step_mock, singlebandswarp_step_mock):
     galsim_step_mock.return_value.name = "galsim"
-    galsim_step_mock.return_value.execute_step.return_value = (1, 2)
+    galsim_step_mock.return_value.execute_step.return_value = (0, 1)
+    singlebandswarp_step_mock.return_value.name = "single_band_swarp"
+    singlebandswarp_step_mock.return_value.execute_step.return_value = (0, 2)
 
     with tempfile.TemporaryDirectory() as tmpdir:
         config_file_path = os.path.join(tmpdir, "cfg.yaml")
@@ -518,9 +540,31 @@ def test_pipeline_from_config_file_execute(galsim_step_mock):
 
         pl = Pipeline.from_config_file(
             config_file_path, base_dir, logger=None, verbosity=1,
-            log_file=None, name="pipeline", step_names=["galsim"], new_params=None,
+            log_file=None, name="pipeline", step_names=["galsim", "single_band_swarp"], new_params=None,
             record_file=None,
         )
 
         pl.execute()
         galsim_step_mock.return_value.execute_step.assert_called()
+        singlebandswarp_step_mock.return_value.execute_step.assert_called()
+
+        # testing line 260. 
+        # steps would be ["galsim", "single_band_swarp"]. 
+        assert pl.stash["completed_step_names"] == [("galsim", 0), ("single_band_swarp", 0)]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
