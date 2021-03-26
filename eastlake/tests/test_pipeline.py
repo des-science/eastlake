@@ -522,14 +522,16 @@ def test_pipeline_from_config_file():
         assert isinstance(pipe_conf.steps[1], SingleBandSwarpRunner)
 
 
-
-@mock.patch("eastlake.pipeline.GalSimRunner")
 @mock.patch("eastlake.pipeline.SingleBandSwarpRunner")
+@mock.patch("eastlake.pipeline.GalSimRunner")
 def test_pipeline_from_config_file_execute(galsim_step_mock, singlebandswarp_step_mock):
+
     galsim_step_mock.return_value.name = "galsim"
-    galsim_step_mock.return_value.execute_step.return_value = (0, 1)
+    galsim_step_mock.side_effect = Stash('foo', ["galsim", "single_band_swarp"])
+    galsim_step_mock.return_value.execute_step.return_value = (0, Stash('foo', ["galsim", "single_band_swarp"]))
     singlebandswarp_step_mock.return_value.name = "single_band_swarp"
-    singlebandswarp_step_mock.return_value.execute_step.return_value = (0, 2)
+    singlebandswarp_step_mock.side_effect = Stash('foo', ["galsim", "single_band_swarp"])
+    singlebandswarp_step_mock.return_value.execute_step.return_value = (0, Stash('foo', ["galsim", "single_band_swarp"]))
 
     with tempfile.TemporaryDirectory() as tmpdir:
         config_file_path = os.path.join(tmpdir, "cfg.yaml")
