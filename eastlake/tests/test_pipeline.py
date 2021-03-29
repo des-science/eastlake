@@ -445,18 +445,18 @@ def test_pipeline_from_config_file():
         # step_names must exist if config['pipeline'] does not exist.
         # In that case, step_names in from_config_file arguments go through the
         # rest to make steps list. -> TEST THIS LATER
-        config_nopl_path = os.path.join(tmpdir, "cfg_nopl.yaml")
+        config_nopl_path = os.path.join(tmpdir, "config.yaml")
         with open(config_nopl_path, "w") as fp:
             fp.write(CONFIG_NOPL)
-        # nopipe_config = Pipeline.from_config_file(
-        #     config_nopl_path, base_dir, logger=None, verbosity=1,
-        #     log_file=None, name="pipeline", step_names=["galsim"], new_params=None,
-        #     record_file=None,
-        # )
-        # loading up config,yaml that is saved on disk.
+        nopipe_config = Pipeline.from_config_file(
+            config_nopl_path, base_dir, logger=None, verbosity=1,
+            log_file=None, name="pipeline", step_names=["galsim"], new_params=None,
+            record_file=None,
+        )
+        # loading up config.yaml that is saved on disk.
         with open(os.path.join(base_dir, "config.yaml"), "r") as f:
             config_nopl = yaml.load(f, Loader=yaml.Loader)
-        assert config_nopl['pipeline'] == {'ntiles': 1}
+        assert config_nopl["pipeline"] == {'ntiles': 1}
 
         # if step_names are None. config['pipeline'] must exist.
         # testing Line 182-216. Use pipe_conf as a default Pipeline class.
