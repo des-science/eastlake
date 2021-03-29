@@ -180,61 +180,6 @@ psf:
         beta: 3.
         fwhm: 1.
 
-#No knots
-gal:
-    type: Sum
-    items:
-        - type: Exponential
-          half_light_radius: { type: catalog_sampler_value, col: bdf_hlr }
-          ellip:
-              type: GBeta
-              g: { type: Eval, str: "np.sqrt(g1**2 + g2**2)", fg1: { type: catalog_sampler_value, col: bdf_g1 }, fg2: { type: catalog_sampler_value, col: bdf_g2 } }
-              beta: { type: Random }
-          flux: { type: Eval, str: "1-fracdev", ffracdev: { type: catalog_sampler_value, col: bdf_fracdev } }
-
-        - type: DeVaucouleurs
-          half_light_radius: '@gal.items.0.half_light_radius'
-          ellip: "@gal.items.0.ellip"
-          flux: "$1-@gal.items.0.flux"
-
-    flux:
-        type: Eval
-        #Input catalog has mag
-        #convert to flux via flux = 10**(0.4*(mag_zp-mag))
-        str: "10**(0.4*(mag_zp-mag))"
-        fmag: { type: catalog_sampler_value, col: *gal_mag_col }
-
-star:
-    type: Gaussian  # Basically a delta function.
-    sigma: 1.e-6
-    flux:
-        type: Eval
-        str: "10**( 0.4 * (mag_zp - mag))"
-        fmag: { type: DESStarValue, col: *star_mag_col }
-
-stamp:
-    type: MixedScene
-    objects:
-        # These give the probability of picking each kind of object.  The
-        # choice of which one is picked for a given object is written to the
-        # base dict as base['current_obj_type'] and is thus available as
-        # @current_obj_type.  The actual constructed object is similarly
-        # available as @current_obj.  And the type by number in this list
-        # (starting with 0 for the first) is @current_obj_type_index.
-        star: 0.2
-        gal: 0.8
-    obj_type: {type: Eval,
-              str: "object_type_list[i]",
-              ii: "$obj_num-start_obj_num"
-              }
-    draw_method: auto
-    shear:
-        type: G1G2
-        g1: 0.02
-        g2: 0.00
-    gsparams:
-        maximum_fft_size: 16384
-
 output:
     type: DESTile
     nproc: 32
@@ -399,10 +344,11 @@ def test_pipeline_state(capsys):
 
         # record_file check. Use pl.
         assert pl.record_file == os.path.join(base_dir, 'job_record.pkl')
+        rec = os.path.join(base_dir, 'job_record.pkl')
         assert Pipeline(steps, base_dir, logger=None, verbosity=1, log_file=None, name="pipeline", config=None,
-                        record_file=base_dir + '/job_record.pkl').record_file == os.path.join(base_dir, 'job_record.pkl')
+                        record_file=base_dir + '/job_record.pkl').record_file == rec
         assert Pipeline(steps, base_dir, logger=None, verbosity=1, log_file=None, name="pipeline",
-                        config=None, record_file=None).record_file == os.path.join(base_dir, 'job_record.pkl')
+                        config=None, record_file=None).record_file == rec
 
         # init stash. Use pl.
         assert pl.stash == Stash(base_dir, [s.name for s in steps])
@@ -462,8 +408,8 @@ def test_pipeline_from_config_file():
             log_file=None, name="pipeline", step_names=None, new_params=None,
             record_file=None,
         )
-        with open(os.path.join(base_dir, "config.yaml"), "r") as f:
-            config = yaml.load(f, Loader=yaml.Loader)
+        # with open(os.path.join(base_dir, "config.yaml"), "r") as f:
+        #     config = yaml.load(f, Loader=yaml.Loader)
         assert pipe_conf.logger == logging.getLogger("pipeline")  # logger is None.
         # len(config) is 1.
         # assert config == galsim.config.ReadConfig(config_file_path)[0]
@@ -502,11 +448,11 @@ def test_pipeline_from_config_file():
         config_nopl_path = os.path.join(tmpdir, "cfg_nopl.yaml")
         with open(config_nopl_path, "w") as fp:
             fp.write(CONFIG_NOPL)
-        nopipe_config = Pipeline.from_config_file(
-            config_nopl_path, base_dir, logger=None, verbosity=1,
-            log_file=None, name="pipeline", step_names=["galsim"], new_params=None,
-            record_file=None,
-        )
+        # nopipe_config = Pipeline.from_config_file(
+        #     config_nopl_path, base_dir, logger=None, verbosity=1,
+        #     log_file=None, name="pipeline", step_names=["galsim"], new_params=None,
+        #     record_file=None,
+        # )
         # loading up config,yaml that is saved on disk.
         with open(os.path.join(base_dir, "config.yaml"), "r") as f:
             config_nopl = yaml.load(f, Loader=yaml.Loader)
