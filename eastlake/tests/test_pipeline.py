@@ -411,6 +411,16 @@ def test_pipeline_from_config_file():
         # with open(os.path.join(base_dir, "config.yaml"), "r") as f:
         #     config = yaml.load(f, Loader=yaml.Loader)
         assert pipe_conf.logger == logging.getLogger("pipeline")  # logger is None.
+
+        # if step_names are None. config['pipeline'] must exist.
+        # testing Line 182-216. Use pipe_conf as a default Pipeline class.
+        assert pipe_conf.base_dir == os.path.abspath(base_dir)
+        # test line 197 later. This is when elements in step_names are not in config.
+        # 'galsim' is going to be added to steps first, and then step_class(other steps) is going to be added.
+        # assumes step_class is not in step_config. skip line 203-208 and go to line 209.
+        assert isinstance(pipe_conf.steps[0], GalSimRunner)
+        assert isinstance(pipe_conf.steps[1], SingleBandSwarpRunner)
+
         # len(config) is 1.
         # assert config == galsim.config.ReadConfig(config_file_path)[0]
 
@@ -445,10 +455,10 @@ def test_pipeline_from_config_file():
         # step_names must exist if config['pipeline'] does not exist.
         # In that case, step_names in from_config_file arguments go through the
         # rest to make steps list. -> TEST THIS LATER
-        config_nopl_path = os.path.join(tmpdir, "config.yaml")
+        config_nopl_path = os.path.join(tmpdir, "cfg-nopl.yaml")
         with open(config_nopl_path, "w") as fp:
             fp.write(CONFIG_NOPL)
-        nopipe_config = Pipeline.from_config_file(
+        Pipeline.from_config_file(
             config_nopl_path, base_dir, logger=None, verbosity=1,
             log_file=None, name="pipeline", step_names=["galsim"], new_params=None,
             record_file=None,
@@ -457,15 +467,6 @@ def test_pipeline_from_config_file():
         with open(os.path.join(base_dir, "config.yaml"), "r") as f:
             config_nopl = yaml.load(f, Loader=yaml.Loader)
         assert config_nopl["pipeline"] == {'ntiles': 1}
-
-        # if step_names are None. config['pipeline'] must exist.
-        # testing Line 182-216. Use pipe_conf as a default Pipeline class.
-        assert pipe_conf.base_dir == os.path.abspath(base_dir)
-        # test line 197 later. This is when elements in step_names are not in config.
-        # 'galsim' is going to be added to steps first, and then step_class(other steps) is going to be added.
-        # assumes step_class is not in step_config. skip line 203-208 and go to line 209.
-        assert isinstance(pipe_conf.steps[0], GalSimRunner)
-        assert isinstance(pipe_conf.steps[1], SingleBandSwarpRunner)
 
 
 @mock.patch("eastlake.pipeline.STEP_CLASSES")
