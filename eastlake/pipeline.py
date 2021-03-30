@@ -236,33 +236,34 @@ class Pipeline(object):
         # Loop through steps calling execute function. Pass self.stash and any new_params
         # Move to base_dir, first get cwd which we'll return to later
         cwd = os.getcwd()
-        os.chdir(self.base_dir)
+        try:
+            os.chdir(self.base_dir)
 
-        for step, new_params in zip(self.steps, new_params_list):
-            if skip_completed_steps:
-                if (step.name, 0) in self.stash["completed_step_names"]:
-                    self.logger.error("""Skipping step %s since already completed with status 0,
-                    and you have skip_completed_steps=True""" % step.name)
-                    continue
-            self.logger.error(THINGS_GOING_FINE+"Running step %s\n" %
-                              step.name + THINGS_GOING_FINE)
-            status, self.stash = step.execute_step(self.stash, new_params=new_params)
-            if status != 0:
-                self.logger.error(
-                    PANIC_STRING
-                    + "step %s return status %d: quitting pipeline here\n" % (step.name, status)
-                    + PANIC_STRING)
-                return status
-            else:
-                self.logger.error(THINGS_GOING_FINE + "Completed step %s\n" %
+            for step, new_params in zip(self.steps, new_params_list):
+                if skip_completed_steps:
+                    if (step.name, 0) in self.stash["completed_step_names"]:
+                        self.logger.error("""Skipping step %s since already completed with status 0,
+                        and you have skip_completed_steps=True""" % step.name)
+                        continue
+                self.logger.error(THINGS_GOING_FINE+"Running step %s\n" %
                                   step.name + THINGS_GOING_FINE)
-            # record that we've completed this step
-            self.stash["completed_step_names"].append((step.name, status))
-            # save stash
-            self._save_restart(no_overwrite_job_record)
-
-        # Return to the previous cwd
-        os.chdir(cwd)
+                status, self.stash = step.execute_step(self.stash, new_params=new_params)
+                if status != 0:
+                    self.logger.error(
+                        PANIC_STRING
+                        + "step %s return status %d: quitting pipeline here\n" % (step.name, status)
+                        + PANIC_STRING)
+                    return status
+                else:
+                    self.logger.error(THINGS_GOING_FINE + "Completed step %s\n" %
+                                      step.name + THINGS_GOING_FINE)
+                # record that we've completed this step
+                self.stash["completed_step_names"].append((step.name, status))
+                # save stash
+                self._save_restart(no_overwrite_job_record)
+        finally:
+            # Return to the previous cwd
+            os.chdir(cwd)
         return 0
 
     def _save_restart(self, no_overwrite_job_record):
