@@ -264,7 +264,6 @@ class Pipeline(object):
         finally:
             # Return to the previous cwd
             os.chdir(cwd)
-        
         return 0
 
     def _save_restart(self, no_overwrite_job_record):
