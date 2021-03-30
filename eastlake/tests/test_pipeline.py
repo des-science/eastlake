@@ -344,9 +344,10 @@ def test_pipeline_state(capsys):
 
         # record_file check. Use pl.
         assert pl.record_file == os.path.join(base_dir, 'job_record.pkl')
-        rec = os.path.join(base_dir, 'job_record.pkl')
+        rec = os.path.join(base_dir, 'job_rec_pl.pkl')
         assert Pipeline(steps, base_dir, logger=None, verbosity=1, log_file=None, name="pipeline", config=None,
-                        record_file=base_dir + '/job_record.pkl').record_file == rec
+                        record_file=base_dir + '/job_rec_pl.pkl').record_file == rec
+        rec = os.path.join(base_dir, 'job_record.pkl')
         assert Pipeline(steps, base_dir, logger=None, verbosity=1, log_file=None, name="pipeline",
                         config=None, record_file=None).record_file == rec
 
