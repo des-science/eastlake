@@ -16,7 +16,7 @@ from ..des_tile import (
     Blacklist, get_orig_coadd_file)
 
 
-class GalSimRunner(Step):
+class MontaraGalSimRunner(Step):
     """
     Pipeline step which runs galsim
 
