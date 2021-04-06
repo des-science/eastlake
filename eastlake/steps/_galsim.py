@@ -25,7 +25,7 @@ class MontaraGalSimRunner(Step):
     """
     def __init__(self, config, base_dir, name="galsim", logger=None,
                  verbosity=0, log_file=None):
-        super(GalSimRunner, self).__init__(
+        super().__init__(
             config, base_dir, name=name, logger=logger, verbosity=verbosity,
             log_file=log_file)
         self.config['output']['dir'] = base_dir
