@@ -61,7 +61,6 @@ output :
     type : Fits
     dir : output_yaml
     file_name : demo1.fits
-    tilename : DES0003-3832
 """
 
 def test_galsim_execute():
@@ -80,7 +79,7 @@ def test_galsim_execute():
         galsim_stash = Stash(base_dir, ["galsim"])
         status, stsh = step_galsim[0].execute_step(galsim_stash, new_params=None)
 
-        #assert stsh["tilename"] == "DES0003-3832"
+        assert os.path.isfile(os.path.join(base_dir, 'demo1.fits'))
 
 
 
