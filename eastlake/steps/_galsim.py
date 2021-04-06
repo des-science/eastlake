@@ -453,12 +453,6 @@ class GalSimRunner(Step):
             log_file=log_file)
         self.config['output']['dir'] = base_dir
 
-        # For the downstream interpretation of these sims, it's going to be
-        # quite important to have various quantities saved in the truth files.
-        # And that the column names correspond to what we expect them to...so
-        # do a bit of enforcement of that here.
-        output = self.config["output"]
-
         self.config_orig = galsim.config.CopyConfig(self.config)
 
     def execute(self, stash, new_params=None, except_abort=False, verbosity=1.,
@@ -483,21 +477,8 @@ class GalSimRunner(Step):
 
         galsim.config.Process(config, self.logger, except_abort=except_abort)
 
-        self.update_stash(config, stash)
-
         # Return status and stash
         return 0, stash
-
-    def update_stash(self, config, stash):
-        # Update the stash with information on image files etc. required by
-        # following steps.
-
-        # Get the output type and number of files
-        image_type = config["output"]["type"]
-
-        # Add the PSF config
-        stash["psf_config"] = config["psf"]
-        # add draw_method if present
 
 
     @classmethod
