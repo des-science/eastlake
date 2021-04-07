@@ -482,10 +482,10 @@ class GalSimRunner(Step):
 
 
     @classmethod
-    def from_config_file(cls, config_file, logger=None):
+    def from_config_file(cls, config_file, base_dir, logger=None):
         all_config = galsim.config.ReadConfig(config_file, None, logger)
         assert len(all_config) == 1
-        return cls(all_config[0], logger=logger)
+        return cls(all_config[0], base_dir, logger=logger)
 
     def set_base_dir(self, base_dir):
         self.base_dir = base_dir
