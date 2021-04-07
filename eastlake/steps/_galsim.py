@@ -16,16 +16,17 @@ from ..des_tile import (
     Blacklist, get_orig_coadd_file)
 
 
-class GalSimRunner(Step):
+class MontaraGalSimRunner(Step):
     """
     Pipeline step which runs galsim
 
     The config attribute is a little different here, since it is updated when
     running GalSim
     """
+
     def __init__(self, config, base_dir, name="galsim", logger=None,
                  verbosity=0, log_file=None):
-        super(GalSimRunner, self).__init__(
+        super().__init__(
             config, base_dir, name=name, logger=logger, verbosity=verbosity,
             log_file=log_file)
         self.config['output']['dir'] = base_dir
@@ -265,12 +266,12 @@ class GalSimRunner(Step):
                             y_pos_list = []
                             L = 10000  # tile length in pixels
                             nobj_per_row = int(np.ceil(np.sqrt(nobjects)))
-                            object_sep = L/nobj_per_row
+                            object_sep = L / nobj_per_row
                             for i in range(nobjects):
                                 x_pos_list.append(
-                                    (object_sep/2. + object_sep * (i % nobj_per_row)))
+                                    (object_sep / 2. + object_sep * (i % nobj_per_row)))
                                 y_pos_list.append(
-                                    object_sep/2. + object_sep * (i // nobj_per_row))
+                                    object_sep / 2. + object_sep * (i // nobj_per_row))
                             # get coadd wcs
                             coadd_file = get_orig_coadd_file(
                                 desdata,
@@ -433,6 +434,60 @@ class GalSimRunner(Step):
         all_config = galsim.config.ReadConfig(config_file, None, logger)
         assert len(all_config) == 1
         return cls(all_config[0], logger=logger)
+
+    def set_base_dir(self, base_dir):
+        self.base_dir = base_dir
+        # Update the output directory.
+        self.config['output']['dir'] = base_dir
+
+
+class GalSimRunner(Step):
+    """
+    Pipeline step which runs galsim
+
+    The config attribute is a little different here, since it is updated when
+    running GalSim
+    """
+
+    def __init__(self, config, base_dir, name="galsim", logger=None,
+                 verbosity=0, log_file=None):
+        super().__init__(
+            config, base_dir, name=name, logger=logger, verbosity=verbosity,
+            log_file=log_file)
+        self.config['output']['dir'] = base_dir
+
+        self.config_orig = galsim.config.CopyConfig(self.config)
+
+    def execute(self, stash, new_params=None, except_abort=False, verbosity=1.,
+                log_file=None, comm=None):
+
+        if comm is not None:
+            rank = comm.Get_rank()
+        else:
+            rank = 0
+
+        if new_params is not None:
+            galsim.config.UpdateConfig(self.config, new_params)
+
+        # Make a copy of original config
+        config = galsim.config.CopyConfig(self.config)
+        if rank == 0:
+            self.logger.debug(
+                "Process config dict: \n%s", pprint.pformat(config))
+
+        if self.name not in stash:
+            stash[self.name] = {}
+
+        galsim.config.Process(config, self.logger, except_abort=except_abort)
+
+        # Return status and stash
+        return 0, stash
+
+    @classmethod
+    def from_config_file(cls, config_file, base_dir, logger=None):
+        all_config = galsim.config.ReadConfig(config_file, None, logger)
+        assert len(all_config) == 1
+        return cls(all_config[0], base_dir, logger=logger)
 
     def set_base_dir(self, base_dir):
         self.base_dir = base_dir
