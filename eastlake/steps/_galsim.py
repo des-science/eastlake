@@ -23,6 +23,7 @@ class MontaraGalSimRunner(Step):
     The config attribute is a little different here, since it is updated when
     running GalSim
     """
+
     def __init__(self, config, base_dir, name="galsim", logger=None,
                  verbosity=0, log_file=None):
         super().__init__(
@@ -265,12 +266,12 @@ class MontaraGalSimRunner(Step):
                             y_pos_list = []
                             L = 10000  # tile length in pixels
                             nobj_per_row = int(np.ceil(np.sqrt(nobjects)))
-                            object_sep = L/nobj_per_row
+                            object_sep = L / nobj_per_row
                             for i in range(nobjects):
                                 x_pos_list.append(
-                                    (object_sep/2. + object_sep * (i % nobj_per_row)))
+                                    (object_sep / 2. + object_sep * (i % nobj_per_row)))
                                 y_pos_list.append(
-                                    object_sep/2. + object_sep * (i // nobj_per_row))
+                                    object_sep / 2. + object_sep * (i // nobj_per_row))
                             # get coadd wcs
                             coadd_file = get_orig_coadd_file(
                                 desdata,
@@ -439,6 +440,7 @@ class MontaraGalSimRunner(Step):
         # Update the output directory.
         self.config['output']['dir'] = base_dir
 
+
 class GalSimRunner(Step):
     """
     Pipeline step which runs galsim
@@ -446,6 +448,7 @@ class GalSimRunner(Step):
     The config attribute is a little different here, since it is updated when
     running GalSim
     """
+
     def __init__(self, config, base_dir, name="galsim", logger=None,
                  verbosity=0, log_file=None):
         super().__init__(
@@ -479,7 +482,6 @@ class GalSimRunner(Step):
 
         # Return status and stash
         return 0, stash
-
 
     @classmethod
     def from_config_file(cls, config_file, base_dir, logger=None):
