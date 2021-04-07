@@ -1,17 +1,34 @@
 import galsim
 import os
-import numpy as np
 import yaml
 
-from galsim.config.output import OutputBuilder
-from .fits import writeMulti
-import astropy.io.fits as pyfits
-from .utils import safe_mkdir
-from .tile_setup import Tile
-import shutil
-from collections import OrderedDict
-
 MODES = ["single-epoch", "coadd"]  # beast too?
+
+
+def _replace_desdata(pth, desdata):
+
+    """Replace the NERSC DESDATA path if needed.
+    Parameters
+    ----------
+    pth : str
+        The path string on which to do replacement.
+    desdata : str
+        The desired DESDATA. If None, then the path is simply returned as is.
+    Returns
+    -------
+    pth : str
+        The path, possible with DESDATA in the path replaced with the desired
+        one.
+    """
+    if desdata is None:
+        return pth
+
+    nersc_desdata = '/global/project/projectdirs/des/y3-image-sims'
+    if (nersc_desdata in pth and
+            os.path.normpath(desdata) != os.path.normpath(nersc_desdata)):
+        return pth.replace(nersc_desdata, desdata)
+    else:
+        return pth
 
 
 def get_source_list_files(base_dir, desrun, tilename, bands):
