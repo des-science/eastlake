@@ -88,7 +88,7 @@ def test_galsim_execute():
         gal_model = galsim.Convolve(gal_model, psf_model)
         gal_stamp = galsim.Image(scale=0.2)
         gal_model.drawImage(image=gal_stamp)
-        assert obj.all() == gal_stamp.array.all()
+        assert np.array_equal(obj, gal_stamp.array)
 
 
 def test_galsim_from_config_file():
