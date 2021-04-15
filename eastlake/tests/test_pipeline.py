@@ -309,8 +309,7 @@ def test_pipeline_state(capsys):
         assert pl.name == 'pipeline'
         # calling get_logger(). check for print statements
         captured = capsys.readouterr()
-        assert "log_file=" in captured.out
-        assert "filemode=" in captured.out
+        assert "log file|mode" in captured.out
         logging.basicConfig(format="%(message)s", level=logging.WARNING, stream=sys.stdout, filemode='w')
         log1 = logging.getLogger(pl.name)
         assert pl.logger == log1
