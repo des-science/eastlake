@@ -302,7 +302,7 @@ class MEDSRunner(Step):
 
                     # Are we rejectlisting?
                     if self.config["use_rejectlist"]:
-                        rejectlist = Rejectlist(stash["rejectlist"])
+                        rejectlist = RejectList(stash["rejectlist"])
                         # keep only non-rejectlisted files
                         is_rejectlisted = [rejectlist.img_file_is_rejectlisted(f) for f in img_files]
                         img_files = [f for (i, f) in enumerate(img_files) if not is_rejectlisted[i]]
