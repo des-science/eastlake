@@ -22,6 +22,7 @@ def get_logger(logger_name, verbosity, log_file=None, filemode="w"):
             log_file or "stdout",
             filemode,
         ),
+        flush=True,
     )
 
     # initialize a logger Galsim-style
