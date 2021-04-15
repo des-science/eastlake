@@ -5,7 +5,7 @@ import shutil
 import fitsio
 import numpy as np
 
-from ..des_tile import get_orig_coadd_file
+from ..des_files import get_orig_coadd_file
 from ..step import Step
 from ..utils import safe_mkdir
 

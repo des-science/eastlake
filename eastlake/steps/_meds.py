@@ -23,9 +23,10 @@ from ..des_piff import DES_Piff
 from .meds_psf_interface import PSFForMeds
 from ..step import Step
 from ..stash import Stash
-from ..des_tile import (
+from ..des_files import (
     get_orig_coadd_file, get_psfex_path, get_psfex_path_coadd, get_bkg_path,
-    get_piff_path, Blacklist)
+    get_piff_path)
+from ..rejectlist import RejectList
 
 # This is for MEDS boxsize calculation.
 FWHM_FAC = 2*np.sqrt(2*np.log(2))
@@ -67,9 +68,9 @@ class MEDSRunner(Step):
             self.config["magzp_ref"] = 30.
         if "stage_output" not in self.config:
             self.config["stage_output"] = False
-        if "use_blacklist" not in self.config:
-            # We can blacklist some of the images
-            self.config["use_blacklist"] = True
+        if "use_rejectlist" not in self.config:
+            # We can rejectlist some of the images
+            self.config["use_rejectlist"] = True
 
     def clear_stash(self, stash):
         # If we continued the pipeline from a previous job record file,
@@ -93,21 +94,21 @@ class MEDSRunner(Step):
         stash["meds_run"] = self.config["meds_run"]
         stash["env"].append(("MEDS_DIR", os.environ["MEDS_DIR"]))
 
-        # If we used DES_Piff psfs, we should have also done some blacklisting.
-        # Make sure then that there is a blacklist in stash["blacklist"],
-        # and that self.config["use_blacklist"] is True
+        # If we used DES_Piff psfs, we should have also done some rejectlisting.
+        # Make sure then that there is a rejectlist in stash["rejectlist"],
+        # and that self.config["use_rejectlist"] is True
         if stash["psf_config"]["type"] == "DES_Piff":
             try:
-                assert self.config["use_blacklist"] is True
+                assert self.config["use_rejectlist"] is True
             except AssertionError as e:
                 self.logger.error("""Found the psf type DES_Piff,
-                but use_blacklist is set to False. This will not stand""")
+                but use_rejectlist is set to False. This will not stand""")
                 raise(e)
-        if self.config["use_blacklist"]:
+        if self.config["use_rejectlist"]:
             try:
-                assert "blacklist" in stash
+                assert "rejectlist" in stash
             except AssertionError as e:
-                self.logger.error("""use_blacklist is True, but no 'blacklist'
+                self.logger.error("""use_rejectlist is True, but no 'rejectlist'
                 entry found in stash""")
                 raise(e)
 
@@ -299,15 +300,15 @@ class MEDSRunner(Step):
                     img_files = stash.get_filepaths(
                         "img_files", tilename, band=band)
 
-                    # Are we blacklisting?
-                    if self.config["use_blacklist"]:
-                        blacklist = Blacklist(stash["blacklist"])
-                        # keep only non-blacklisted files
-                        is_blacklisted = [blacklist.img_file_is_blacklisted(f) for f in img_files]
-                        img_files = [f for (i, f) in enumerate(img_files) if not is_blacklisted[i]]
-                        wgt_files = [f for (i, f) in enumerate(img_data['wgt_files']) if not is_blacklisted[i]]
-                        msk_files = [f for (i, f) in enumerate(img_data['msk_files']) if not is_blacklisted[i]]
-                        mag_zps = [m for (i, m) in enumerate(img_data['mag_zps']) if not is_blacklisted[i]]
+                    # Are we rejectlisting?
+                    if self.config["use_rejectlist"]:
+                        rejectlist = Rejectlist(stash["rejectlist"])
+                        # keep only non-rejectlisted files
+                        is_rejectlisted = [rejectlist.img_file_is_rejectlisted(f) for f in img_files]
+                        img_files = [f for (i, f) in enumerate(img_files) if not is_rejectlisted[i]]
+                        wgt_files = [f for (i, f) in enumerate(img_data['wgt_files']) if not is_rejectlisted[i]]
+                        msk_files = [f for (i, f) in enumerate(img_data['msk_files']) if not is_rejectlisted[i]]
+                        mag_zps = [m for (i, m) in enumerate(img_data['mag_zps']) if not is_rejectlisted[i]]
                     else:
                         wgt_files, msk_files = img_data['wgt_files'], img_data['msk_files']
 

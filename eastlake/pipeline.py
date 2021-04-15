@@ -3,6 +3,7 @@
 # then a 'Pipeline' class for running these steps
 from __future__ import print_function
 import galsim
+import galsim.config.process
 import os
 import yaml
 import pickle
@@ -37,6 +38,22 @@ STEP_CLASSES = OrderedDict([
 ])
 
 DEFAULT_STEPS = ["galsim", "swarp", "sextractor", "meds"]
+
+
+def register_pipeline_step(step_name, step_class):
+    """Register a pipeline step w/ eastlake
+
+    Parameters
+    ----------
+    step_name : str
+        The name of the step.
+    step_class : class
+        The step class.
+    """
+    if step_name in STEP_CLASSES:
+        raise ValueError("A step with the name '%s' already exists!" % step_name)
+    global STEP_CLASSES
+    STEP_CLASSES[step_name] = step_class
 
 
 class Pipeline(object):
@@ -74,6 +91,7 @@ class Pipeline(object):
                           ' '.join([s.name for s in self.steps]))
 
         if config is not None:
+            galsim.config.process.ImportModules(config)
             with open(os.path.join(self.base_dir, "config.yaml"), 'w') as f:
                 yaml.dump(config, f)
 
@@ -145,6 +163,8 @@ class Pipeline(object):
             raise RuntimeError("Multiple documents in config file not supported, sorry.")
 
         config = config[0]
+
+        galsim.config.process.ImportModules(config)
 
         # Process templates.
         # allow for template config in the same directory as the config file

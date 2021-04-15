@@ -1,5 +1,4 @@
 from __future__ import print_function
-import logging
 import os
 
 import galsim
@@ -14,17 +13,17 @@ from ngmix.admom import Admom
 
 from scipy.interpolate import CloughTocher2DInterpolator
 
-LOGGER = logging.getLogger(__name__)
-
 # pixel scale used for fitting the Piff models
 PIFF_SCALE = 0.25
 
 
 class DES_Piff(object):
     """A wrapper for Piff to use with Galsim.
+
     This wrapper uses ngmix to fit smooth models to the Piff PSF images. The
     parameters of these models are then interpolated across the SE image
     and used to generate a smooth approximation to the PSF.
+
     Parameters
     ----------
     file_name : str
@@ -42,13 +41,13 @@ class DES_Piff(object):
         # Read the Piff file. This may fail if the Piff
         # file is missing. We catch this and continue
         # since if we're substituting in some different
-        # PSF model for blacklisted piff files, we'll
+        # PSF model for rejectlisted piff files, we'll
         # never actually use self._piff
         try:
             self._piff = piff.read(
                 os.path.expanduser(os.path.expandvars(file_name)))
         except IOError:
-            print("failed to load Piff file, hopefully it's blacklisted...")
+            print("failed to load Piff file, hopefully it's rejectlisted...")
             self._piff = None
         self._did_fit = False
         self.no_smooth = no_smooth
@@ -161,6 +160,7 @@ class DES_Piff(object):
     def _draw(self, image_pos, wcs=None, n_pix=None,
               x_interpolant='lanczos15', gsparams=None):
         """Get an image of the PSF at the given location.
+
         Parameters
         ----------
         image_pos : galsim.Position
@@ -174,6 +174,7 @@ class DES_Piff(object):
             The interpolant to use.
         gsparams : galsim.GSParams, optional
             Ootional galsim configuration data to pass along.
+
         Returns
         -------
         psf : galsim.InterpolatedImage
@@ -221,6 +222,7 @@ class DES_Piff(object):
     def getPSF(self, image_pos, wcs=None,
                no_smooth=False, n_pix=None, **kwargs):
         """Get an image of the PSF at the given location.
+
         Parameters
         ----------
         image_pos : galsim.Position
@@ -234,6 +236,7 @@ class DES_Piff(object):
             The image size to use when drawing without smoothing.
         **kargs : extra keyword arguments
             These are all ignored.
+
         Returns
         -------
         psf : galsim.GSObject
@@ -323,7 +326,7 @@ def BuildDES_Piff(config, base, ignore, gsparams, logger):
 def BuildDES_Piff_with_substitute(config, base, ignore, gsparams, logger):
     # This builder usually just calls BuildDES_Piff, but can also
     # be passed use_substitute = True, in which case it builds some
-    # other PSF. We use this for blacklisted Piff files.
+    # other PSF. We use this for rejectlisted Piff files.
     if "use_substitute" in config:
         use_substitute = galsim.config.ParseValue(config, "use_substitute",
                                                   base, bool)[0]
