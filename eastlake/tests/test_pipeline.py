@@ -16,8 +16,6 @@ TEST_DIR = os.getcwd()
 CONFIG = """\
 modules:
     - galsim.des
-    - galsim_extra
-    - montara
     - numpy
 
 pipeline:
@@ -229,8 +227,6 @@ output:
 CONFIG_NOPL = """\
 modules:
     - galsim.des
-    - galsim_extra
-    - montara
     - numpy
 
 input:
