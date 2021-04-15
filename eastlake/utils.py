@@ -17,8 +17,13 @@ LOGGING_LEVELS = {
 
 
 def get_logger(logger_name, verbosity, log_file=None, filemode="w"):
-    print("log_file=", log_file)
-    print("filemode=", filemode)
+    print(
+        "log file|mode: %s|%s" % (
+            log_file or "stdout",
+            filemode,
+        ),
+    )
+
     # initialize a logger Galsim-style
     logging_level = LOGGING_LEVELS[verbosity]
     if log_file is None:
