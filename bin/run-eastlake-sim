@@ -1,0 +1,154 @@
+#!/usr/bin/env python
+from __future__ import print_function
+import os
+from montara import get_logger
+from montara import Pipeline as EnsemblePipeline
+import argparse
+import datetime
+
+
+def ParseVariables(variables, logger):
+    new_params = {}
+    for v in variables:
+        logger.debug('Parsing additional variable: %s', v)
+        if '=' not in v:
+            raise ValueError(
+                'Improper variable specification.  Use field.item=value.')
+        key, value = v.split('=', 1)
+        # Try to evaluate the value string to allow people to input things like
+        # gal.rotate='{type : Rotate}'
+        # But if it fails (particularly with json), just assign the value as a
+        # string.
+        try:
+            try:
+                import yaml
+                value = yaml.load(value, Loader=yaml.Loader)
+            except ImportError:
+                # Don't require yaml.  json usually works for these.
+                import json
+                value = json.loads(value)
+        except Exception:
+            logger.debug(
+                'Unable to parse %s.  Treating it as a string.' % value)
+        new_params[key] = value
+
+    return new_params
+
+
+def parse_args():
+
+    description = "run a simulation w/ eastlake"
+    parser = argparse.ArgumentParser(description=description, add_help=True)
+    parser.add_argument('config_file', type=str, help="config file")
+    parser.add_argument('base_dir', type=str, help="base directory for output")
+    parser.add_argument(
+        'galsim_variables', type=str, nargs='*',
+        help=(
+            'additional galsim variables or modifications ' +
+            'to variables in the config file. ' +
+            'e.g. galsim foo.yaml output.nproc=-1 ' +
+            'gal.rotate="{type : Random}"'),
+        default=None)
+    parser.add_argument('--record_file', type=str, default=None,
+                        help="output job record file")
+    parser.add_argument(
+        '--resume_from', type=str, default=None,
+        help="job record file to start pipeline from")
+    parser.add_argument('--step_names', nargs='*', default=None)
+    parser.add_argument('--skip_completed_steps', action='store_true', default=False)
+    parser.add_argument('--logger_name', type=str, default="pipeline")
+    parser.add_argument(
+        '--no_overwrite_job_record', action='store_true', default=False)
+    parser.add_argument('-v', '--verbosity', default=1)
+    parser.add_argument('-l', '--logfile', default=None)
+    return parser.parse_args()
+
+
+def main():
+
+    args = parse_args()
+
+    # MPI can be a mess. We allow imports of mpi4py to fail, in case
+    # we just want to run in serial. However, if we're actually using
+    # mpirun or srun or something, and the import does fail, then things
+    # get messed up. So check for environment variables which suggest
+    # we are using mpi, attempt the import, and complain if this doesn't work
+    ntasks_srun = int(os.environ.get("SLURM_STEP_NUM_TASKS", 1))
+    ntasks_mpirun = int(os.environ.get("OMPI_COMM_WORLD_SIZE", 1))
+    if ntasks_srun > 1:
+        try:
+            from mpi4py import MPI  # noqa
+        except ImportError as e:
+            print("found SLURM_STEP_NUM_TASKS=%d but mpi4py failed to import" % ntasks_srun)
+            print("aborting.")
+            raise(e)
+    if ntasks_mpirun > 1:
+        try:
+            from mpi4py import MPI  # noqa
+        except ImportError as e:
+            print("found OMPI_COMM_WORLD_SIZE=%d but mpi4py failed to import" % ntasks_mpirun)
+            print("aborting.")
+            raise(e)
+
+    # Set output directory
+    base_dir = args.base_dir
+
+    # Get base_pipeline from config file.
+    config_file = args.config_file
+
+    # Setup the logger
+    # If we're resuming a pipeline (ie. if args.job_record_file is not None),
+    # then we probably want to append to the existing logfile, if not, we probably
+    # want to overwrite it, so set filemode='w'
+    filemode = 'w'
+    if args.resume_from is not None:
+        filemode = 'a'
+    logger = get_logger(
+        args.logger_name, args.verbosity,
+        log_file=args.logfile, filemode=filemode,
+    )
+
+    # log some potentially useful info
+    from socket import gethostname
+    logger.error(
+        "Starting run-sim on host %s at %s" % (
+            repr(gethostname()),
+            str(datetime.datetime.now())
+        ),
+    )
+
+    # Parse command line variables
+    if args.galsim_variables is not None:
+        new_params = ParseVariables(args.galsim_variables, logger)
+    else:
+        new_params = None
+
+    if (args.step_names is not None and
+            args.step_names[0] != 'galsim' and
+            args.resume_from is None):
+        raise ValueError(
+            "You must give a job record file if the first step is not galsim!")
+
+    if args.resume_from is not None:
+        pipeline = EnsemblePipeline.from_record_file(
+            config_file, args.resume_from, base_dir=base_dir,
+            step_names=args.step_names, logger=logger,
+            new_params=new_params
+            )
+    else:
+        assert args.skip_completed_steps is False
+        pipeline = EnsemblePipeline.from_config_file(
+            config_file, base_dir, logger=logger, new_params=new_params,
+            step_names=args.step_names, record_file=args.record_file)
+
+    # go ahead and execute
+    pipeline.execute(
+        no_overwrite_job_record=args.no_overwrite_job_record,
+        skip_completed_steps=args.skip_completed_steps)
+
+    # and we're done. hopefully.
+    logger.error("Completed pipeline at %s" % (str(datetime.datetime.now())))
+
+
+if __name__ == "__main__":
+    main()

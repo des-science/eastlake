@@ -7,7 +7,7 @@ import astropy.io.fits as fits
 
 from ..utils import safe_mkdir
 from ..step import Step, run_and_check, _get_relpath
-from ..des_tile import get_orig_coadd_file
+from ..des_files import get_orig_coadd_file
 
 
 class SingleBandSwarpRunner(Step):

@@ -16,8 +16,6 @@ TEST_DIR = os.getcwd()
 CONFIG = """\
 modules:
     - galsim.des
-    - galsim_extra
-    - montara
     - numpy
 
 pipeline:
@@ -173,7 +171,7 @@ image:
 #use Piff PSF for now
 psf:
     type: DES_Piff
-    use_substitute: "$is_blacklisted"
+    use_substitute: "$is_rejectlisted"
     no_smooth: False
     substitute_psf:
         type: Moffat
@@ -190,7 +188,7 @@ output:
     noise_mode: from_weight
     add_bkg: False
     tilename: DES0003-3832
-    blacklist_file: /global/homes/m/maccrann/DES/y3-wl_image_sims/input/piff_stuff/blacklist400.yaml
+    rejectlist_file: /global/homes/m/maccrann/DES/y3-wl_image_sims/input/piff_stuff/rejectlist400.yaml
 
     #Save weight and badpix extensions too
     badpixfromfits:
@@ -229,8 +227,6 @@ output:
 CONFIG_NOPL = """\
 modules:
     - galsim.des
-    - galsim_extra
-    - montara
     - numpy
 
 input:
@@ -263,7 +259,7 @@ output:
     noise_mode: from_weight
     add_bkg: False
     tilename: DES0003-3832
-    blacklist_file: /global/homes/m/maccrann/DES/y3-wl_image_sims/input/piff_stuff/blacklist400.yaml
+    rejectlist_file: /global/homes/m/maccrann/DES/y3-wl_image_sims/input/piff_stuff/rejectlist400.yaml
 
     #Save weight and badpix extensions too
     badpixfromfits:
@@ -313,8 +309,7 @@ def test_pipeline_state(capsys):
         assert pl.name == 'pipeline'
         # calling get_logger(). check for print statements
         captured = capsys.readouterr()
-        assert "log_file=" in captured.out
-        assert "filemode=" in captured.out
+        assert "log file|mode" in captured.out
         logging.basicConfig(format="%(message)s", level=logging.WARNING, stream=sys.stdout, filemode='w')
         log1 = logging.getLogger(pl.name)
         assert pl.logger == log1
