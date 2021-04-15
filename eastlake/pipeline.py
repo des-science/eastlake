@@ -50,9 +50,9 @@ def register_pipeline_step(step_name, step_class):
     step_class : class
         The step class.
     """
+    global STEP_CLASSES
     if step_name in STEP_CLASSES:
         raise ValueError("A step with the name '%s' already exists!" % step_name)
-    global STEP_CLASSES
     STEP_CLASSES[step_name] = step_class
 
 
