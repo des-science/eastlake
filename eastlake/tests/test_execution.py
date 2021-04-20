@@ -1,17 +1,14 @@
 import galsim
 import galsim.config
 import tempfile
-import logging
 import fitsio as fio
 import numpy as np
-
-from ..step import Step
 import os
 
 DEMO1_CONFIG = """\
 pipeline:
     steps: [galsim]
-    
+
 # The gal field defines what kind of galaxy profile to use.
 gal :
     # One of the simplest profiles is a Gaussian.
@@ -62,6 +59,7 @@ output :
     file_name : demo1.fits
 """
 
+
 def test_execution():
     with tempfile.TemporaryDirectory() as tmpdir:
         base_dir = tmpdir
@@ -69,7 +67,7 @@ def test_execution():
         with open(config_file_path, "w") as fp:
             fp.write(DEMO1_CONFIG)
 
-        os.system("run-eastlake-sim "+config_file_path+" "+base_dir)        
+        os.system("run-eastlake-sim " + config_file_path + " " + base_dir)
         obj_file = os.path.join(base_dir, 'demo1.fits')
         assert os.path.isfile(obj_file)
 
