@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 from __future__ import print_function
 import os
-from montara import get_logger
-from montara import Pipeline as EnsemblePipeline
+from eastlake.utils import get_logger
+from eastlake.pipeline import Pipeline as EnsemblePipeline
 import argparse
 import datetime
 

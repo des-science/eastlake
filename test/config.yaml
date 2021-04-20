@@ -1,0 +1,31 @@
+!!python/object/apply:collections.OrderedDict
+- - - pipeline
+    - !!python/object/apply:collections.OrderedDict
+      - - - steps
+          - - galsim
+  - - gal
+    - !!python/object/apply:collections.OrderedDict
+      - - - type
+          - Gaussian
+        - - sigma
+          - 2
+        - - flux
+          - 1.e5
+  - - psf
+    - !!python/object/apply:collections.OrderedDict
+      - - - type
+          - Gaussian
+        - - sigma
+          - 1
+  - - image
+    - !!python/object/apply:collections.OrderedDict
+      - - - pixel_scale
+          - 0.2
+  - - output
+    - !!python/object/apply:collections.OrderedDict
+      - - - type
+          - Fits
+        - - dir
+          - /Users/masayayamamoto/Desktop/DarkEnergySurvey/eastlake/test
+        - - file_name
+          - demo1.fits
