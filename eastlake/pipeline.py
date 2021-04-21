@@ -37,10 +37,12 @@ STEP_CLASSES = OrderedDict([
     ('delete_meds', DeleteMeds),
 ])
 
+STEP_IS_GALSIM = set(["galsim"])
+
 DEFAULT_STEPS = ["galsim", "swarp", "sextractor", "meds"]
 
 
-def register_pipeline_step(step_name, step_class):
+def register_pipeline_step(step_name, step_class, is_galsim=False):
     """Register a pipeline step w/ eastlake
 
     Parameters
@@ -49,11 +51,18 @@ def register_pipeline_step(step_name, step_class):
         The name of the step.
     step_class : class
         The step class.
+    is_galsim : bool, optional
+        Set to true if the step is running a galsim config.
     """
     global STEP_CLASSES
+    global STEP_IS_GALSIM
+
     if step_name in STEP_CLASSES:
         raise ValueError("A step with the name '%s' already exists!" % step_name)
     STEP_CLASSES[step_name] = step_class
+
+    if is_galsim:
+        STEP_IS_GALSIM.add(step_name)
 
 
 class Pipeline(object):
@@ -232,8 +241,13 @@ class Pipeline(object):
                     step_verbosity = step_config["verbosity"]
                 else:
                     step_verbosity = 1
-                steps.append(step_class(step_config, base_dir, logger=logger,
-                             verbosity=step_verbosity, name=step_name))
+
+                if step_name in STEP_IS_GALSIM:
+                    steps.append(step_class(config, base_dir, logger=logger,
+                                 verbosity=step_verbosity, name=step_name))
+                else:
+                    steps.append(step_class(step_config, base_dir, logger=logger,
+                                 verbosity=step_verbosity, name=step_name))
 
         return cls(steps, base_dir, logger=None, verbosity=1, log_file=None, name="pipeline", config=config,
                    record_file=record_file)
