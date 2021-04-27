@@ -30,7 +30,7 @@ jobs:
         shell: bash -l {0}
         run: |
           conda install pytest flake8
-          python -m pip install -e .
+          python -m pip install -e . -vv
 
       - name: test
         shell: bash -l {0}
