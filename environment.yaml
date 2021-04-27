@@ -27,3 +27,5 @@ dependencies:
   - psfex
   - pixmappy
   - joblib
+  - compilers
+  - mamba
