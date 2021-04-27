@@ -2,6 +2,9 @@ channels:
   - conda-forge
   - defaults
 dependencies:
+  - autoconf
+  - automake
+  - libtool
   - python=3.8
   - numpy
   - astropy
@@ -13,6 +16,7 @@ dependencies:
   - matplotlib
   - pybind11
   - fitsio
+  - fftw
   - galsim
   - tqdm
   - h5py
@@ -29,3 +33,4 @@ dependencies:
   - joblib
   - compilers
   - mamba
+  - libblas=*=*openblas
