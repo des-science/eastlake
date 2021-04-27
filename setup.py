@@ -52,10 +52,11 @@ def _build_swarp():
 def _build_src_ext():
     if "CONDA_BUILD" in os.environ:
         cc = "${CC}"
-        cldflags = "\"${CFLAGS} ${LDFLAGS}\""
+        cldflags = "\"${CFLAGS}\""
     elif all(v in os.environ for v in ["CONDA_PREFIX", "CC", "CFLAGS", "LDFLAGS"]):
+        # assume compilers package is installed
         cc = os.environ["CC"]
-        cldflags = "\"" + os.environ["CFLAGS"] + " " + os.environ["LDFLAGS"] + "\""
+        cldflags = "\"" + os.environ["CFLAGS"] + "\""
     elif sys.platform == "linux":
         cc = "gcc"
         cldflags = (
