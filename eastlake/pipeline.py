@@ -12,7 +12,7 @@ from collections import OrderedDict
 from .steps import (
     GalSimRunner,
     SWarpRunner,
-    SExtractorRunner,
+    SrcExtractorRunner,
     MEDSRunner,
     SingleBandSwarpRunner,
     TrueDetectionRunner,
@@ -29,7 +29,7 @@ THINGS_GOING_FINE = "****************\n=>=>=>=>=>=>=>=>\n"
 STEP_CLASSES = OrderedDict([
     ('galsim', GalSimRunner),
     ('swarp', SWarpRunner),
-    ('sextractor', SExtractorRunner),
+    ('src_extractor', SrcExtractorRunner),
     ('meds', MEDSRunner),
     ('single_band_swarp', SingleBandSwarpRunner),
     ('true_detection', TrueDetectionRunner),
@@ -39,7 +39,7 @@ STEP_CLASSES = OrderedDict([
 
 STEP_IS_GALSIM = set(["galsim"])
 
-DEFAULT_STEPS = ["galsim", "swarp", "sextractor", "meds"]
+DEFAULT_STEPS = ["galsim", "swarp", "src_extractor", "meds"]
 
 
 def register_pipeline_step(step_name, step_class, is_galsim=False):

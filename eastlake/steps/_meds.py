@@ -120,10 +120,10 @@ class MEDSRunner(Step):
         # Loop through tiles
         tilenames = stash["tilenames"]
 
-        if "use_sex_from" in self.config:
+        if "use_srcex_from" in self.config:
             other_stash = Stash.load(
-                self.config["use_sex_from"],
-                os.path.dirname(self.config["use_sex_from"]), [])
+                self.config["use_srcex_from"],
+                os.path.dirname(self.config["use_srcex_from"]), [])
 
         for tilename in tilenames:
 
@@ -134,18 +134,18 @@ class MEDSRunner(Step):
             # meds files
             meds_files = []
 
-            # object_data comes from SExtractor - assume either sextractor
+            # object_data comes from SExtractor - assume either src extractor
             # catalog filename is in the stash
             # or the data is in the stash as a recarray
             # Use SExtractor catalog for refband
 
-            # Hack to use sextractor catalog and segmentation map from
+            # Hack to use src extractor catalog and segmentation map from
             # different run
             refband = self.config["refband"]
-            if "use_sex_from" in self.config:
-                sex_cat = other_stash.get_filepaths(
-                    "sex_cat", tilename, band=refband)
-                tile_file_info["sex_cat"] = sex_cat
+            if "use_srcex_from" in self.config:
+                srcex_cat = other_stash.get_filepaths(
+                    "srcex_cat", tilename, band=refband)
+                tile_file_info["sex_cat"] = srcex_cat
 
                 # the seg map may not exist if we are doing true detection
                 try:
@@ -157,9 +157,9 @@ class MEDSRunner(Step):
                     seg_ext = -1
             # Normal mode:
             else:
-                sex_cat = stash.get_filepaths(
-                    "sex_cat", tilename, band=refband)
-                stash.set_filepaths("sex_cat", sex_cat, tilename)
+                srcex_cat = stash.get_filepaths(
+                    "srcex_cat", tilename, band=refband)
+                stash.set_filepaths("srcex_cat", srcex_cat, tilename)
 
                 # the seg map may not exist if we are doing true detection
                 try:
@@ -170,18 +170,18 @@ class MEDSRunner(Step):
                     seg_ext = -1
 
             try:
-                sex_data = fitsio.read(sex_cat, lower=True)
+                srcex_data = fitsio.read(srcex_cat, lower=True)
             except IOError:
                 # you can get an IOError here if there's no detected
                 # objects...in this case we want to quit the
                 # pipeline gracefully
-                if os.path.isfile(sex_cat):
+                if os.path.isfile(srcex_cat):
                     self.logger.error(
-                        "IOError when trying to read SExtractor catalog but "
+                        "IOError when trying to read SrcExtractor catalog but "
                         "file exists - maybe no objects were detected?")
                 else:
                     self.logger.error(
-                        "IOError when trying to read SExtractor catalog "
+                        "IOError when trying to read SrcExtractor catalog "
                         "and file does not exist")
                 return 1, stash
 
@@ -191,11 +191,11 @@ class MEDSRunner(Step):
 
             # This is the same for each band
             obj_data = meds.util.get_meds_input_struct(
-                len(sex_data), extra_fields=extra_obj_data_fields)
-            obj_data["id"] = sex_data["number"]
-            obj_data["number"] = sex_data["number"]
-            obj_data["ra"] = sex_data["alpha_j2000"]
-            obj_data["dec"] = sex_data["delta_j2000"]
+                len(srcex_data), extra_fields=extra_obj_data_fields)
+            obj_data["id"] = srcex_data["number"]
+            obj_data["number"] = srcex_data["number"]
+            obj_data["ra"] = srcex_data["alpha_j2000"]
+            obj_data["dec"] = srcex_data["delta_j2000"]
 
             # Choose the boxsize - this is the same method as used in desmeds
             # Pasted in these functions from desmeds.
@@ -247,7 +247,7 @@ class MEDSRunner(Step):
                 return sigma_size
 
             # Get boxsizes
-            obj_data["box_size"] = get_box_sizes(sex_data)
+            obj_data["box_size"] = get_box_sizes(srcex_data)
 
             t1 = timer()
             self.logger.error(
@@ -340,7 +340,7 @@ class MEDSRunner(Step):
                 image_info = meds.util.get_image_info_struct(
                     n_images+1, slen, wcs_len=wcs_len)
 
-                # assuming sextractor positions
+                # assuming src extractor positions
                 image_info["position_offset"] = 1.
 
                 # fill coadd quantities

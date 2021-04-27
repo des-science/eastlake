@@ -1,0 +1,11 @@
+#!/usr/bin/env python
+import os
+import sys
+import pkg_resources
+
+src_ext = pkg_resources.resource_filename("eastlake", "astromatic/src-extractor")
+
+args = list(sys.argv)
+args[0] = "src-extractor"
+
+os.execv(src_ext, args)

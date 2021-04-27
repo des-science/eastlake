@@ -53,7 +53,7 @@ class TrueDetectionRunner(Step):
         tdetfile = stash.get_filepaths("truepositions_file", tilename)
         tdet = fitsio.read(tdetfile)
 
-        # now we reformat to the sectractor output
+        # now we reformat to the src extractor output
         # note that we are hacking on the fields to force the
         # MEDS maker to use the right sized stamps
         # to do this we
@@ -101,7 +101,7 @@ class TrueDetectionRunner(Step):
         # write it to disk
         srcext_cat_name = coadd_file.replace(".fits", "_sexcat.fits")
         stash.set_filepaths(
-            "sex_cat", srcext_cat_name, tilename, band=band)
+            "srcex_cat", srcext_cat_name, tilename, band=band)
         fitsio.write(srcext_cat_name, srcext_cat, clobber=True)
 
     def _copy_and_munge_coadd_data(self, stash, tilename, band):

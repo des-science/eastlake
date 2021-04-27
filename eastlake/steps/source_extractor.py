@@ -2,6 +2,7 @@ from __future__ import print_function, absolute_import
 import os
 import subprocess
 import copy
+import pkg_resources
 
 import fitsio
 import numpy as np
@@ -10,52 +11,77 @@ from ..step import Step, run_and_check, _get_relpath
 from ..stash import Stash
 
 
-class SExtractorRunner(Step):
+def _get_default(nm):
+    return pkg_resources.resource_filename("eastlake", "astromatic/%s" % nm)
+
+
+class SrcExtractorRunner(Step):
     """
-    Pipeline step for running SExtractor on detection image
+    Pipeline step for running SrcExtractor on detection image
     """
-    def __init__(self, config, base_dir, name="sextractor",
+    def __init__(self, config, base_dir, name="src_extractor",
                  logger=None, verbosity=0, log_file=None):
 
         # name for this step
-        super(SExtractorRunner, self).__init__(
+        super(SrcExtractorRunner, self).__init__(
             config, base_dir, name=name, logger=logger, verbosity=verbosity,
             log_file=log_file)
 
-        self.sex_config_file = os.path.abspath(
-            os.path.expanduser(os.path.expandvars(self.config["config_file"])))
+        self.srcex_config_file = os.path.abspath(
+            os.path.expanduser(
+                os.path.expandvars(
+                    self.config.get("config_file", _get_default("Y6A1_v1_srcex.config"))
+                )
+            )
+        )
         self.params_file = os.path.abspath(
-            os.path.expanduser(os.path.expandvars(self.config["params_file"])))
+            os.path.expanduser(
+                os.path.expandvars(
+                    self.config("params_file", _get_default("Y6A1_v1_srcex.param_diskonly"))
+                )
+            )
+        )
         self.filter_file = os.path.abspath(
-            os.path.expanduser(os.path.expandvars(self.config["filter_file"])))
+            os.path.expanduser(
+                os.path.expandvars(
+                    self.config.get("filter_file", _get_default("Y6A1_v1_gauss_3.0_7x7.conv"))
+                )
+            )
+        )
         self.star_nnw_file = os.path.abspath(
             os.path.expanduser(
-                os.path.expandvars(self.config["star_nnw_file"])))
-        # sextractor command my be an environment variable
+                os.path.expandvars(
+                    self.config.get("star_nnw_file", _get_default("Y6A1_v1_srcex.nnw"))
+                )
+            )
+        )
+        # src_extractor command my be an environment variable
         # so use os.path.expandvars
-        self.sex_cmd = os.path.expandvars(self.config["sex_cmd"])
+        self.srcex_cmd = os.path.expandvars(
+            self.config.get("srcex_cmd", _get_default("eastlake-src-extractor"))
+        )
 
-        # make sure SExtractor works...
-        # run_and_check( [self.sex_cmd], "SExtractor" )
-        self.sex_cmd_root = [
-            "%s" % (self.sex_cmd), "-c", "%s" % (self.sex_config_file)]
+        # make sure SrcExtractor works...
+        # run_and_check( [self.srcex_cmd], "SrcExtractor" )
+        self.srcex_cmd_root = [
+            "%s" % (self.srcex_cmd), "-c", "%s" % (self.srcex_config_file)]
         if "update" in self.config:
             for key, val in self.config["update"].items():
-                self.sex_cmd_root += ["-%s" % key, str(val)]
+                self.srcex_cmd_root += ["-%s" % key, str(val)]
 
-        # update paths to sextractor files
-        self.sex_cmd_root += ["-PARAMETERS_NAME", self.params_file]
-        self.sex_cmd_root += ["-FILTER_NAME", self.filter_file]
-        self.sex_cmd_root += ["-STARNNW_NAME", self.star_nnw_file]
+        # update paths to src_extractor files
+        self.srcex_cmd_root += ["-PARAMETERS_NAME", self.params_file]
+        self.srcex_cmd_root += ["-FILTER_NAME", self.filter_file]
+        self.srcex_cmd_root += ["-STARNNW_NAME", self.star_nnw_file]
 
     def execute(self, stash, new_params=None):
-        # Loop through tiles calling SExtractor
+        # Loop through tiles calling SrcExtractor
         tilenames = stash["tilenames"]
 
         for tilename in tilenames:
             tile_info = stash["tile_info"][tilename]
 
-            # Get detection weight file. SExtractor doesn't like compressed
+            # Get detection weight file. SrcExtractor doesn't like compressed
             # fits files, so may need to funpack
             if "single_band_det" in self.config:
                 det_image_file, det_image_ext = (
@@ -97,7 +123,7 @@ class SExtractorRunner(Step):
                 det_weight_ext = tile_info["det_weight_ext"]-1
 
             # Assoc mode hack
-            sex_cmd_root = copy.copy(self.sex_cmd_root)
+            srcex_cmd_root = copy.copy(self.srcex_cmd_root)
             if "use_assoc_from" in self.config:
                 # load other stash with the directory containing the
                 # job_record file as the base_dir
@@ -106,30 +132,30 @@ class SExtractorRunner(Step):
                     os.path.dirname(self.config["use_assoc_from"]), [])
                 refband = self.config.get("refband", "i")
 
-                # Grab the SExtractor catalog from this other stash
-                sex_cat = other_stash.get_filepaths(
-                    "sex_cat", tilename, band=refband)
+                # Grab the SrcExtractor catalog from this other stash
+                srcex_cat = other_stash.get_filepaths(
+                    "srcex_cat", tilename, band=refband)
 
                 # Write assoc file
-                sex_data = fitsio.read(sex_cat)
+                srcex_data = fitsio.read(srcex_cat)
                 assoc_file = os.path.join(
                     self.base_dir, "assoc_file_%s.txt" % tilename)
                 assoc_data = np.array([
-                    sex_data["NUMBER"],
-                    sex_data["X_IMAGE"],
-                    sex_data["Y_IMAGE"]]).T
+                    srcex_data["NUMBER"],
+                    srcex_data["X_IMAGE"],
+                    srcex_data["Y_IMAGE"]]).T
                 with open(assoc_file, 'w') as f:
                     np.savetxt(
                         f, assoc_data,
                         fmt=["%d", "%.9f", "%.9f"], delimiter=" ")
 
                 # Add assoc options to command
-                sex_cmd_root += ["-ASSOC_NAME", "%s" % assoc_file]
-                sex_cmd_root += ["-ASSOC_PARAMS", "2,3"]
+                srcex_cmd_root += ["-ASSOC_NAME", "%s" % assoc_file]
+                srcex_cmd_root += ["-ASSOC_PARAMS", "2,3"]
 
-            # Now loop through bands calling SExtractor in dual image mode
+            # Now loop through bands calling SrcExtractor in dual image mode
             for band in stash["bands"]:
-                cmd = copy.copy(sex_cmd_root)
+                cmd = copy.copy(srcex_cmd_root)
                 band_file_info = tile_info[band]
                 weight_file, weight_ext = (
                     stash.get_filepaths(
@@ -150,7 +176,7 @@ class SExtractorRunner(Step):
                 coadd_file, coadd_ext = (
                     stash.get_filepaths("coadd_file", tilename, band=band),
                     band_file_info["coadd_ext"])
-                # SExtractor is annoying and can vomit a segfault if the paths
+                # SrcExtractor is annoying and can vomit a segfault if the paths
                 # to the input images are too long. So change to the
                 # band coadd directory and use relative paths from there
                 coadd_dir = os.path.realpath(os.path.dirname(coadd_file))
@@ -192,11 +218,11 @@ class SExtractorRunner(Step):
                 cmd = [cmd[0]] + [image_arg] + cmd[1:]
 
                 if self.logger is not None:
-                    self.logger.error("calling sextractor with command:")
+                    self.logger.error("calling source extractor with command:")
                     self.logger.error(" ".join(cmd))
-                run_and_check(cmd, "SExtractor")
+                run_and_check(cmd, "SrcExtractor")
                 stash.set_filepaths(
-                    "sex_cat", catalog_name, tilename, band=band)
+                    "srcex_cat", catalog_name, tilename, band=band)
                 stash.set_filepaths("seg_file", seg_name, tilename, band=band)
                 stash.set_filepaths("bkg_file", bkg_name, tilename, band=band)
                 stash.set_filepaths(
