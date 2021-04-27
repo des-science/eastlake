@@ -18,6 +18,7 @@ from .steps import (
     TrueDetectionRunner,
     DeleteImages,
     DeleteMeds,
+    NewishMetcalRunner,
 )
 from .utils import get_logger, safe_mkdir
 from .stash import Stash
@@ -35,6 +36,7 @@ STEP_CLASSES = OrderedDict([
     ('true_detection', TrueDetectionRunner),
     ('delete_images', DeleteImages),
     ('delete_meds', DeleteMeds),
+    ('newish_metacal', NewishMetcalRunner),
 ])
 
 STEP_IS_GALSIM = set(["galsim"])
