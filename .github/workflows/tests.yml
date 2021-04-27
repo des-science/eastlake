@@ -32,6 +32,12 @@ jobs:
           conda install pytest flake8
           python -m pip install -e . -vv
 
+      - name: run cli
+        shell: bash -l {0}
+        run: |
+          eastlake-swarp -dd
+          run-eastlake-sim --help
+
       - name: test
         shell: bash -l {0}
         run: |
