@@ -94,7 +94,7 @@ def _build_swarp():
                     _run_shell(
                         "CC=%s "
                         "CFLAGS=%s "
-                        "./configure --prefix=%s" % tmpdir
+                        "./configure --prefix=%s" % (cc, cldflags, tmpdir)
                     )
                 else:
                     _run_shell("./configure --prefix=%s" % tmpdir)
