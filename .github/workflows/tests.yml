@@ -36,6 +36,7 @@ jobs:
         shell: bash -l {0}
         run: |
           eastlake-swarp -dd
+          eastlake-src-extractor -dd
           run-eastlake-sim --help
 
       - name: test

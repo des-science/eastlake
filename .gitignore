@@ -129,3 +129,6 @@ dmypy.json
 .pyre/
 
 eastlake/astromatic/swarp
+eastlake/astromatic/src-extractor
+src/sextractor*/*
+src/swarp*/*

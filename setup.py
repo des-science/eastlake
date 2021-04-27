@@ -52,29 +52,45 @@ def _build_swarp():
 def _build_src_ext():
     if "CONDA_BUILD" in os.environ:
         cc = "${CC}"
-        cldflags = "\"${CFLAGS}\""
+        cldflags = "\"${CFLAGS} -fcommon\""
+        prefix_var = "PREFIX"
     elif all(v in os.environ for v in ["CONDA_PREFIX", "CC", "CFLAGS", "LDFLAGS"]):
         # assume compilers package is installed
         cc = os.environ["CC"]
-        cldflags = "\"" + os.environ["CFLAGS"] + "\""
+        cldflags = "\"" + os.environ["CFLAGS"] + " -fcommon\""
+        prefix_var = "CONDA_PREFIX"
     elif sys.platform == "linux":
-        cc = "gcc"
-        cldflags = (
-            "\"-isystem ${CONDA_PREFIX}/include "
-            "-Wl,-rpath,${CONDA_PREFIX}/lib "
-            "-Wl,-rpath-link,${CONDA_PREFIX}/lib "
-            "-L${CONDA_PREFIX}/lib\""
-        )
+        if "CONDA_PREFIX" in os.environ:
+            cc = "gcc"
+            cldflags = (
+                "\"-isystem ${CONDA_PREFIX}/include "
+                "-Wl,-rpath,${CONDA_PREFIX}/lib "
+                "-Wl,-rpath-link,${CONDA_PREFIX}/lib "
+                "-L${CONDA_PREFIX}/lib "
+                "-ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 "
+                "-ffunction-sections -pipe -fcommon\""
+            )
+            prefix_var = "CONDA_PREFIX"
+        else:
+            # good luck!
+            cc = None
+            cldflags = None
     elif sys.platform == "darwin":
-        cc = "clang"
-        cldflags = (
-            "\"-ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe "
-            "-isystem ${CONDA_PREFIX}/include "
-            "-Wl,-rpath,${CONDA_PREFIX}/lib "
-            "-L${CONDA_PREFIX}/lib "
-            "-Wl,-pie -Wl,-headerpad_max_install_names "
-            "-Wl,-dead_strip_dylibs\""
-        )
+        if "CONDA_PREFIX" in os.environ:
+            cc = "clang"
+            cldflags = (
+                "\"-ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe "
+                "-isystem ${CONDA_PREFIX}/include "
+                "-Wl,-rpath,${CONDA_PREFIX}/lib "
+                "-L${CONDA_PREFIX}/lib "
+                "-Wl,-pie -Wl,-headerpad_max_install_names "
+                "-Wl,-dead_strip_dylibs -fcommon\""
+            )
+            prefix_var = "CONDA_PREFIX"
+        else:
+            # good luck!
+            cc = None
+            cldflags = None
     else:
         print(sys.platform, flush=True)
         raise RuntimeError("platform %s not recognized" % sys.platform)
@@ -87,17 +103,25 @@ def _build_src_ext():
             with pushd("sextractor-2.24.4"):
                 try:
                     _run_shell("sh autogen.sh")
-                    _run_shell(
-                        "CC=%s "
-                        "CFLAGS=%s "
-                        "./configure "
-                        "--prefix=%s "
-                        "--enable-openblas "
-                        "--with-openblas-libdir=${CONDA_PREFIX}/lib "
-                        "--with-openblas-incdir=${CONDA_PREFIX}/include " % (
-                            cc, cldflags, tmpdir
+                    if cc is not None and cldflags is not None:
+                        _run_shell(
+                            "CC=%s "
+                            "CFLAGS=%s "
+                            "./configure "
+                            "--prefix=%s "
+                            "--enable-openblas "
+                            "--with-openblas-libdir=${%s}/lib "
+                            "--with-openblas-incdir=${%s}/include " % (
+                                cc, cldflags, tmpdir, prefix_var, prefix_var
+                            )
                         )
-                    )
+                    else:
+                        _run_shell(
+                            "./configure "
+                            "--prefix=%s " % (
+                                tmpdir
+                            )
+                        )
                 except Exception:
                     _run_shell("cat config.log")
                     raise

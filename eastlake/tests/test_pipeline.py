@@ -50,8 +50,6 @@ sof:
     use_joblib: True
 
 single_band_swarp:
-    config_file: ${IMSIM_DIR}/astromatic_config/Y3A1_v1_swarp.config
-    swarp_cmd: swarp
     ref_mag_zp: 30.
     update:
         NTHREADS: 8
@@ -59,8 +57,6 @@ single_band_swarp:
         IMAGE_SIZE : 10000,10000
 
 swarp:
-    config_file: ${IMSIM_DIR}/astromatic_config/Y3A1_v1_swarp.config
-    swarp_cmd: swarp
     center_from_header: True
     coadd_bands: ['r','i','z']
     mask_hdu : 1
@@ -73,16 +69,11 @@ swarp:
         NTHREADS : 32
         BLANK_BADPIXELS : Y
 
-#Options for SExtractor - can just provide a sextractor config file as below
-#Fields can be updated using the update section e.g. here we update the detection
-#threshold DETECT_THRESH.
-sextractor:
-    sex_cmd: sex
+# Options for SExtractor - the code already has the Y6 params and executable
+# Fields can be updated using the update section e.g. here we update the detection
+# threshold DETECT_THRESH.
+src_extractor:
     #single_band_det: r
-    config_file: ${IMSIM_DIR}/astromatic_config/Y3A1_v1_sex.config
-    params_file : ${IMSIM_DIR}/astromatic_config/deblend.param
-    filter_file : ${IMSIM_DIR}/astromatic_config/Y3A1_v1_gauss_3.0_7x7.conv
-    star_nnw_file : ${IMSIM_DIR}/astromatic_config/Y3A1_v1_sex.nnw
     update:
         CHECKIMAGE_TYPE : SEGMENTATION,BACKGROUND,BACKGROUND_RMS
         DEBLEND_MINCONT : 0.001
