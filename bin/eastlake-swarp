@@ -1,0 +1,11 @@
+#!/usr/bin/env python
+import os
+import sys
+import pkg_resources
+
+swarp = pkg_resources.resource_filename("eastlake", "astromatic/swarp")
+
+args = list(sys.argv)
+args[0] = "swarp"
+
+os.execv(swarp, args)
