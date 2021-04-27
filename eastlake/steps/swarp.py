@@ -1,6 +1,7 @@
 from __future__ import print_function, absolute_import
 import os
 import subprocess
+import pkg_resources
 
 import fitsio
 import astropy.io.fits as fits
@@ -10,6 +11,9 @@ from ..step import Step, run_and_check, _get_relpath
 from ..des_files import get_orig_coadd_file
 
 
+DEFAULT_SWARP_CONFIG = pkg_resources.resource_filename("eastlake", "astromatic/Y6A1_v1_swarp.config")
+
+
 class SingleBandSwarpRunner(Step):
     def __init__(self, config, base_dir, name="single_band_swarp", logger=None,
                  verbosity=0, log_file=None):
@@ -17,8 +21,15 @@ class SingleBandSwarpRunner(Step):
             config, base_dir, name=name, logger=logger, verbosity=verbosity,
             log_file=log_file)
         self.swarp_config_file = os.path.abspath(
-            os.path.expanduser(os.path.expandvars(self.config["config_file"])))
-        self.swarp_cmd = os.path.expandvars(self.config["swarp_cmd"])
+            os.path.expanduser(
+                os.path.expandvars(
+                    self.config.get("config_file", DEFAULT_SWARP_CONFIG)
+                )
+            )
+        )
+        self.swarp_cmd = os.path.expandvars(
+            self.config.get("swarp_cmd", "eastlake-swarp")
+        )
         self.swarp_cmd_root = [
             "%s" % (self.swarp_cmd), "-c", "%s" % (self.swarp_config_file)]
         if "mag_zp_ref" not in config:
@@ -203,11 +214,17 @@ class SWarpRunner(Step):
             config, base_dir, name=name, logger=logger,
             verbosity=verbosity, log_file=log_file)
         self.swarp_config_file = os.path.abspath(
-            os.path.expanduser(os.path.expandvars(self.config["config_file"])))
+            os.path.expanduser(
+                os.path.expandvars(
+                    self.config.get("config_file", DEFAULT_SWARP_CONFIG)
+                )
+            )
+        )
         # swarp command my be an environment variable
         # so use os.path.expandvars
-        self.swarp_cmd = os.path.expandvars(self.config["swarp_cmd"])
-        # make sure Swarp works...
+        self.swarp_cmd = os.path.expandvars(
+            self.config.get("swarp_cmd", "eastlake-swarp")
+        )
         self.swarp_cmd_root = [
             "%s" % (self.swarp_cmd), "-c", "%s" % (self.swarp_config_file)]
 
