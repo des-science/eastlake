@@ -9,7 +9,12 @@ on:
 jobs:
   tests:
     name: tests
-    runs-on: "ubuntu-latest"
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest]
+
+    runs-on: ${{ matrix.os }}
+
     steps:
       - name: cancel previous runs
         uses: styfle/cancel-workflow-action@0.9.0
