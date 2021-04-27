@@ -9,8 +9,8 @@ import fitsio
 from ngmix import ObsList, MultiBandObsList
 from ngmix.gexceptions import GMixRangeError
 
-from .newish_metacal.ngmix_compat import NGMixMEDS, MultiBandNGMixMEDS, NGMIX_V1
-from .newish_metacal.metacal.metacal_fitter import MetacalFitter
+from .ngmix_compat import NGMixMEDS, MultiBandNGMixMEDS, NGMIX_V1
+from .metacal import MetacalFitter
 from eastlake.step import Step
 from eastlake.utils import safe_mkdir
 
