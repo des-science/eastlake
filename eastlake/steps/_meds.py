@@ -369,7 +369,7 @@ class MEDSRunner(Step):
 
                     image_info["bkg_path"][ind] = bkg_filenames[i]
                     image_info["bkg_ext"][ind] = bkg_ext
-                    image_info["seg_path"][ind] = None
+                    image_info["seg_path"][ind] = ''
                     image_info["seg_ext"][ind] = -1
 
                     image_info["wcs"][ind] = wcs_json[ind]
