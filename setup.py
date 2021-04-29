@@ -5,14 +5,6 @@ import subprocess
 import glob
 import sys
 
-
-if "--skip-swarp-build" in sys.argv:
-    SKIP_SWARP_BUILD = True
-    sys.argv.remove("--skip-swarp-build")
-else:
-    SKIP_SWARP_BUILD = False
-
-
 from setuptools import setup, find_packages
 import setuptools.command.build_ext
 import setuptools.command.build_py
@@ -34,33 +26,21 @@ def _run_shell(cmd):
     subprocess.run(cmd, shell=True, check=True)
 
 
-def _build_swarp():
-    if SKIP_SWARP_BUILD:
-        return
-    cwd = os.path.abspath(os.getcwd())
-    with tempfile.TemporaryDirectory() as tmpdir:
-        with pushd(tmpdir):
-            _run_shell("cp %s/src/swarp-2.40.1.tar.gz ." % cwd)
-            _run_shell("tar -xzvf swarp-2.40.1.tar.gz")
-            with pushd("swarp-2.40.1"):
-                _run_shell("./configure --prefix=%s" % tmpdir)
-                _run_shell("make")
-                _run_shell("make install")
-            _run_shell("cp bin/swarp %s/eastlake/astromatic/." % cwd)
-
-
-def _build_src_ext():
+def _get_cc_flags_prefix():
     if "CONDA_BUILD" in os.environ:
+        print(">>>  building in conda build", flush=True)
         cc = "${CC}"
         cldflags = "\"${CFLAGS} -fcommon\""
         prefix_var = "PREFIX"
     elif all(v in os.environ for v in ["CONDA_PREFIX", "CC", "CFLAGS", "LDFLAGS"]):
         # assume compilers package is installed
+        print(">>>  building w/ conda-forge compilers package", flush=True)
         cc = os.environ["CC"]
         cldflags = "\"" + os.environ["CFLAGS"] + " -fcommon\""
         prefix_var = "CONDA_PREFIX"
     elif sys.platform == "linux":
         if "CONDA_PREFIX" in os.environ:
+            print(">>>  building in generic conda prefix", flush=True)
             cc = "gcc"
             cldflags = (
                 "\"-isystem ${CONDA_PREFIX}/include "
@@ -72,11 +52,13 @@ def _build_src_ext():
             )
             prefix_var = "CONDA_PREFIX"
         else:
+            print(">>>  building without any extra flags - good luck!", flush=True)
             # good luck!
             cc = None
             cldflags = None
     elif sys.platform == "darwin":
         if "CONDA_PREFIX" in os.environ:
+            print(">>>  building in generic conda prefix", flush=True)
             cc = "clang"
             cldflags = (
                 "\"-ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe "
@@ -88,13 +70,41 @@ def _build_src_ext():
             )
             prefix_var = "CONDA_PREFIX"
         else:
+            print(">>>  building without any extra flags - good luck!", flush=True)
             # good luck!
             cc = None
             cldflags = None
+            prefix_var = None
     else:
         print(sys.platform, flush=True)
         raise RuntimeError("platform %s not recognized" % sys.platform)
 
+    return cc, cldflags, prefix_var
+
+
+def _build_swarp():
+    cc, cldflags, prefix_var = _get_cc_flags_prefix()
+    cwd = os.path.abspath(os.getcwd())
+    with tempfile.TemporaryDirectory() as tmpdir:
+        with pushd(tmpdir):
+            _run_shell("cp %s/src/swarp-2.40.1.tar.gz ." % cwd)
+            _run_shell("tar -xzvf swarp-2.40.1.tar.gz")
+            with pushd("swarp-2.40.1"):
+                if cc is not None and cldflags is not None:
+                    _run_shell(
+                        "CC=%s "
+                        "CFLAGS=%s "
+                        "./configure --prefix=%s" % (cc, cldflags, tmpdir)
+                    )
+                else:
+                    _run_shell("./configure --prefix=%s" % tmpdir)
+                _run_shell("make")
+                _run_shell("make install")
+            _run_shell("cp bin/swarp %s/eastlake/astromatic/." % cwd)
+
+
+def _build_src_ext():
+    cc, cldflags, prefix_var = _get_cc_flags_prefix()
     cwd = os.path.abspath(os.getcwd())
     with tempfile.TemporaryDirectory() as tmpdir:
         with pushd(tmpdir):
