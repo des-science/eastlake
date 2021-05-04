@@ -24,6 +24,8 @@ CONFIG = {
         # check for an edge hit
         'bmask_flags': 2**30,
 
+        'metacal_pars': {'psf': 'fitgauss'},
+        
         'model': 'gauss',
 
         'max_pars': {
