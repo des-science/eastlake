@@ -404,10 +404,11 @@ class MEDSRunner(Step):
 
                 if self.config.get("add_psf_data", True):
                     if stash["psf_config"]["type"] == "DES_Piff":
-                        if stash["psf_config"].get("no_smooth", False):
-                            assert stash["draw_method"] == "no_pixel"
-                        else:
+                        if stash["psf_config"].get("smooth", False):
                             assert stash["draw_method"] == "auto"
+                        else:
+                            assert stash["draw_method"] == "no_pixel"
+
                         self.logger.error("Adding Piff info to meds file")
                         # this is the type for the meds maker - sets the layout
                         # etc
