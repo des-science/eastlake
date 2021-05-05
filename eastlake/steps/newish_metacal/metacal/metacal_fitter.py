@@ -10,7 +10,7 @@ from . import procflags
 
 if NGMIX_V2:
     from ngmix.runners import Runner, PSFRunner
-    from ngmix.guessers import SimplePSFGuesser, TFluxAndPriorGuesser, PriorGuesser
+    from ngmix.guessers import SimplePSFGuesser, TFluxAndPriorGuesser
     from ngmix.fitting import Fitter
     from ngmix.metacal import MetacalBootstrapper
     from ngmix.gaussmom import GaussMom
@@ -143,12 +143,18 @@ class MetacalFitter(FitterBase):
         if gm['flags'] == 0:
             flux_guess = gm['flux']
             Tguess = gm['T']
-            guesser = TFluxAndPriorGuesser(
-                rng=self.rng, T=Tguess, flux=flux_guess, prior=self.metacal_prior,
-            )
         else:
-            guesser = PriorGuesser(self.metacal_prior)
-        psf_guesser = SimplePSFGuesser(rng=self.rng)
+            gm = GaussMom(1.2).go(mbobs[0][0].psf)
+            if gm['flags'] == 0:
+                Tguess = 2 * gm['T']
+            else:
+                Tguess = 2
+            flux_guess = np.sum(mbobs[0][0].image)
+
+        guesser = TFluxAndPriorGuesser(
+            rng=self.rng, T=Tguess, flux=flux_guess, prior=self.metacal_prior,
+        )
+        psf_guesser = SimplePSFGuesser(rng=self.rng, guess_from_moms=True)
 
         fitter = Fitter(
             model=self['metacal']['model'],
