@@ -163,7 +163,7 @@ image:
 psf:
     type: DES_Piff
     use_substitute: "$is_rejectlisted"
-    no_smooth: False
+    smooth: False
     substitute_psf:
         type: Moffat
         beta: 3.

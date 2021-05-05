@@ -9,8 +9,9 @@ import fitsio
 from ngmix import ObsList, MultiBandObsList
 from ngmix.gexceptions import GMixRangeError
 
-from .ngmix_compat import NGMixMEDS, MultiBandNGMixMEDS, NGMIX_V1
+from ngmix.medsreaders import MultiBandNGMixMEDS, NGMixMEDS
 from .metacal import MetacalFitter
+from .ngmix_compat import NGMIX_V2
 from eastlake.step import Step
 from eastlake.utils import safe_mkdir
 
@@ -24,7 +25,10 @@ CONFIG = {
         # check for an edge hit
         'bmask_flags': 2**30,
 
-        'metacal_pars': {'psf': 'fitgauss'},
+        'metacal_pars': {
+            'psf': 'fitgauss',
+            'types': ['noshear', '1p', '1m', '2p', '2m'],
+        },
 
         'model': 'gauss',
 
@@ -73,18 +77,6 @@ CONFIG = {
         }
     },
 }
-
-if not NGMIX_V1:
-    CONFIG['metacal']['metacal_pars'] = {
-        'types': ['noshear', '1p', '1m', '2p', '2m'],
-        # 'symmetrize_psf': True
-    }
-else:
-    CONFIG['metacal']['metacal_pars'] = {
-        'psf': 'fitgauss',
-        'types': ['noshear', '1p', '1m', '2p', '2m'],
-        # 'use_noise_image': True,
-    }
 
 
 class NewishMetcalRunner(Step):
@@ -250,7 +242,9 @@ def _run_mcal_one_chunk(meds_files, start, end, seed):
             o = mbmeds.get_mbobs(ind)
             o = _strip_coadd(o)
             o = _strip_zero_flux(o)
-            o = _apply_pixel_scale(o)
+            if not NGMIX_V2:
+                # ngmix v1 worked in surface brightness, not flux
+                o = _apply_pixel_scale(o)
 
             skip_me = False
             for ol in o:

@@ -28,12 +28,20 @@ def get_logger(logger_name, verbosity, log_file=None, filemode="w"):
     # initialize a logger Galsim-style
     logging_level = LOGGING_LEVELS[verbosity]
     if log_file is None:
-        logging.basicConfig(format="%(message)s", level=logging_level,
-                            stream=sys.stdout, filemode=filemode)
+        logging.basicConfig(
+            format="%(message)s",
+            stream=sys.stdout,
+            filemode=filemode,
+        )
     else:
-        logging.basicConfig(format="%(message)s", level=logging_level,
-                            filename=log_file, filemode=filemode)
-    return logging.getLogger(logger_name)
+        logging.basicConfig(
+            format="%(message)s",
+            filename=log_file,
+            filemode=filemode,
+        )
+    logger = logging.getLogger(logger_name)
+    logger.setLevel(logging_level)
+    return logger
 
 
 def safe_mkdir(d):

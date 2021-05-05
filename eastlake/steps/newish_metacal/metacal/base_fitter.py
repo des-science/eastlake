@@ -1,9 +1,8 @@
 from __future__ import print_function
 import logging
-import numpy as np
 
 import ngmix
-from ..ngmix_compat import format_pars
+from ..ngmix_compat import NGMIX_V2
 from ngmix.gexceptions import BootPSFFailure
 from ngmix.joint_prior import PriorSimpleSep
 
@@ -12,8 +11,6 @@ try:
     NO_BD_MODELS = False
 except ImportError:
     NO_BD_MODELS = True
-
-from .util import NoDataError
 
 logger = logging.getLogger(__name__)
 
@@ -177,210 +174,44 @@ class FitterBase(dict):
         return prior
 
 
-def _fit_all_psfs(mbobs_list, psf_conf):
-    """
-    fit all psfs in the input observations
-    """
-    fitter = AllPSFFitter(mbobs_list, psf_conf)
-    fitter.go()
+if not NGMIX_V2:
+    def _fit_one_psf(obs, pconf):
+        Tguess = 4.0*obs.jacobian.get_scale()**2
 
+        if 'coellip' in pconf['model']:
+            ngauss = ngmix.bootstrap.get_coellip_ngauss(pconf['model'])
+            runner = ngmix.bootstrap.PSFRunnerCoellip(
+                obs,
+                Tguess,
+                ngauss,
+                pconf['lm_pars'],
+            )
 
-def _measure_all_psf_fluxes(mbobs_list):
-    """
-    fit all psfs in the input observations
-    """
-    fitter = AllPSFFluxFitter(mbobs_list)
-    fitter.go()
-
-
-class AllPSFFitter(object):
-    def __init__(self, mbobs_list, psf_conf):
-        self.mbobs_list = mbobs_list
-        self.psf_conf = psf_conf
-
-    def go(self):
-        for mbobs in self.mbobs_list:
-            for obslist in mbobs:
-                for obs in obslist:
-                    psf_obs = obs.get_psf()
-                    _fit_one_psf(psf_obs, self.psf_conf)
-
-
-def _fit_one_psf(obs, pconf):
-    Tguess = 4.0*obs.jacobian.get_scale()**2
-
-    if 'coellip' in pconf['model']:
-        ngauss = ngmix.bootstrap.get_coellip_ngauss(pconf['model'])
-        runner = ngmix.bootstrap.PSFRunnerCoellip(
-            obs,
-            Tguess,
-            ngauss,
-            pconf['lm_pars'],
-        )
-
-    elif 'em' in pconf['model']:
-        ngauss = ngmix.bootstrap.get_em_ngauss(pconf['model'])
-        runner = ngmix.bootstrap.EMRunner(
-            obs,
-            Tguess,
-            ngauss,
-            pconf['em_pars'],
-        )
-
-    else:
-        runner = ngmix.bootstrap.PSFRunner(
-            obs,
-            pconf['model'],
-            Tguess,
-            pconf['lm_pars'],
-        )
-
-    runner.go(ntry=pconf['ntry'])
-
-    psf_fitter = runner.fitter
-    res = psf_fitter.get_result()
-    obs.update_meta_data({'fitter': psf_fitter})
-
-    if res['flags'] == 0:
-        gmix = psf_fitter.get_gmix()
-        obs.set_gmix(gmix)
-    else:
-        raise BootPSFFailure("failed to fit psfs: %s" % str(res))
-
-
-class AllPSFFluxFitter(object):
-    def __init__(self, mbobs_list):
-        self.mbobs_list = mbobs_list
-
-    def go(self):
-        for mbobs in self.mbobs_list:
-            for band, obslist in enumerate(mbobs):
-
-                if len(obslist) == 0:
-                    raise NoDataError('no data in band %d' % band)
-
-                meta = obslist.meta
-
-                res = self._fit_psf_flux(band, obslist)
-                meta['psf_flux_flags'] = res['flags']
-
-                for n in ('psf_flux', 'psf_flux_err', 'psf_flux_s2n'):
-                    meta[n] = res[n.replace('psf_', '')]
-
-    def _fit_psf_flux(self, band, obslist):
-        fitter = ngmix.fitting.TemplateFluxFitter(
-            obslist,
-            do_psf=True,
-        )
-        fitter.go()
-
-        res = fitter.get_result()
-
-        if res['flags'] == 0 and res['flux_err'] > 0:
-            res['flux_s2n'] = res['flux']/res['flux_err']
-        else:
-            res['flux_s2n'] = -9999.0
-            raise BootPSFFailure(
-                "failed to fit psf fluxes for band %d: %s" % (band, str(res)))
-
-        return res
-
-
-def get_stamp_guesses(list_of_obs, detband, model, rng, prior=None):
-    """
-    get a guess based on metadata in the obs
-
-    T guess is gotten from detband
-    """
-
-    nband = len(list_of_obs[0])
-
-    if model == 'bd':
-        npars_per = 7+nband
-    elif model == 'bdf':
-        npars_per = 6+nband
-    else:
-        npars_per = 5+nband
-
-    nobj = len(list_of_obs)
-
-    npars_tot = nobj*npars_per
-    guess = np.zeros(npars_tot)
-
-    for i, mbo in enumerate(list_of_obs):
-        detobslist = mbo[detband]
-        detmeta = detobslist.meta
-
-        T = detmeta['Tsky']
-
-        beg = i*npars_per
-
-        # always close guess for center
-        rowguess, colguess = prior.cen_prior.sample()
-        guess[beg+0] = rowguess
-        guess[beg+1] = colguess
-
-        # always arbitrary guess for shape
-        guess[beg+2] = rng.uniform(low=-0.05, high=0.05)
-        guess[beg+3] = rng.uniform(low=-0.05, high=0.05)
-
-        guess[beg+4] = T*(1.0 + rng.uniform(low=-0.05, high=0.05))
-
-        if 'bd' in model:
-            if hasattr(prior.fracdev_prior, 'sigma'):
-                # guessing close to mean seems to be important for the
-                # pathological cases of an undetected object close to another
-                low = prior.fracdev_prior.mean - 0.1*prior.fracdev_prior.sigma
-                high = prior.fracdev_prior.mean + 0.1*prior.fracdev_prior.sigma
-                while True:
-                    fracdev_guess = rng.uniform(low=low, high=high)
-                    if 0 < fracdev_guess < 1:
-                        break
-            else:
-                fracdev_guess = prior.fracdev_prior.sample()
-
-        if model == 'bd':
-            low = prior.logTratio_prior.mean - 0.1*prior.logTratio_prior.sigma
-            high = prior.logTratio_prior.mean + 0.1*prior.logTratio_prior.sigma
-            logTratio_guess = rng.uniform(low=low, high=high)
-
-            guess[beg+5] = logTratio_guess
-            guess[beg+6] = fracdev_guess
-            flux_start = 7
-
-        elif model == 'bdf':
-            guess[beg+5] = fracdev_guess
-            flux_start = 6
+        elif 'em' in pconf['model']:
+            ngauss = ngmix.bootstrap.get_em_ngauss(pconf['model'])
+            runner = ngmix.bootstrap.EMRunner(
+                obs,
+                Tguess,
+                ngauss,
+                pconf['em_pars'],
+            )
 
         else:
-            flux_start = 5
+            runner = ngmix.bootstrap.PSFRunner(
+                obs,
+                pconf['model'],
+                Tguess,
+                pconf['lm_pars'],
+            )
 
-        for band, obslist in enumerate(mbo):
-            obslist = mbo[band]
-            band_meta = obslist.meta
+        runner.go(ntry=pconf['ntry'])
 
-            # note we take out scale**2 in DES images when
-            # loading from MEDS so this isn't needed
-            flux = band_meta['psf_flux']
-            low = flux
-            high = flux*2.0
-            flux_guess = rng.uniform(low=low, high=high)
-            guess[beg+flux_start+band] = flux_guess
+        psf_fitter = runner.fitter
+        res = psf_fitter.get_result()
+        obs.update_meta_data({'fitter': psf_fitter})
 
-        # fix fluxes
-        fluxes = guess[beg+flux_start:beg+flux_start+nband]
-        logic = np.isfinite(fluxes) & (fluxes > 0.0)
-        wgood, = np.where(logic == True)  # noqa
-        if wgood.size != nband:
-            logging.info('fixing bad flux guesses: %s' % format_pars(fluxes))
-            if wgood.size == 0:
-                fluxes[:] = rng.uniform(low=100, high=200)
-            else:
-                wbad, = np.where(logic == False)  # noqa
-                fac = 1.0 + rng.uniform(low=-0.1, high=0.1, size=wbad.size)
-                fluxes[wbad] = fluxes[wgood].mean()*fac
-            logging.info('new guesses: %s' % format_pars(fluxes))
-
-        logger.debug('guess[%d]: %s' % (
-            i, format_pars(guess[beg:beg+flux_start+band+1])))
-    return guess
+        if res['flags'] == 0:
+            gmix = psf_fitter.get_gmix()
+            obs.set_gmix(gmix)
+        else:
+            raise BootPSFFailure("failed to fit psfs: %s" % str(res))

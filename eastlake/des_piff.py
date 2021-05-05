@@ -1,5 +1,5 @@
-from __future__ import print_function
 import os
+import logging
 
 import galsim
 import galsim.config
@@ -8,10 +8,18 @@ import piff
 
 import numpy as np
 import ngmix
-from ngmix.fitting import LMSimple
-from ngmix.admom import Admom
+if ngmix.__version__[0:2] == "v1":
+    NGMIX_V2 = False
+    from ngmix.fitting import LMSimple
+    from ngmix.admom import Admom
+else:
+    NGMIX_V2 = True
+    from ngmix.fitting import Fitter
+    from ngmix.admom import AdmomFitter
 
 from scipy.interpolate import CloughTocher2DInterpolator
+
+logger = logging.getLogger(__name__)
 
 # pixel scale used for fitting the Piff models
 PIFF_SCALE = 0.25
@@ -28,15 +36,15 @@ class DES_Piff(object):
     ----------
     file_name : str
         The file with the Piff psf solution.
-    no_smooth : bool, optional
-        If True, then do not smooth the Piff PSFs. Default of False.
+    smooth : bool, optional
+        If True, then smooth the Piff PSFs. Default of False.
     """
     _req_params = {'file_name': str}
     _opt_params = {}
     _single_params = []
     _takes_rng = False
 
-    def __init__(self, file_name, no_smooth=False):
+    def __init__(self, file_name, smooth=False):
         self.file_name = file_name
         # Read the Piff file. This may fail if the Piff
         # file is missing. We catch this and continue
@@ -50,7 +58,7 @@ class DES_Piff(object):
             print("failed to load Piff file, hopefully it's rejectlisted...")
             self._piff = None
         self._did_fit = False
-        self.no_smooth = no_smooth
+        self.smooth = smooth
 
     def _fit_smooth_model(self):
         dxy = 256
@@ -86,20 +94,34 @@ class DES_Piff(object):
                 if gs_img.calculateFWHM() > 0.5:
                     for _ in range(5):
                         try:
-                            am = Admom(obs, rng=rng)
-                            am.go(0.3)
-                            res = am.get_result()
-                            if res['flags'] != 0:
-                                continue
+                            if NGMIX_V2:
+                                am = AdmomFitter(rng=rng)
+                                res = am.go(obs, 0.3)
+                                if res['flags'] != 0:
+                                    continue
 
-                            lm = LMSimple(obs, 'turb')
-                            lm.go(res['pars'])
-                            lm_res = lm.get_result()
-                            if lm_res['flags'] == 0:
-                                _g1 = lm_res['pars'][2]
-                                _g2 = lm_res['pars'][3]
-                                _T = lm_res['pars'][4]
-                                break
+                                lm = Fitter(model='turb')
+                                lm_res = lm.go(obs, res['pars'])
+                                if lm_res['flags'] == 0:
+                                    _g1 = lm_res['pars'][2]
+                                    _g2 = lm_res['pars'][3]
+                                    _T = lm_res['pars'][4]
+                                    break
+                            else:
+                                am = Admom(obs, rng=rng)
+                                am.go(0.3)
+                                res = am.get_result()
+                                if res['flags'] != 0:
+                                    continue
+
+                                lm = LMSimple(obs, 'turb')
+                                lm.go(res['pars'])
+                                lm_res = lm.get_result()
+                                if lm_res['flags'] == 0:
+                                    _g1 = lm_res['pars'][2]
+                                    _g2 = lm_res['pars'][3]
+                                    _T = lm_res['pars'][4]
+                                    break
                         except ngmix.gexceptions.GMixRangeError:
                             pass
 
@@ -193,17 +215,12 @@ class DES_Piff(object):
         # nice and big image size here cause this has been a problem
         image = galsim.ImageD(ncol=n_pix, nrow=n_pix, wcs=pixel_wcs)
 
-        # piff offsets the center of the PSF from the true image
-        # center - here we will return a properly centered image by undoing
-        # the offset
-        dx = image_pos.x - int(image_pos.x + 0.5)
-        dy = image_pos.y - int(image_pos.y + 0.5)
-
         psf = self.getPiff().draw(
             image_pos.x,
             image_pos.y,
             image=image,
-            offset=(-dx, -dy))
+            center=True,
+        )
 
         psf = galsim.InterpolatedImage(
             galsim.ImageD(psf.array),  # make sure galsim is not keeping state
@@ -219,8 +236,10 @@ class DES_Piff(object):
     def getPiff(self):
         return self._piff
 
-    def getPSF(self, image_pos, wcs=None,
-               no_smooth=False, n_pix=None, **kwargs):
+    def getPSF(
+        self, image_pos, wcs=None,
+        smooth=False, n_pix=None, **kwargs
+    ):
         """Get an image of the PSF at the given location.
 
         Parameters
@@ -228,10 +247,10 @@ class DES_Piff(object):
         image_pos : galsim.Position
             The image position for the PSF.
         wcs : galsim.BaseWCS or subclass, optional
-            The WCS to use to draw the PSF. Currently used only for the
-            `no_smooth` option.
-        no_smooth : bool, optional
-            If True, then do not smooth the Piff PSFs. Default of False.
+            The WCS to use to draw the PSF. Currently used only when smoothing
+            is turned off.
+        smooth : bool, optional
+            If True, then smooth the Piff PSFs. Default of False.
         n_pix : int, optional
             The image size to use when drawing without smoothing.
         **kargs : extra keyword arguments
@@ -242,27 +261,25 @@ class DES_Piff(object):
         psf : galsim.GSObject
             The PSF at the image position.
         """
-        if no_smooth or self.no_smooth:
+        if smooth or self.smooth:
+            if not self._did_fit:
+                self._fit_smooth_model()
+
+            arr = np.array([
+                np.clip(image_pos.x, 1, 2048),
+                np.clip(image_pos.y, 1, 4096)])
+
+            _g1 = self._g1int(arr)[0]
+            _g2 = self._g2int(arr)[0]
+            _T = self._Tint(arr)[0]
+            if np.any(np.isnan(np.array([_g1, _g2, _T]))):
+                logger.debug("Piff smooth fit params are NaN: %s %s %s %s", image_pos, _g1, _g2, _T)
+                raise RuntimeError("NaN smooth Piff params at %s!" % image_pos)
+            pars = np.array([0, 0, _g1, _g2, _T, 1])
+            obj = ngmix.gmix.make_gmix_model(pars, 'turb').make_galsim_object()
+            return obj.withFlux(1)
+        else:
             return self._draw(image_pos, wcs=wcs, n_pix=n_pix)
-
-        if not self._did_fit:
-            self._fit_smooth_model()
-
-        arr = np.array([
-            np.clip(image_pos.x, 1, 2048),
-            np.clip(image_pos.y, 1, 4096)])
-
-        _g1 = self._g1int(arr)[0]
-        _g2 = self._g2int(arr)[0]
-        _T = self._Tint(arr)[0]
-        if np.any(np.isnan(np.array([_g1, _g2, _T]))):
-            try:
-                print("\n\n\n", image_pos, _g1, _g2, _T, "\n\n\n", flush=True)
-            except (SyntaxError, TypeError):
-                print("\n\n\n", image_pos, _g1, _g2, _T, "\n\n\n")
-        pars = np.array([0, 0, _g1, _g2, _T, 1])
-        obj = ngmix.gmix.make_gmix_model(pars, 'turb').make_galsim_object()
-        return obj.withFlux(1)
 
 
 class PiffLoader(galsim.config.InputLoader):
@@ -287,7 +304,7 @@ def BuildDES_Piff(config, base, ignore, gsparams, logger):
            'num': int,
            'image_pos': galsim.PositionD,
            'x_interpolant': str,
-           'no_smooth': bool}
+           'smooth': bool}
     params, safe = galsim.config.GetAllParams(
         config, base, opt=opt, ignore=ignore)
 
@@ -312,7 +329,7 @@ def BuildDES_Piff(config, base, ignore, gsparams, logger):
     psf = des_piff.getPSF(
         image_pos,
         wcs,
-        no_smooth=params.get('no_smooth', False),
+        smooth=params.get('smooth', False),
         gsparams=gsparams)
 
     if 'flux' in params:
