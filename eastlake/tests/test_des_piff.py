@@ -34,6 +34,11 @@ def test_des_piff_smoke():
     assert np.all(np.isfinite(psf_im))
     assert np.allclose(np.sum(psf_im), 1)
 
+    y, x = np.unravel_index(np.argmax(psf_im), psf_im.shape)
+    cen = (psf_im.shape[0]-1)/2
+    assert y == cen
+    assert x == cen
+
 
 @pytest.mark.skipif(
     os.environ.get('TEST_DESDATA', None) is None,
@@ -67,6 +72,10 @@ def test_des_piff_smooth():
     for im in [psf_im, psf_im1, psf_im2]:
         assert np.all(np.isfinite(im))
         assert np.allclose(np.sum(im), 1)
+        y, x = np.unravel_index(np.argmax(im), im.shape)
+        cen = (im.shape[0]-1)/2
+        assert y == cen
+        assert x == cen
 
     assert np.allclose(psf_im1, psf_im2)
     assert not np.allclose(psf_im, psf_im1)
