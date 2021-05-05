@@ -21,7 +21,7 @@ def make_sim(*, seed, g1, g2):
     scale = 0.263
 
     im = obj.drawImage(nx=53, ny=53, offset=dither, scale=scale).array
-    nse = np.sqrt(np.sum(im**2)) / 1e5
+    nse = np.sqrt(np.sum(im**2)) / 1e6
     im += rng.normal(size=im.shape, scale=nse)
 
     psf_im = psf.drawImage(nx=53, ny=53, scale=scale).array
