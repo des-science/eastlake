@@ -1,6 +1,10 @@
 # flake8: noqa
-from __future__ import print_function
-from ngmix.medsreaders import MultiBandNGMixMEDS, NGMixMEDS
-from ngmix.fitting import format_pars
+import ngmix
 
-NGMIX_V1 = True
+if ngmix.__version__[0:2] == "v1":
+    NGMIX_V2 = False
+    from ngmix.fitting import format_pars
+
+else:
+    NGMIX_V2 = True
+    from ngmix.util import format_pars

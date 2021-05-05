@@ -8,8 +8,14 @@ import piff
 
 import numpy as np
 import ngmix
-from ngmix.fitting import LMSimple
-from ngmix.admom import Admom
+if ngmix.__version__[0:2] == "v1":
+    NGMIX_V2 = False
+    from ngmix.fitting import LMSimple
+    from ngmix.admom import Admom
+else:
+    NGMIX_V2 = True
+    from ngmix.fitting import Fitter
+    from ngmix.admom import AdmomFitter
 
 from scipy.interpolate import CloughTocher2DInterpolator
 
@@ -86,20 +92,34 @@ class DES_Piff(object):
                 if gs_img.calculateFWHM() > 0.5:
                     for _ in range(5):
                         try:
-                            am = Admom(obs, rng=rng)
-                            am.go(0.3)
-                            res = am.get_result()
-                            if res['flags'] != 0:
-                                continue
+                            if NGMIX_V2:
+                                am = AdmomFitter(rng=rng)
+                                res = am.go(obs, 0.3)
+                                if res['flags'] != 0:
+                                    continue
 
-                            lm = LMSimple(obs, 'turb')
-                            lm.go(res['pars'])
-                            lm_res = lm.get_result()
-                            if lm_res['flags'] == 0:
-                                _g1 = lm_res['pars'][2]
-                                _g2 = lm_res['pars'][3]
-                                _T = lm_res['pars'][4]
-                                break
+                                lm = Fitter(model='turb')
+                                lm_res = lm.go(obs, res['pars'])
+                                if lm_res['flags'] == 0:
+                                    _g1 = lm_res['pars'][2]
+                                    _g2 = lm_res['pars'][3]
+                                    _T = lm_res['pars'][4]
+                                    break
+                            else:
+                                am = Admom(obs, rng=rng)
+                                am.go(0.3)
+                                res = am.get_result()
+                                if res['flags'] != 0:
+                                    continue
+
+                                lm = LMSimple(obs, 'turb')
+                                lm.go(res['pars'])
+                                lm_res = lm.get_result()
+                                if lm_res['flags'] == 0:
+                                    _g1 = lm_res['pars'][2]
+                                    _g2 = lm_res['pars'][3]
+                                    _T = lm_res['pars'][4]
+                                    break
                         except ngmix.gexceptions.GMixRangeError:
                             pass
 

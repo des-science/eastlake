@@ -3,12 +3,22 @@ import logging
 import numpy as np
 import esutil as eu
 
+from ..ngmix_compat import NGMIX_V2
 from ngmix import ObsList, MultiBandObsList
-from ngmix.bootstrap import MaxMetacalBootstrapper
 from ngmix.gexceptions import BootPSFFailure, BootGalFailure
+from . import procflags
 
-from ..ngmix_compat import NGMIX_V1
-from .base_fitter import FitterBase, _fit_one_psf, _fit_all_psfs
+if NGMIX_V2:
+    from ngmix.runners import Runner, PSFRunner
+    from ngmix.guessers import SimplePSFGuesser, TFluxAndPriorGuesser, PriorGuesser
+    from ngmix.fitting import Fitter
+    from ngmix.metacal import MetacalBootstrapper
+    from ngmix.gaussmom import GaussMom
+else:
+    from ngmix.bootstrap import MaxMetacalBootstrapper
+    from .base_fitter import _fit_one_psf
+
+from .base_fitter import FitterBase
 from .util import Namer
 
 logger = logging.getLogger(__name__)
@@ -27,18 +37,13 @@ class MetacalFitter(FitterBase):
         The number of bands.
     rng : np.random.RandomState
         An RNG instance.
-    mof_fitter : mdetsims.metcal.MOFFitter
-        An instantiated MOFFitter for doing neighbor subtraction.
 
     Methods
     -------
     go(mbobs_list_input)
     """
-    def __init__(self, conf, nband, rng, mof_fitter=None, **kw):
-
-        self.mof_fitter = mof_fitter
-
-        super(MetacalFitter, self).__init__(conf, nband, rng)
+    def __init__(self, conf, nband, rng):
+        super().__init__(conf, nband, rng)
 
     def _setup(self):
         self.metacal_prior = self._get_prior(self['metacal'])
@@ -73,31 +78,13 @@ class MetacalFitter(FitterBase):
         if not isinstance(mbobs_list, list):
             mbobs_list = [mbobs_list]
 
-        if self.mof_fitter is not None:
-            # for mof fitting, we expect a list of mbobs_lists
-            mof_data, epochs_data = self.mof_fitter.go(mbobs_list)
-            if mof_data is None or epochs_data is None:
-                self._result = None
-                return None
-            fitter = self.mof_fitter.get_mof_fitter()
-
-            # test if the fitter worked
-            res = fitter.get_result()
-            if res['flags'] != 0:
-                self._result = None
-                return None
-
-            # this gets all objects, all bands in a list of MultiBandObsList
-            mbobs_list_mcal = fitter.make_corrected_obs()
-        else:
-            mbobs_list_mcal = mbobs_list
-            mof_data = None
+        mbobs_list_mcal = mbobs_list
         self.mbobs_list_mcal = mbobs_list_mcal
 
         if self['metacal']['symmetrize_weight']:
             self._symmetrize_weights(mbobs_list_mcal)
 
-        self._result = self._do_all_metacal(mbobs_list_mcal, data=mof_data)
+        self._result = self._do_all_metacal(mbobs_list_mcal)
 
     def _symmetrize_weights(self, mbobs_list):
         def _symmetrize_weight(wt):
@@ -112,7 +99,7 @@ class MetacalFitter(FitterBase):
                 for obs in obslist:
                     _symmetrize_weight(obs.weight)
 
-    def _do_all_metacal(self, mbobs_list, data=None):
+    def _do_all_metacal(self, mbobs_list):
         """run metacal on all objects
 
         NOTE: failed mbobs will have no entries in the final list
@@ -125,14 +112,14 @@ class MetacalFitter(FitterBase):
             passed_flags, mbobs = self._check_flags(_mbobs)
             if passed_flags:
                 try:
-                    if not NGMIX_V1:
-                        _fit_all_psfs([mbobs], self['metacal']['psf'])
-
-                    boot = self._do_one_metacal(mbobs)
-                    if isinstance(boot, dict):
-                        res = boot
+                    if NGMIX_V2:
+                        res = self._do_one_metacal_ngmixv2(mbobs)
                     else:
-                        res = boot.get_metacal_result()
+                        boot = self._do_one_metacal_ngmixv1(mbobs)
+                        if isinstance(boot, dict):
+                            res = boot
+                        else:
+                            res = boot.get_metacal_result()
                 except (BootPSFFailure, BootGalFailure) as err:
                     logger.debug(str(err))
                     res = {'mcal_flags': 1}
@@ -142,14 +129,6 @@ class MetacalFitter(FitterBase):
                 else:
                     # make sure we send an array
                     fit_data = self._get_metacal_output(res, self.nband, mbobs)
-                    if data is not None:
-                        odata = data[i:i+1]
-                        fit_data = eu.numpy_util.add_fields(
-                            fit_data,
-                            odata.dtype.descr,
-                        )
-                        eu.numpy_util.copy_fields(odata, fit_data)
-
                     self._print_result(fit_data)
                     datalist.append(fit_data)
 
@@ -159,7 +138,73 @@ class MetacalFitter(FitterBase):
         output = eu.numpy_util.combine_arrlist(datalist)
         return output
 
-    def _do_one_metacal(self, mbobs):
+    def _do_one_metacal_ngmixv2(self, mbobs):
+        gm = GaussMom(1.2).go(mbobs[0][0])
+        if gm['flags'] == 0:
+            flux_guess = gm['flux']
+            Tguess = gm['T']
+            guesser = TFluxAndPriorGuesser(
+                rng=self.rng, T=Tguess, flux=flux_guess, prior=self.metacal_prior,
+            )
+        else:
+            guesser = PriorGuesser(self.metacal_prior)
+        psf_guesser = SimplePSFGuesser(rng=self.rng)
+
+        fitter = Fitter(
+            model=self['metacal']['model'],
+            fit_pars=self['metacal']['max_pars']['pars']['lm_pars'],
+            prior=self.metacal_prior
+        )
+        psf_fitter = Fitter(
+            model=self['metacal']['psf']['model'],
+            fit_pars=self['metacal']['psf']['lm_pars'],
+        )
+
+        psf_runner = PSFRunner(
+            fitter=psf_fitter,
+            guesser=psf_guesser,
+            ntry=self['metacal']['psf']['ntry'],
+        )
+        runner = Runner(
+            fitter=fitter,
+            guesser=guesser,
+            ntry=self['metacal']['max_pars']['ntry'],
+        )
+
+        boot = MetacalBootstrapper(
+            runner=runner, psf_runner=psf_runner,
+            rng=self.rng, **self['metacal']['metacal_pars'],
+        )
+        resdict, _ = boot.go(mbobs)
+        flags = 0
+        for key in resdict:
+            flags |= resdict[key]['flags']
+        resdict['mcal_flags'] = flags
+
+        psf_T = 0.0
+        psf_g = np.zeros(2)
+        wsum = 0.0
+        for obslist in mbobs:
+            for obs in obslist:
+                msk = obs.weight > 0
+                if np.any(msk) and 'result' in obs.psf.meta:
+                    wgt = np.median(obs.weight[msk])
+                    psf_T += wgt * obs.psf.meta['result']['T']
+                    psf_g += wgt * obs.psf.meta['result']['e']
+                    wsum += wgt
+        if wsum > 0:
+            psf_T /= wsum
+            psf_g /= wsum
+            resdict['noshear']['Tpsf'] = psf_T
+            resdict['noshear']['gpsf'] = psf_g
+        else:
+            resdict['mcal_flags'] |= procflags.NO_DATA
+            resdict['noshear']['Tpsf'] = -9999.0
+            resdict['noshear']['gpsf'] = np.array([-9999.0, -9999.0])
+
+        return resdict
+
+    def _do_one_metacal_ngmixv1(self, mbobs):
         conf = self['metacal']
         psf_pars = conf['psf']
         max_conf = conf['max_pars']
@@ -253,9 +298,9 @@ class MetacalFitter(FitterBase):
                 (n('T'), 'f8'),
                 (n('T_err'), 'f8'),
                 (n('T_ratio'), 'f8'),
-                (n('flux'), 'f8', nband),
+                (n('flux'), 'f8', (nband,)),
                 (n('flux_cov'), 'f8', (nband, nband)),
-                (n('flux_err'), 'f8', nband),
+                (n('flux_err'), 'f8', (nband,)),
             ]
 
         return dt
