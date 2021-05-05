@@ -123,7 +123,7 @@ def test_metacal():
 
     nsims = 100
 
-    rng = np.random.RandomState(seed=10)
+    rng = np.random.RandomState(seed=34132)
     seeds = rng.randint(size=nsims, low=1, high=2**29)
     jobs = [
         joblib.delayed(run_single_sim_pair)(seed)

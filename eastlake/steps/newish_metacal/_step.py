@@ -11,6 +11,7 @@ from ngmix.gexceptions import GMixRangeError
 
 from ngmix.medsreaders import MultiBandNGMixMEDS, NGMixMEDS
 from .metacal import MetacalFitter
+from .ngmix_compat import NGMIX_V2
 from eastlake.step import Step
 from eastlake.utils import safe_mkdir
 
@@ -241,7 +242,9 @@ def _run_mcal_one_chunk(meds_files, start, end, seed):
             o = mbmeds.get_mbobs(ind)
             o = _strip_coadd(o)
             o = _strip_zero_flux(o)
-            o = _apply_pixel_scale(o)
+            if not NGMIX_V2:
+                # ngmix v1 worked in surface brightness, not flux
+                o = _apply_pixel_scale(o)
 
             skip_me = False
             for ol in o:
