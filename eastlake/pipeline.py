@@ -251,8 +251,12 @@ class Pipeline(object):
                     steps.append(step_class(step_config, base_dir, logger=logger,
                                  verbosity=step_verbosity, name=step_name))
 
-        return cls(steps, base_dir, logger=None, verbosity=1, log_file=None, name="pipeline", config=config,
-                   record_file=record_file)
+        return cls(
+            steps, base_dir,
+            logger=logger, verbosity=verbosity,
+            log_file=log_file, name=name, config=config,
+            record_file=record_file
+        )
 
     def execute(self, new_params_list=None, base_dir=None, no_overwrite_job_record=False,
                 skip_completed_steps=False):
