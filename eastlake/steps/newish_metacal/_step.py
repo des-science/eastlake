@@ -122,7 +122,7 @@ class NewishMetcalRunner(Step):
                         if sstr in f:
                             meds_files_to_use.append(f)
                             break
-            assert len(meds_files_to_use) == 3, (
+            assert len(meds_files_to_use) == len(self.bands), (
                 "We did not find the right number of meds files!")
 
             # record what bands we're running in the stash

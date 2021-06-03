@@ -310,7 +310,9 @@ class MEDSRunner(Step):
                         msk_files = [f for (i, f) in enumerate(img_data['msk_files']) if not is_rejectlisted[i]]
                         mag_zps = [m for (i, m) in enumerate(img_data['mag_zps']) if not is_rejectlisted[i]]
                     else:
-                        wgt_files, msk_files = img_data['wgt_files'], img_data['msk_files']
+                        wgt_files, msk_files, mag_zps = (
+                            img_data['wgt_files'], img_data['msk_files'], img_data['mag_zps']
+                        )
 
                     if self.config.get("sub_bkg", True):
                         bkg_filenames = [get_bkg_path(f) for f in img_files]
@@ -474,8 +476,8 @@ class MEDSRunner(Step):
                             self.logger.error(
                                 "se psfex files: %s" % [
                                     get_psfex_path(f)
-                                    for f in img_data["img_files"]])
-                            for img_file in img_data["img_files"]:
+                                    for f in img_files])
+                            for img_file in img_files:
                                 psfex_path = get_psfex_path(img_file)
                                 if self.config.get("use_galsim_psfex", True):
                                     self.logger.error(
