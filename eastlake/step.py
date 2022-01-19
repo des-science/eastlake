@@ -7,19 +7,6 @@ from timeit import default_timer as timer
 from datetime import timedelta
 
 
-def _get_relpath(pth, start=None):
-    if start is not None:
-        real_rel = os.path.relpath(os.path.realpath(pth), os.path.realpath(start))
-        rel = os.path.relpath(pth, start)
-    else:
-        real_rel = os.path.relpath(os.path.realpath(pth))
-        rel = os.path.relpath(pth)
-    if len(real_rel) < len(rel):
-        return real_rel
-    else:
-        return rel
-
-
 def run_and_check(command, command_name, logger=None):
     if logger is not None:
         logger.info("running cmd: %s" % (" ".join(command),))
@@ -90,10 +77,6 @@ class Step(object):
             if verbosity is None:
                 verbosity = 1
             self.logger = get_logger(self.name, verbosity, log_file=log_file)
-        # if verbosity is not None:
-        #     new_level = LOGGING_LEVELS[verbosity]
-        #     if new_level != self.logger.getEffectiveLevel():
-        #         self.logger.setLevel(new_level)
 
         # Make base_dir if it doesn't exist.
         # If base_dir is None, set to current directory

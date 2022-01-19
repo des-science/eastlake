@@ -14,11 +14,9 @@ from .metacal import MetacalFitter
 from .ngmix_compat import NGMIX_V2
 from eastlake.step import Step
 from eastlake.utils import safe_mkdir
+from eastlake.des_files import MAGZP_REF
 
 logger = logging.getLogger(__name__)
-
-# always and forever
-MAGZP_REF = 30.0
 
 CONFIG = {
     'metacal': {

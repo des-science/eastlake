@@ -20,7 +20,7 @@ from .steps import (
     DeleteMeds,
     NewishMetcalRunner,
 )
-from .utils import get_logger, safe_mkdir
+from .utils import get_logger, safe_mkdir, pushd
 from .stash import Stash
 
 PANIC_STRING = "!!!!!!!!!!!!!!\nWTF*WTF*WTF*WTF*\n"
@@ -275,10 +275,7 @@ class Pipeline(object):
 
         # Loop through steps calling execute function. Pass self.stash and any new_params
         # Move to base_dir, first get cwd which we'll return to later
-        cwd = os.getcwd()
-        try:
-            os.chdir(self.base_dir)
-
+        with pushd(self.base_dir):
             for step, new_params in zip(self.steps, new_params_list):
                 if skip_completed_steps:
                     if (step.name, 0) in self.stash["completed_step_names"]:
@@ -301,9 +298,7 @@ class Pipeline(object):
                 self.stash["completed_step_names"].append((step.name, status))
                 # save stash
                 self._save_restart(no_overwrite_job_record)
-        finally:
-            # Return to the previous cwd
-            os.chdir(cwd)
+
         return 0
 
     def _save_restart(self, no_overwrite_job_record):

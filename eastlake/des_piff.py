@@ -25,6 +25,14 @@ logger = logging.getLogger(__name__)
 PIFF_SCALE = 0.25
 
 
+PSF_KWARGS = {
+    "g": {"GI_COLOR": 0.61},
+    "r": {"GI_COLOR": 0.61},
+    "i": {"GI_COLOR": 0.61},
+    "z": {"IZ_COLOR": 0.34},
+}
+
+
 class DES_Piff(object):
     """A wrapper for Piff to use with Galsim.
 
@@ -44,8 +52,9 @@ class DES_Piff(object):
     _single_params = []
     _takes_rng = False
 
-    def __init__(self, file_name, smooth=False):
+    def __init__(self, file_name, smooth=False, psf_kwargs=None):
         self.file_name = file_name
+        self.psf_kwargs = psf_kwargs or {}
         # Read the Piff file. This may fail if the Piff
         # file is missing. We catch this and continue
         # since if we're substituting in some different
@@ -54,8 +63,11 @@ class DES_Piff(object):
         try:
             self._piff = piff.read(
                 os.path.expanduser(os.path.expandvars(file_name)))
-        except IOError:
-            print("failed to load Piff file, hopefully it's rejectlisted...")
+
+            self._chipnum = list(set(self._piff.wcs.keys()))[0]
+            assert len(list(set(self._piff.wcs.keys()))) == 1
+        except IOError as e:
+            print("failed to load Piff file, hopefully it's rejectlisted: %s" % repr(e))
             self._piff = None
         self._did_fit = False
         self.smooth = smooth
@@ -220,6 +232,8 @@ class DES_Piff(object):
             image_pos.y,
             image=image,
             center=True,
+            chipnum=self._chipnum,
+            **self.psf_kwargs,
         )
 
         psf = galsim.InterpolatedImage(

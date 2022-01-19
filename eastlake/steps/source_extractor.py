@@ -1,14 +1,14 @@
 from __future__ import print_function, absolute_import
 import os
-import subprocess
 import copy
 import pkg_resources
 
 import fitsio
 import numpy as np
 
-from ..step import Step, run_and_check, _get_relpath
+from ..step import Step, run_and_check
 from ..stash import Stash
+from ..utils import get_relpath, pushd, unpack_fits_file_if_needed
 
 
 def _get_default(nm):
@@ -79,48 +79,41 @@ class SrcExtractorRunner(Step):
         tilenames = stash["tilenames"]
 
         for tilename in tilenames:
-            tile_info = stash["tile_info"][tilename]
-
             # Get detection weight file. SrcExtractor doesn't like compressed
             # fits files, so may need to funpack
             if "single_band_det" in self.config:
-                det_image_file, det_image_ext = (
-                    stash.get_filepaths(
-                        "coadd_file", tilename,
-                        band=self.config["single_band_det"]),
-                    tile_info[self.config["single_band_det"]]["coadd_ext"])
-                det_weight_file, det_weight_ext = (
-                    stash.get_filepaths(
-                        "coadd_weight_file", tilename,
-                        band=self.config["single_band_det"]),
-                    tile_info[self.config["single_band_det"]][
-                        "coadd_weight_ext"])
-                det_mask_file, det_mask_ext = (
-                    stash.get_filepaths(
-                        "coadd_mask_file", tilename,
-                        band=self.config["single_band_det"]),
-                    tile_info[self.config["single_band_det"]][
-                        "coadd_mask_ext"])
+                det_image_file, det_image_ext = stash.get_filepaths(
+                    "coadd_file", tilename,
+                    band=self.config["single_band_det"],
+                    with_fits_ext=True,
+                )
+                det_weight_file, det_weight_ext = stash.get_filepaths(
+                    "coadd_weight_file", tilename,
+                    band=self.config["single_band_det"],
+                    with_fits_ext=True,
+                )
+                det_mask_file, det_mask_ext = stash.get_filepaths(
+                    "coadd_mask_file", tilename,
+                    band=self.config["single_band_det"],
+                    with_fits_ext=True,
+                )
             else:
-                det_image_file, det_image_ext = (
-                    stash.get_filepaths("det_image_file", tilename),
-                    tile_info["det_image_ext"])
-                det_weight_file = stash.get_filepaths(
-                    "det_weight_file", tilename)
-                det_weight_ext = tile_info["det_weight_ext"]
-                det_mask_file = stash.get_filepaths("det_mask_file", tilename)
-                det_mask_ext = tile_info["det_mask_ext"]
+                det_image_file, det_image_ext = stash.get_filepaths(
+                    "det_image_file", tilename, with_fits_ext=True
+                )
+                det_weight_file, det_weight_ext = stash.get_filepaths(
+                    "det_weight_file", tilename, with_fits_ext=True
+                )
+                det_mask_file, det_mask_ext = stash.get_filepaths(
+                    "det_mask_file", tilename, with_fits_ext=True
+                )
 
-            if ".fits.fz" in det_weight_file:
-                det_weight_file_funpacked = det_weight_file.replace(
-                    ".fits.fz", ".fits")
-                # There may already be a funpacked version there
-                if not os.path.isfile(det_weight_file_funpacked):
-                    subprocess.check_output(["funpack", det_weight_file])
-                det_weight_file = det_weight_file_funpacked
-                # If we've funpacked, we'll also need to reduce the
-                # extension number by 1
-                det_weight_ext = tile_info["det_weight_ext"]-1
+            # Astromatic doesn't like compressed fits files, so we may
+            # need to unpack here if the weight file is .fits.fz. In this
+            # case we also need to subtract 1 from the weight extension
+            det_weight_file, det_weight_ext = unpack_fits_file_if_needed(
+                det_weight_file, det_weight_ext,
+            )
 
             # Assoc mode hack
             srcex_cmd_root = copy.copy(self.srcex_cmd_root)
@@ -156,79 +149,71 @@ class SrcExtractorRunner(Step):
             # Now loop through bands calling SrcExtractor in dual image mode
             for band in stash["bands"]:
                 cmd = copy.copy(srcex_cmd_root)
-                band_file_info = tile_info[band]
-                weight_file, weight_ext = (
-                    stash.get_filepaths(
-                        "coadd_weight_file", tilename, band=band),
-                    band_file_info["coadd_weight_ext"])
-                if ".fits.fz" in weight_file:
-                    weight_file_funpacked = weight_file.replace(
-                        ".fits.fz", ".fits")
-                    # There may already be a funpacked version there
-                    if not os.path.isfile(weight_file_funpacked):
-                        subprocess.check_output(["funpack", weight_file])
-                    weight_file = weight_file_funpacked
-                    # If we've funpacked, we'll also need to reduce the
-                    # extension number by 1
-                    weight_ext = weight_ext - 1
+                weight_file, weight_ext = stash.get_filepaths(
+                    "coadd_weight_file", tilename, band=band, with_fits_ext=True,
+                )
+                # Astromatic doesn't like compressed fits files, so we may
+                # need to unpack here if the weight file is .fits.fz. In this
+                # case we also need to subtract 1 from the weight extension
+                weight_file, weight_ext = unpack_fits_file_if_needed(
+                    weight_file, weight_ext,
+                )
 
                 # set catalog name
-                coadd_file, coadd_ext = (
-                    stash.get_filepaths("coadd_file", tilename, band=band),
-                    band_file_info["coadd_ext"])
+                coadd_file, coadd_ext = stash.get_filepaths(
+                    "coadd_file", tilename, band=band, with_fits_ext=True,
+                )
                 # SrcExtractor is annoying and can vomit a segfault if the paths
                 # to the input images are too long. So change to the
                 # band coadd directory and use relative paths from there
                 coadd_dir = os.path.realpath(os.path.dirname(coadd_file))
-                orig_working_dir = os.getcwd()
-                os.chdir(coadd_dir)
+                with pushd(coadd_dir):
 
-                # Add weight file stuff to command string
-                cmd += ["-WEIGHT_IMAGE", "%s[%d],%s[%d]" % (
-                    _get_relpath(det_weight_file), det_weight_ext,
-                    _get_relpath(weight_file), weight_ext)]
+                    # Add weight file stuff to command string
+                    cmd += ["-WEIGHT_IMAGE", "%s[%d],%s[%d]" % (
+                        get_relpath(det_weight_file), det_weight_ext,
+                        get_relpath(weight_file), weight_ext)]
 
-                catalog_name = coadd_file.replace(".fits", "_sexcat.fits")
+                    catalog_name = coadd_file.replace(".fits", "_sexcat.fits")
 
-                cmd += ["-CATALOG_NAME", _get_relpath(catalog_name)]
-                cmd += ["-CATALOG_TYPE", "FITS_1.0"]
+                    cmd += ["-CATALOG_NAME", get_relpath(catalog_name)]
+                    cmd += ["-CATALOG_TYPE", "FITS_1.0"]
 
-                # and seg name
-                seg_name = coadd_file.replace(".fits", "_seg.fits")
-                bkg_name = coadd_file.replace(".fits", "_bkg.fits")
-                bkg_rms_name = coadd_file.replace(".fits", "_bkg-rms.fits")
-                cmd += ["-CHECKIMAGE_NAME", "%s,%s,%s" % (
-                    _get_relpath(seg_name),
-                    _get_relpath(bkg_name),
-                    _get_relpath(bkg_rms_name))]
+                    # and seg name
+                    seg_name = coadd_file.replace(".fits", "_seg.fits")
+                    bkg_name = coadd_file.replace(".fits", "_bkg.fits")
+                    bkg_rms_name = coadd_file.replace(".fits", "_bkg-rms.fits")
+                    cmd += ["-CHECKIMAGE_NAME", "%s,%s,%s" % (
+                        get_relpath(seg_name),
+                        get_relpath(bkg_name),
+                        get_relpath(bkg_rms_name))]
 
-                # and mask file
-                mask_file = "%s[%d]" % (_get_relpath(det_mask_file),
-                                        det_mask_ext)
-                if mask_file is not None:
-                    cmd += ["-FLAG_IMAGE", _get_relpath(mask_file)]
-                else:
-                    self.logger.error("No mask for detection image")
+                    # and mask file
+                    mask_file = "%s[%d]" % (get_relpath(det_mask_file),
+                                            det_mask_ext)
+                    if mask_file is not None:
+                        cmd += ["-FLAG_IMAGE", get_relpath(mask_file)]
+                    else:
+                        self.logger.error("No mask for detection image")
 
-                # image name should be first argument
-                image_arg = "%s[%d],%s[%d]" % (_get_relpath(det_image_file),
-                                               det_image_ext,
-                                               _get_relpath(coadd_file),
-                                               coadd_ext)
-                cmd = [cmd[0]] + [image_arg] + cmd[1:]
+                    # image name should be first argument
+                    image_arg = "%s[%d],%s[%d]" % (get_relpath(det_image_file),
+                                                   det_image_ext,
+                                                   get_relpath(coadd_file),
+                                                   coadd_ext)
+                    cmd = [cmd[0]] + [image_arg] + cmd[1:]
 
-                if self.logger is not None:
-                    self.logger.error("calling source extractor with command:")
-                    self.logger.error(" ".join(cmd))
-                run_and_check(cmd, "SrcExtractor")
-                stash.set_filepaths(
-                    "srcex_cat", catalog_name, tilename, band=band)
-                stash.set_filepaths("seg_file", seg_name, tilename, band=band)
+                    if self.logger is not None:
+                        self.logger.error("calling source extractor with command:")
+                        self.logger.error(" ".join(cmd))
+                    run_and_check(cmd, "SrcExtractor")
+
+                with stash.update_output_pizza_cutter_yaml(tilename, band) as pyml:
+                    pyml["cat_path"] = catalog_name
+                    pyml["seg_path"] = seg_name
+                    pyml["seg_ext"] = 0
                 stash.set_filepaths("bkg_file", bkg_name, tilename, band=band)
                 stash.set_filepaths(
                     "bkg_rms_file", bkg_rms_name, tilename, band=band)
-
-                # change back to orig working dir
-                os.chdir(orig_working_dir)
 
         return 0, stash

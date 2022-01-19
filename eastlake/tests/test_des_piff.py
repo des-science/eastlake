@@ -2,10 +2,23 @@ import os
 
 import numpy as np
 import galsim
+import yaml
 
 import pytest
 
-from ..des_piff import DES_Piff
+from ..des_piff import DES_Piff, PSF_KWARGS
+
+
+def _get_piff_file():
+    with open(
+        os.path.join(os.environ['TEST_DESDATA'], "source_info.yaml"),
+        "r",
+    ) as fp:
+        return os.path.join(
+            os.environ['TEST_DESDATA'],
+            "DESDATA",
+            yaml.safe_load(fp)["piff_path"]
+        )
 
 
 @pytest.mark.skipif(
@@ -14,14 +27,8 @@ from ..des_piff import DES_Piff
         'DES_Piff can only be tested if '
         'test data is at TEST_DESDATA'))
 def test_des_piff_smoke():
-    piff_fname = os.path.join(
-        os.environ['TEST_DESDATA'],
-        "PIFF_DATA_DIR",
-        "y3a1-v29",
-        "232321",
-        "D00232321_i_c55_r2357p01_piff.fits",
-    )
-    piff = DES_Piff(piff_fname)
+    piff_fname = _get_piff_file()
+    piff = DES_Piff(piff_fname, psf_kwargs=PSF_KWARGS["g"])
     psf_im = piff.getPSF(galsim.PositionD(20, 10)).drawImage(nx=53, ny=53, scale=0.263).array
 
     if False:
@@ -46,25 +53,19 @@ def test_des_piff_smoke():
         'DES_Piff can only be tested if '
         'test data is at TEST_DESDATA'))
 def test_des_piff_smooth():
-    piff_fname = os.path.join(
-        os.environ['TEST_DESDATA'],
-        "PIFF_DATA_DIR",
-        "y3a1-v29",
-        "232321",
-        "D00232321_i_c55_r2357p01_piff.fits",
-    )
-    piff = DES_Piff(piff_fname)
+    piff_fname = _get_piff_file()
+    piff = DES_Piff(piff_fname, psf_kwargs=PSF_KWARGS["g"])
     psf_im = piff.getPSF(
         galsim.PositionD(20, 10),
     ).drawImage(nx=53, ny=53, scale=0.263).array
 
-    piff = DES_Piff(piff_fname)
+    piff = DES_Piff(piff_fname, psf_kwargs=PSF_KWARGS["g"])
     psf_im1 = piff.getPSF(
         galsim.PositionD(20, 10),
         smooth=True,
     ).drawImage(nx=53, ny=53, scale=0.263).array
 
-    piff = DES_Piff(piff_fname, smooth=True)
+    piff = DES_Piff(piff_fname, psf_kwargs=PSF_KWARGS["g"], smooth=True)
     psf_im2 = piff.getPSF(
         galsim.PositionD(20, 10),
     ).drawImage(nx=53, ny=53, scale=0.263).array

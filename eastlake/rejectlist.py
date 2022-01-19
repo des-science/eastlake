@@ -14,8 +14,8 @@ class RejectList(object):
     @classmethod
     def from_file(cls, rejectlist_file):
         # read the rejectlist from the file
-        with open(os.path.expandvars(rejectlist_file), "r") as f:
-            rejectlist_data = yaml.load(f, Loader=yaml.Loader)
+        with open(os.path.expandvars(rejectlist_file), "r") as fp:
+            rejectlist_data = yaml.safe_load(fp)
         return cls(rejectlist_data)
 
     def img_file_is_rejectlisted(self, img_file):

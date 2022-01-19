@@ -26,30 +26,6 @@ def test_stash_state_update():  # test from line 37-51.
     assert stsh2["orig_base_dirs"] == [os.path.abspath("blah1")]  # Why?
 
 
-def test_stash_get_abs_path():  # test from line 53-60.
-
-    stsh1 = Stash("blah1", ["foo1", "bar1"])
-    stsh2 = Stash("blah2", ["foo2", "bar2"], stash=stsh1)
-    stsh2['tile_info'] = {
-        'tile1': {
-            'r': {
-                'key1': 'path_to_file1'},
-            'i': {},
-            'z': {}},
-        'tile2': {
-            'key2': 'path_to_file2'},
-        'tile3': {}}
-
-    # When band==None
-    paths = stsh2.get_abs_path('key2', 'tile2', band=None)
-    # assert, do we need a test for os.path.isabs() ?
-    assert paths == TEST_DIR + 'blah2/path_to_file2'
-
-    # When band!=None
-    paths = stsh2.get_abs_path('key1', 'tile1', band='r')
-    assert paths == TEST_DIR + 'blah2/path_to_file1'
-
-
 def test_stash_set_filepaths():  # test from line 62-86.
     stsh1 = Stash("blah1", ["foo1", "bar1"])
     stsh2 = Stash("blah2", ["foo2", "bar2"], stash=stsh1)
