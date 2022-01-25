@@ -145,5 +145,5 @@ def test_metacal():
     print("m: %f +/- %f [1e-3, 3-sigma]" % (m/1e-3, 3*merr/1e-3), flush=True)
     print("c: %f +/- %f [1e-5, 3-sigma]" % (c/1e-5, 3*cerr/1e-5), flush=True)
 
-    assert np.abs(m) < max(5e-4, 3*merr), (m, merr)
-    assert np.abs(c) < 3.0*cerr, (c, cerr)
+    assert np.abs(m) < max(5e-4, 4*merr), (m, merr)
+    assert np.abs(c) < 4.0*cerr, (c, cerr)
