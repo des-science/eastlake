@@ -6,6 +6,19 @@ import numpy as np
 from coord import CelestialCoord
 
 MAGZP_REF = 30.0
+PIZZA_CUTTER_YAML_PATH_KEYS = [
+    "bmask_path",
+    "cat_path",
+    "gaia_stars_file",
+    "image_path",
+    "psf_path",
+    "seg_path",
+    "bkg_path",
+    "head_path",
+    "piff_path",
+    "psfex_path",
+    "weight_path",
+]
 
 
 def replace_imsim_data(
@@ -20,7 +33,7 @@ def replace_imsim_data(
     pth : str
         The path string on which to do replacement.
     imsim_data : str
-        The desired IMSIM_DATA. If None, then the path is simply returned as is.
+        The desired IMSIM_DATA.
     old_imsim_data : str, optional
         The IMSIM_DATA path to be replaced. If None, it will be inferred by splitting
         on "/sources-" and using the first part. If the old path cannot be inferred,
@@ -32,27 +45,48 @@ def replace_imsim_data(
         The path, possible with IMSIM_DATA in the path replaced with the desired
         one.
     """
-    if imsim_data is None:
-        return pth
-
     if old_imsim_data is None:
         # try to infer
         # paths look like this
         # /Users/beckermr/MEDS_DIR/test-y6-sims/DES0131-3206/sources-r/OPS/
         parts = pth.split("/sources-")
-        if len(parts) == 2 and parts[1][1:6] in ["/OPS/", "/ACT/"]:
+        if (
+            len(parts) == 2
+            and parts[1][1:6] in ["/OPS/", "/ACT/"]
+            and os.path.basename(parts[0]).startswith("DES")
+        ):
             old_imsim_data = os.path.dirname(parts[0])
         else:
-            old_imsim_data = '/global/project/projectdirs/des/y6-image-sims'
+            raise RuntimeError("Could not infer imsim data from the path %s!" % pth)
 
-    if (old_imsim_data in pth and
-            os.path.normpath(imsim_data) != os.path.normpath(old_imsim_data)):
-        return pth.replace(old_imsim_data, imsim_data)
+    if (
+        old_imsim_data in pth
+        and os.path.normpath(imsim_data) != os.path.normpath(old_imsim_data)
+    ):
+        return os.path.join(imsim_data, os.path.relpath(pth, start=old_imsim_data))
     else:
         return pth
 
 
 def get_pizza_cutter_yaml_path(imsim_data, desrun, tilename, band):
+    """Return the path to a pizza cutter info file.
+
+    Parameters
+    ----------
+    imsim_data : str
+        The path to the local IMSIM_DATA dir.
+    desrun : str
+        The DES run name.
+    tilename : str
+        The name of the coadd tile.
+    band : str
+        The desired band (e.g., 'r').
+
+    Returns
+    -------
+    pth : str
+        The path to the file.
+    """
     return os.path.join(
         imsim_data, desrun, "pizza_cutter_info",
         f"{tilename}_{band}_pizza_cutter_info.yaml",
@@ -62,30 +96,33 @@ def get_pizza_cutter_yaml_path(imsim_data, desrun, tilename, band):
 def replace_imsim_data_in_pizza_cutter_yaml(
     band_info, output_imsim_data, old_imsim_data=None
 ):
-    keys_to_munge = [
-        "bmask_path"
-        "cat_path"
-        "gaia_stars_file"
-        "image_path"
-        "psf_path"
-        "seg_path"
-        "bkg_path"
-        "head_path"
-        "piff_path"
-        "psfex_path"
-        "weight_path"
-    ]
-    for key in keys_to_munge:
+    """Replace the NERSC IMSIM_DATA path in a pizza cutter yaml file.
+
+    **This function operates in-place!**
+
+    Parameters
+    ----------
+    band_info : dict
+        The pizza cutter info.
+    output_imsim_data : str
+        The desired IMSIM_DATA.
+    old_imsim_data : str, optional
+        The IMSIM_DATA path to be replaced. If None, it will be inferred by splitting
+        on "/sources-" and using the first part. If the old path cannot be inferred,
+        assume NERSC.
+    """
+
+    for key in PIZZA_CUTTER_YAML_PATH_KEYS:
         if key in band_info:
             band_info[key] = replace_imsim_data(
                 band_info[key], output_imsim_data,
                 old_imsim_data=old_imsim_data,
             )
     for i in range(len(band_info["src_info"])):
-        for key in keys_to_munge:
+        for key in PIZZA_CUTTER_YAML_PATH_KEYS:
             if key in band_info["src_info"][i]:
-                band_info["src_info"][i] = replace_imsim_data(
-                    band_info["src_info"][i], output_imsim_data,
+                band_info["src_info"][i][key] = replace_imsim_data(
+                    band_info["src_info"][i][key], output_imsim_data,
                     old_imsim_data=old_imsim_data,
                 )
 
@@ -114,43 +151,6 @@ def read_pizza_cutter_yaml(imsim_data, desrun, tilename, band):
         band_info = yaml.safe_load(fp)
 
     replace_imsim_data_in_pizza_cutter_yaml(band_info, imsim_data)
-
-    return band_info
-
-
-def write_pizza_cutter_yaml(imsim_data, desrun, tilename, band, output_imsim_data):
-    """Write the pizza-cutter YAML file for this tile and band.
-
-    Parameters
-    ----------
-    imsim_data : str
-        The path to the input IMSIM_DATA dir.
-    desrun : str
-        The DES run name.
-    tilename : str
-        The name of the coadd tile.
-    band : str
-        The desired band (e.g., 'r').
-    output_imsim_data : str
-        The output IMSIM_DATA path. Called base_dir in some spots too.
-
-    Returns
-    -------
-    info : dict
-        The information for this tile.
-    """
-    pth = get_pizza_cutter_yaml_path(imsim_data, desrun, tilename, band)
-    with open(pth, "r") as fp:
-        band_info = yaml.safe_load(fp)
-
-    replace_imsim_data_in_pizza_cutter_yaml(band_info, imsim_data)
-    replace_imsim_data_in_pizza_cutter_yaml(
-        band_info, output_imsim_data, old_imsim_data=imsim_data
-    )
-
-    pth = get_pizza_cutter_yaml_path(output_imsim_data, desrun, tilename, band)
-    with open(pth, "w") as fp:
-        yaml.dump(band_info, fp)
 
     return band_info
 

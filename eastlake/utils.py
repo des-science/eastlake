@@ -51,7 +51,7 @@ def safe_mkdir(d):
         os.makedirs(d)
     except OSError as e:
         if e.errno != errno.EEXIST:
-            raise(e)
+            raise e
 
 
 def get_relpath(pth, start=None):
@@ -67,20 +67,6 @@ def get_relpath(pth, start=None):
         return rel
 
 
-def unpack_fits_file_if_needed(pth, ext):
-    if ".fits.fz" in pth:
-        pth_funpacked = pth.replace(".fits.fz", ".fits")
-        # There may already be a funpacked version there
-        if not os.path.isfile(pth_funpacked):
-            subprocess.check_output(["funpack", pth])
-        pth = pth_funpacked
-        # If we've funpacked, we'll also need to reduce the
-        # extension number by 1
-        if isinstance(ext, int):
-            ext -= 1
-    return pth, ext
-
-
 # https://stackoverflow.com/questions/6194499/pushd-through-os-system
 @contextlib.contextmanager
 def pushd(new_dir):
@@ -90,3 +76,21 @@ def pushd(new_dir):
         yield
     finally:
         os.chdir(previous_dir)
+
+
+def unpack_fits_file_if_needed(pth, ext):
+    if ".fits.fz" in pth:
+        pth_funpacked = pth.replace(".fits.fz", ".fits")
+        # There may already be a funpacked version there
+        if not os.path.isfile(pth_funpacked):
+            subprocess.check_output(
+                ["funpack", os.path.basename(pth)],
+                cwd=os.path.dirname(pth),
+            )
+        pth = pth_funpacked
+        # If we've funpacked, we'll also need to reduce the
+        # extension number by 1
+        if isinstance(ext, int):
+            ext -= 1
+
+    return pth, ext

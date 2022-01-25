@@ -46,6 +46,8 @@ class Stash(dict):
         # replace imsim_data with current value if it exists
         if "IMSIM_DATA" in os.environ:
             self["imsim_data"] = os.environ["IMSIM_DATA"]
+        else:
+            self["imsim_data"] = None
 
     def set_filepaths(self, file_key, filepaths, tilename, band=None, ext=None):
         # For simulation output files, we want to save a relative path w.r.t
@@ -186,7 +188,10 @@ class Stash(dict):
                 else:
                     raise(e)
 
-    def set_output_pizza_cutter_yaml(self, data, tilename, band):
+    def set_output_pizza_cutter_yaml(self, _data, tilename, band):
+        data = copy.deepcopy(_data)
+        replace_imsim_data_in_pizza_cutter_yaml(data, self["base_dir"])
+
         if "_output_pizza_cutter_yaml" not in self:
             self["_output_pizza_cutter_yaml"] = {}
         if tilename not in self["_output_pizza_cutter_yaml"]:
@@ -256,7 +261,8 @@ class Stash(dict):
 
     def has_output_pizza_cutter_yaml(self, tilename, band):
         if (
-            tilename in self["_output_pizza_cutter_yaml"]
+            "_output_pizza_cutter_yaml" in self
+            and tilename in self["_output_pizza_cutter_yaml"]
             and band in self["_output_pizza_cutter_yaml"][tilename]
         ):
             return True
@@ -265,14 +271,11 @@ class Stash(dict):
 
     def get_output_pizza_cutter_yaml(self, tilename, band):
         if (
-            tilename in self["_output_pizza_cutter_yaml"]
+            "_output_pizza_cutter_yaml" in self
+            and tilename in self["_output_pizza_cutter_yaml"]
             and band in self["_output_pizza_cutter_yaml"][tilename]
         ):
-            pyml = copy.deepcopy(self["_output_pizza_cutter_yaml"][tilename][band])
-            replace_imsim_data_in_pizza_cutter_yaml(
-                pyml, self["base_dir"]
-            )
-            return pyml
+            return copy.deepcopy(self["_output_pizza_cutter_yaml"][tilename][band])
         else:
             raise RuntimeError(
                 f"Could not find output pizza cutter yaml entry for tile|band {tilename}|{band}"
@@ -293,7 +296,11 @@ class Stash(dict):
         self.set_output_pizza_cutter_yaml(*self._output_pyml_info)
         self._output_pyml_info = None
 
-    def set_input_pizza_cutter_yaml(self, data, tilename, band):
+    def set_input_pizza_cutter_yaml(self, _data, tilename, band):
+        data = copy.deepcopy(_data)
+        if "imsim_data" in self and self["imsim_data"] is not None:
+            replace_imsim_data_in_pizza_cutter_yaml(data, self["imsim_data"])
+
         if "_input_pizza_cutter_yaml" not in self:
             self["_input_pizza_cutter_yaml"] = {}
         if tilename not in self["_input_pizza_cutter_yaml"]:
@@ -301,25 +308,15 @@ class Stash(dict):
         self["_input_pizza_cutter_yaml"][tilename][band] = data
 
         if not self.has_output_pizza_cutter_yaml(tilename, band):
-            pyml = copy.deepcopy(data)
-            replace_imsim_data_in_pizza_cutter_yaml(
-                pyml, self["base_dir"]
-            )
-            self.set_output_pizza_cutter_yaml(pyml, tilename, band)
+            self.set_output_pizza_cutter_yaml(data, tilename, band)
 
-    def get_input_pizza_cutter_yaml(self, tilename, band, imsim_data=None):
-        if imsim_data is None:
-            imsim_data = self["imsim_data"]
-
+    def get_input_pizza_cutter_yaml(self, tilename, band):
         if (
-            tilename in self["_input_pizza_cutter_yaml"]
+            "_input_pizza_cutter_yaml" in self
+            and tilename in self["_input_pizza_cutter_yaml"]
             and band in self["_input_pizza_cutter_yaml"][tilename]
         ):
-            pyml = copy.deepcopy(self["_input_pizza_cutter_yaml"][tilename][band])
-            replace_imsim_data_in_pizza_cutter_yaml(
-                pyml, imsim_data
-            )
-            return pyml
+            return copy.deepcopy(self["_input_pizza_cutter_yaml"][tilename][band])
         else:
             raise RuntimeError(
                 f"Could not find input pizza cutter yaml entry for tile|band={tilename}|{band}"
