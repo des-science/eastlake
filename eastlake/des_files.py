@@ -199,6 +199,7 @@ class Tile(dict):
         # Set up lists - useful for looping through in galsim
         band_list = []
         im_file_list = []
+        bkg_file_list = []
         mag_zp_list = []
         psfex_file_list = []
         piff_file_list = []
@@ -287,6 +288,11 @@ class Tile(dict):
             ]
             piff_file_list += piff_files
 
+            bkg_file_list += [
+                src["bkg_path"]
+                for src in band_info["src_info"]
+            ]
+
             # fill out indexing info for bands, tile_nums and tilenames
             band_list += band * len(image_files)
 
@@ -360,6 +366,7 @@ class Tile(dict):
 
         tile_data["tile_center"] = coadd_center
         tile_data["image_files"] = im_file_list
+        tile_data["bkg_files"] = bkg_file_list
         tile_data["mag_zp_list"] = mag_zp_list
         tile_data["psfex_files"] = psfex_file_list
         tile_data['piff_files'] = piff_file_list

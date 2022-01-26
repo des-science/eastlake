@@ -2,7 +2,8 @@ from __future__ import print_function
 import copy
 import pickle
 import os
-from .des_files import replace_imsim_data_in_pizza_cutter_yaml
+import yaml
+from .des_files import replace_imsim_data_in_pizza_cutter_yaml, get_pizza_cutter_yaml_path
 
 
 class Stash(dict):
@@ -259,6 +260,10 @@ class Stash(dict):
             "seg_file", data["seg_path"], tilename, band=band, ext=data["seg_ext"],
         )
 
+        #######################
+        # push changes to disk
+        self.write_pizza_cutter_yaml()
+
     def has_output_pizza_cutter_yaml(self, tilename, band):
         if (
             "_output_pizza_cutter_yaml" in self
@@ -295,6 +300,26 @@ class Stash(dict):
     def __exit__(self, exception_type, exception_value, traceback):
         self.set_output_pizza_cutter_yaml(*self._output_pyml_info)
         self._output_pyml_info = None
+
+    def write_output_pizza_cutter_yaml(self):
+        if "_output_pizza_cutter_yaml" in self and "desrun" in self:
+            for tilename in self["_output_pizza_cutter_yaml"]:
+                for band in self["_output_pizza_cutter_yaml"][tilename]:
+                    pth = get_pizza_cutter_yaml_path(
+                        self.base_dir,
+                        self["desrun"],
+                        tilename,
+                        band,
+                    )
+                    with open(pth, "w") as fp:
+                        yaml.dump(
+                            self["_output_pizza_cutter_yaml"][tilename][band],
+                            fp
+                        )
+        else:
+            raise RuntimeError(
+                "Could not write pizza cutter yaml due to missing yaml ot desrun!"
+            )
 
     def set_input_pizza_cutter_yaml(self, _data, tilename, band):
         data = copy.deepcopy(_data)
