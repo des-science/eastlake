@@ -73,7 +73,6 @@ class SingleBandSwarpRunner(Step):
                 cmd = self.swarp_cmd_root
 
                 coadd_center = stash.get_tile_info_quantity("tile_center", tilename)
-                print(coadd_center, type(coadd_center))
 
                 orig_coadd_path = stash.get_input_pizza_cutter_yaml(tilename, band)["image_path"]
                 orig_coadd_ext = stash.get_input_pizza_cutter_yaml(tilename, band)["image_ext"]
@@ -85,7 +84,12 @@ class SingleBandSwarpRunner(Step):
 
                 coadd_header = galsim.fits.FitsHeader(orig_coadd_path)
                 coadd_wcs, _ = galsim.wcs.readFromFitsHeader(coadd_header)
-                pixel_scale = np.sqrt(coadd_wcs.pixelArea(world_pos=coadd_center))
+                pixel_scale = np.sqrt(coadd_wcs.pixelArea(
+                    world_pos=galsim.CelestialCoord(
+                        coadd_center[0] * galsim.degrees,
+                        coadd_center[1] * galsim.degrees,
+                    )
+                ))
 
                 self.logger.info(
                     "inferred image size|pixel scale: %s|%s", image_shape, pixel_scale,
