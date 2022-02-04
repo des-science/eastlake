@@ -4,6 +4,8 @@ import pkg_resources
 
 import fitsio
 import astropy.io.fits as fits
+import galsim
+import numpy as np
 
 from ..utils import safe_mkdir, get_relpath, unpack_fits_file_if_needed, pushd
 from ..step import Step, run_and_check
@@ -73,6 +75,21 @@ class SingleBandSwarpRunner(Step):
                 coadd_center = stash.get_tile_info_quantity("tile_center", tilename)
 
                 orig_coadd_path = stash.get_input_pizza_cutter_yaml(tilename, band)["image_path"]
+                orig_coadd_ext = stash.get_input_pizza_cutter_yaml(tilename, band)["image_ext"]
+                h = fitsio.read_header(orig_coadd_path, ext=orig_coadd_ext)
+                if "ZNAXIS1" in h:
+                    image_shape = (h["ZNAXIS1"], h["ZNAXIS2"])
+                else:
+                    image_shape = (h["NAXIS1"], h["NAXIS2"])
+
+                coadd_header = galsim.fits.FitsHeader(orig_coadd_path)
+                coadd_wcs, _ = galsim.wcs.readFromFitsHeader(coadd_header)
+                pixel_scale = np.sqrt(coadd_wcs.pixelArea(world_pos=coadd_center))
+
+                self.logger.info(
+                    "inferred image size|pixel scale: %s|%s", image_shape, pixel_scale,
+                )
+
                 coadd_path_from_imsim_data = get_relpath(
                     orig_coadd_path, stash["imsim_data"])
                 output_coadd_path = os.path.join(
@@ -128,6 +145,8 @@ class SingleBandSwarpRunner(Step):
                     )
 
                     cmd = [cmd[0]] + ["@%s" % im_file_list] + cmd[1:]
+                    cmd += ["-IMAGE_SIZE", "%d,%d" % image_shape]
+                    cmd += ["-PIXEL_SCALE", "%0.16f" % pixel_scale]
                     cmd += ["-WEIGHTOUT_NAME", output_coadd_weight_file]
                     cmd += ["-CENTER", "%s,%s" % (
                         coadd_center[0], coadd_center[1])]
