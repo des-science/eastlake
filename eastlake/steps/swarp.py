@@ -73,10 +73,10 @@ class SingleBandSwarpRunner(Step):
                 coadd_center = stash.get_tile_info_quantity("tile_center", tilename)
 
                 orig_coadd_path = stash.get_input_pizza_cutter_yaml(tilename, band)["image_path"]
-                coadd_path_from_desdata = get_relpath(
-                    orig_coadd_path, stash["desdata"])
+                coadd_path_from_imsim_data = get_relpath(
+                    orig_coadd_path, stash["imsim_data"])
                 output_coadd_path = os.path.join(
-                    stash["base_dir"], coadd_path_from_desdata)
+                    stash["base_dir"], coadd_path_from_imsim_data)
                 if output_coadd_path.endswith("fits.fz"):
                     output_coadd_path = output_coadd_path[:-3]
                 output_coadd_dir = os.path.dirname(output_coadd_path)
