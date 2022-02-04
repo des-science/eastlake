@@ -55,7 +55,7 @@ def replace_imsim_data(
             and parts[1][1:6] in ["/OPS/", "/ACT/"]
             and os.path.basename(parts[0]).startswith("DES")
         ):
-            old_imsim_data = os.path.dirname(parts[0])
+            old_imsim_data = os.path.dirname(os.path.dirname(parts[0]))
         else:
             raise RuntimeError("Could not infer imsim data from the path %s!" % pth)
 
