@@ -262,7 +262,7 @@ class Stash(dict):
 
         #######################
         # push changes to disk
-        self.write_pizza_cutter_yaml()
+        self.write_output_pizza_cutter_yaml()
 
     def has_output_pizza_cutter_yaml(self, tilename, band):
         if (
@@ -311,6 +311,7 @@ class Stash(dict):
                         tilename,
                         band,
                     )
+                    os.makedirs(os.path.dirname(pth), exist_ok=True)
                     with open(pth, "w") as fp:
                         yaml.dump(
                             self["_output_pizza_cutter_yaml"][tilename][band],
