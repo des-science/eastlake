@@ -91,7 +91,7 @@ class SingleBandSwarpRunner(Step):
                     )
                 ))
 
-                self.logger.info(
+                self.logger.error(
                     "inferred image size|pixel scale: %s|%s", image_shape, pixel_scale,
                 )
 
