@@ -130,6 +130,7 @@ def test_stash_io():
 def test_stash_io_pizza_cutter_yaml(pizza_cutter_yaml):
     stsh = Stash("blah1", ["foo1", "bar1"])
     stsh["imsim_data"] = "/imsim_data"
+    stsh["desrun"] = "deeeesssssruuuuunnnnn"
     tilename = "ddd"
     band = "g"
 

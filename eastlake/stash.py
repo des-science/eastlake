@@ -319,7 +319,7 @@ class Stash(dict):
                         )
         else:
             raise RuntimeError(
-                "Could not write pizza cutter yaml due to missing yaml ot desrun!"
+                "Could not write pizza cutter yaml due to missing yaml or desrun!"
             )
 
     def set_input_pizza_cutter_yaml(self, _data, tilename, band):
