@@ -194,56 +194,58 @@ def test_stash_io_pizza_cutter_yaml(pizza_cutter_yaml):
 
 
 def test_set_output_pizza_cutter_yaml_tile_info(pizza_cutter_yaml):
-    stsh = Stash("blah1", ["foo1", "bar1"])
-    stsh["imsim_data"] = "/imsim_data"
-    tilename = "ddd"
-    band = "g"
+    with tempfile.TemporaryDirectory() as tmpdir:
+        stsh = Stash(str(tmpdir), ["foo1", "bar1"])
+        stsh["imsim_data"] = "/imsim_data"
+        stsh["desrun"] = "deeeesssssruuuuunnnnn"
+        tilename = "ddd"
+        band = "g"
 
-    stsh.set_input_pizza_cutter_yaml(pizza_cutter_yaml, tilename, band)
-    pyml = stsh.get_output_pizza_cutter_yaml(tilename, band)
+        stsh.set_input_pizza_cutter_yaml(pizza_cutter_yaml, tilename, band)
+        pyml = stsh.get_output_pizza_cutter_yaml(tilename, band)
 
-    for stsh_key, py_key in [
-        ("img", "image"),
-        ("wgt", "weight"),
-        ("msk", "bmask"),
-        ("bkg", "bkg"),
-        ("piff", "piff"),
-        ("psfex", "psfex"),
-    ]:
-        for with_fits_ext in [True, False]:
-            if py_key in ["piff", "psfex"]:
-                with_fits_ext = False
+        for stsh_key, py_key in [
+            ("img", "image"),
+            ("wgt", "weight"),
+            ("msk", "bmask"),
+            ("bkg", "bkg"),
+            ("piff", "piff"),
+            ("psfex", "psfex"),
+        ]:
+            for with_fits_ext in [True, False]:
+                if py_key in ["piff", "psfex"]:
+                    with_fits_ext = False
 
-            res = stsh.get_filepaths(f"{stsh_key}_files", tilename, band=band, with_fits_ext=with_fits_ext)
-            if with_fits_ext:
-                fnames = res[0]
-                ext = res[1]
-                assert ext == list(set([src[f"{py_key}_ext"] for src in pyml["src_info"]]))[0]
-            else:
-                fnames = res
-                ext = None
+                res = stsh.get_filepaths(f"{stsh_key}_files", tilename, band=band, with_fits_ext=with_fits_ext)
+                if with_fits_ext:
+                    fnames = res[0]
+                    ext = res[1]
+                    assert ext == list(set([src[f"{py_key}_ext"] for src in pyml["src_info"]]))[0]
+                else:
+                    fnames = res
+                    ext = None
 
-            assert fnames == [src[f"{py_key}_path"] for src in pyml["src_info"]]
+                assert fnames == [src[f"{py_key}_path"] for src in pyml["src_info"]]
 
-    mag_zps = stsh.get_tile_info_quantity("mag_zps", tilename, band=band)
-    assert mag_zps == [src["magzp"] for src in pyml["src_info"]]
+        mag_zps = stsh.get_tile_info_quantity("mag_zps", tilename, band=band)
+        assert mag_zps == [src["magzp"] for src in pyml["src_info"]]
 
-    assert stsh.get_filepaths("srcex_cat", tilename, band=band) == pyml["cat_path"]
+        assert stsh.get_filepaths("srcex_cat", tilename, band=band) == pyml["cat_path"]
 
-    for stsh_key, py_key in [
-        ("coadd", "image"),
-        ("coadd_weight", "weight"),
-        ("coadd_mask", "bmask"),
-        ("seg", "seg"),
-    ]:
-        for with_fits_ext in [True, False]:
-            res = stsh.get_filepaths(f"{stsh_key}_file", tilename, band=band, with_fits_ext=with_fits_ext)
-            if with_fits_ext:
-                fnames = res[0]
-                ext = res[1]
-                assert ext == pyml[f"{py_key}_ext"]
-            else:
-                fnames = res
-                ext = None
+        for stsh_key, py_key in [
+            ("coadd", "image"),
+            ("coadd_weight", "weight"),
+            ("coadd_mask", "bmask"),
+            ("seg", "seg"),
+        ]:
+            for with_fits_ext in [True, False]:
+                res = stsh.get_filepaths(f"{stsh_key}_file", tilename, band=band, with_fits_ext=with_fits_ext)
+                if with_fits_ext:
+                    fnames = res[0]
+                    ext = res[1]
+                    assert ext == pyml[f"{py_key}_ext"]
+                else:
+                    fnames = res
+                    ext = None
 
-            assert fnames == pyml[f"{py_key}_path"]
+                assert fnames == pyml[f"{py_key}_path"]
