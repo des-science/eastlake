@@ -3,7 +3,7 @@ import pytest
 import tempfile
 
 from ..stash import Stash
-from ..des_files import PIZZA_CUTTER_YAML_PATH_KEYS
+from ..des_files import PIZZA_CUTTER_YAML_PATH_KEYS, get_pizza_cutter_yaml_path
 
 
 TEST_DIR = os.getcwd() + '/'
@@ -128,64 +128,69 @@ def test_stash_io():
 
 
 def test_stash_io_pizza_cutter_yaml(pizza_cutter_yaml):
-    stsh = Stash("blah1", ["foo1", "bar1"])
-    stsh["imsim_data"] = "/imsim_data"
-    stsh["desrun"] = "deeeesssssruuuuunnnnn"
-    tilename = "ddd"
-    band = "g"
+    with tempfile.TemporaryDirectory() as tmpdir:
+        stsh = Stash(str(tmpdir), ["foo1", "bar1"])
+        stsh["imsim_data"] = "/imsim_data"
+        stsh["desrun"] = "deeeesssssruuuuunnnnn"
+        tilename = "ddd"
+        band = "g"
 
-    # raises if not there
-    with pytest.raises(RuntimeError):
-        stsh.get_input_pizza_cutter_yaml(tilename, band)
+        # raises if not there
+        with pytest.raises(RuntimeError):
+            stsh.get_input_pizza_cutter_yaml(tilename, band)
 
-    with pytest.raises(RuntimeError):
-        stsh.get_output_pizza_cutter_yaml(tilename, band)
+        with pytest.raises(RuntimeError):
+            stsh.get_output_pizza_cutter_yaml(tilename, band)
 
-    # if no output, set a copy on input
-    assert not stsh.has_output_pizza_cutter_yaml(tilename, band)
-    stsh.set_input_pizza_cutter_yaml(pizza_cutter_yaml, tilename, band)
-    assert stsh.has_output_pizza_cutter_yaml(tilename, band)
+        # if no output, set a copy on input
+        assert not stsh.has_output_pizza_cutter_yaml(tilename, band)
+        stsh.set_input_pizza_cutter_yaml(pizza_cutter_yaml, tilename, band)
+        assert stsh.has_output_pizza_cutter_yaml(tilename, band)
 
-    # the set copy has imsim_data -> base_dir
-    # and the input imsim_data replace with the current one
-    new_yaml = stsh.get_input_pizza_cutter_yaml(tilename, band)
-    for k, v in new_yaml.items():
-        if k.endswith("_path") or k in PIZZA_CUTTER_YAML_PATH_KEYS:
-            assert v.startswith(stsh["imsim_data"])
-        elif k != "src_info":
-            assert new_yaml[k] == pizza_cutter_yaml[k]
+        assert os.path.exists(
+            get_pizza_cutter_yaml_path(tmpdir, stsh["desrun"], tilename, band)
+        )
 
-    for i, src in enumerate(new_yaml["src_info"]):
-        for k, v in src.items():
+        # the set copy has imsim_data -> base_dir
+        # and the input imsim_data replace with the current one
+        new_yaml = stsh.get_input_pizza_cutter_yaml(tilename, band)
+        for k, v in new_yaml.items():
             if k.endswith("_path") or k in PIZZA_CUTTER_YAML_PATH_KEYS:
                 assert v.startswith(stsh["imsim_data"])
-            else:
-                assert src[k] == pizza_cutter_yaml["src_info"][i][k]
+            elif k != "src_info":
+                assert new_yaml[k] == pizza_cutter_yaml[k]
 
-    new_yaml = stsh.get_output_pizza_cutter_yaml(tilename, band)
-    for k, v in new_yaml.items():
-        if k.endswith("_path") or k in PIZZA_CUTTER_YAML_PATH_KEYS:
-            assert v.startswith(stsh["base_dir"])
-        elif k != "src_info":
-            assert new_yaml[k] == pizza_cutter_yaml[k]
+        for i, src in enumerate(new_yaml["src_info"]):
+            for k, v in src.items():
+                if k.endswith("_path") or k in PIZZA_CUTTER_YAML_PATH_KEYS:
+                    assert v.startswith(stsh["imsim_data"])
+                else:
+                    assert src[k] == pizza_cutter_yaml["src_info"][i][k]
 
-    for i, src in enumerate(new_yaml["src_info"]):
-        for k, v in src.items():
+        new_yaml = stsh.get_output_pizza_cutter_yaml(tilename, band)
+        for k, v in new_yaml.items():
             if k.endswith("_path") or k in PIZZA_CUTTER_YAML_PATH_KEYS:
                 assert v.startswith(stsh["base_dir"])
-            else:
-                assert src[k] == pizza_cutter_yaml["src_info"][i][k]
+            elif k != "src_info":
+                assert new_yaml[k] == pizza_cutter_yaml[k]
 
-    # now test an update
-    with stsh.update_output_pizza_cutter_yaml(tilename, band) as pyml:
-        pyml["image_ext"] = 10
-    new_yaml = stsh.get_output_pizza_cutter_yaml(tilename, band)
-    assert new_yaml["image_ext"] == 10
+        for i, src in enumerate(new_yaml["src_info"]):
+            for k, v in src.items():
+                if k.endswith("_path") or k in PIZZA_CUTTER_YAML_PATH_KEYS:
+                    assert v.startswith(stsh["base_dir"])
+                else:
+                    assert src[k] == pizza_cutter_yaml["src_info"][i][k]
 
-    # if we already have an output, setting an input should not change it
-    stsh.set_input_pizza_cutter_yaml(pizza_cutter_yaml, tilename, band)
-    new_yaml = stsh.get_output_pizza_cutter_yaml(tilename, band)
-    assert new_yaml["image_ext"] == 10
+        # now test an update
+        with stsh.update_output_pizza_cutter_yaml(tilename, band) as pyml:
+            pyml["image_ext"] = 10
+        new_yaml = stsh.get_output_pizza_cutter_yaml(tilename, band)
+        assert new_yaml["image_ext"] == 10
+
+        # if we already have an output, setting an input should not change it
+        stsh.set_input_pizza_cutter_yaml(pizza_cutter_yaml, tilename, band)
+        new_yaml = stsh.get_output_pizza_cutter_yaml(tilename, band)
+        assert new_yaml["image_ext"] == 10
 
 
 def test_set_output_pizza_cutter_yaml_tile_info(pizza_cutter_yaml):
