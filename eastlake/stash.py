@@ -306,7 +306,7 @@ class Stash(dict):
             for tilename in self["_output_pizza_cutter_yaml"]:
                 for band in self["_output_pizza_cutter_yaml"][tilename]:
                     pth = get_pizza_cutter_yaml_path(
-                        self.base_dir,
+                        self["base_dir"],
                         self["desrun"],
                         tilename,
                         band,
