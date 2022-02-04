@@ -73,6 +73,7 @@ class SingleBandSwarpRunner(Step):
                 cmd = self.swarp_cmd_root
 
                 coadd_center = stash.get_tile_info_quantity("tile_center", tilename)
+                print(coadd_center, type(coadd_center))
 
                 orig_coadd_path = stash.get_input_pizza_cutter_yaml(tilename, band)["image_path"]
                 orig_coadd_ext = stash.get_input_pizza_cutter_yaml(tilename, band)["image_ext"]
