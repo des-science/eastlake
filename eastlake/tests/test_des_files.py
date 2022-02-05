@@ -63,12 +63,12 @@ def test_replace_imsim_data_in_pizza_cutter_yaml(pizza_cutter_yaml):
 
     for k, v in band_info.items():
         if k.endswith("_path") or k in PIZZA_CUTTER_YAML_PATH_KEYS:
-            assert v.startswith("/blah/DES")
+            assert v.startswith("/blah/test-y6-sims/DES")
 
     for src in band_info["src_info"]:
         for k, v in src.items():
             if k.endswith("_path") or k in PIZZA_CUTTER_YAML_PATH_KEYS:
-                assert v.startswith("/blah/DES")
+                assert v.startswith("/blah/test-y6-sims/DES")
 
 
 def test_pizza_cutter_yaml_io(pizza_cutter_yaml):
