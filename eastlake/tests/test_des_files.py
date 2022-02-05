@@ -16,22 +16,22 @@ from ..des_files import (
 
 @pytest.mark.parametrize("pth,imsim_data,old_imsim_data,val", [
     (
-        "/blah/DESr1431/sources-r/OPS/fname",
+        "/blah/run/DESr1431/sources-r/OPS/fname",
         "/blah/blah",
         None,
-        "/blah/blah/DESr1431/sources-r/OPS/fname",
+        "/blah/blah/run/DESr1431/sources-r/OPS/fname",
     ),
     (
-        "/blah/DESr1431/sources-r/OPS/fname",
+        "/blah/run/DESr1431/sources-r/OPS/fname",
         "/blah/blah",
         "/blah",
-        "/blah/blah/DESr1431/sources-r/OPS/fname",
+        "/blah/blah/run/DESr1431/sources-r/OPS/fname",
     ),
     (
-        "/blah/DESr1431/sources-r/ACT/fname",
+        "/blah/run/DESr1431/sources-r/ACT/fname",
         "/blah/blah",
         None,
-        "/blah/blah/DESr1431/sources-r/ACT/fname",
+        "/blah/blah/run/DESr1431/sources-r/ACT/fname",
     ),
 ])
 def test_replace_imsim_data(pth, imsim_data, old_imsim_data, val):
