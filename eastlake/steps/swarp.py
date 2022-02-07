@@ -36,6 +36,24 @@ def _write_relpath_file_list(lines, output_file_list):
         f.writelines(output_lines)
 
 
+def _get_file_dims_pixscale(pth, ext, world_center):
+    h = fitsio.read_header(pth, ext=ext)
+    if "ZNAXIS1" in h:
+        image_shape = (h["ZNAXIS1"], h["ZNAXIS2"])
+    else:
+        image_shape = (h["NAXIS1"], h["NAXIS2"])
+
+    coadd_header = galsim.fits.FitsHeader(pth)
+    coadd_wcs, _ = galsim.wcs.readFromFitsHeader(coadd_header)
+    pixel_scale = np.sqrt(coadd_wcs.pixelArea(
+        world_pos=galsim.CelestialCoord(
+            world_center[0] * galsim.degrees,
+            world_center[1] * galsim.degrees,
+        )
+    ))
+    return image_shape, pixel_scale
+
+
 class SingleBandSwarpRunner(Step):
     def __init__(self, config, base_dir, name="single_band_swarp", logger=None,
                  verbosity=0, log_file=None):
@@ -73,23 +91,13 @@ class SingleBandSwarpRunner(Step):
                 cmd = self.swarp_cmd_root
 
                 coadd_center = stash.get_tile_info_quantity("tile_center", tilename)
-
                 orig_coadd_path = stash.get_input_pizza_cutter_yaml(tilename, band)["image_path"]
                 orig_coadd_ext = stash.get_input_pizza_cutter_yaml(tilename, band)["image_ext"]
-                h = fitsio.read_header(orig_coadd_path, ext=orig_coadd_ext)
-                if "ZNAXIS1" in h:
-                    image_shape = (h["ZNAXIS1"], h["ZNAXIS2"])
-                else:
-                    image_shape = (h["NAXIS1"], h["NAXIS2"])
-
-                coadd_header = galsim.fits.FitsHeader(orig_coadd_path)
-                coadd_wcs, _ = galsim.wcs.readFromFitsHeader(coadd_header)
-                pixel_scale = np.sqrt(coadd_wcs.pixelArea(
-                    world_pos=galsim.CelestialCoord(
-                        coadd_center[0] * galsim.degrees,
-                        coadd_center[1] * galsim.degrees,
-                    )
-                ))
+                image_shape, pixel_scale = _get_file_dims_pixscale(
+                    orig_coadd_path,
+                    orig_coadd_ext,
+                    coadd_center
+                )
 
                 self.logger.error(
                     "inferred image size|pixel scale: %s|%s", image_shape, pixel_scale,
@@ -268,9 +276,16 @@ class SWarpRunner(Step):
         # Loop through tiles
         tilenames = stash["tilenames"]
 
+        extra_cmd_line_args = [
+            "-RESAMPLE", "N",
+            "-COPY_KEYWORDS", "BUNIT,TILENAME,TILEID",
+            "-COMBINE_TYPE", "CHI-MEAN",
+            "-BLANK_BADPIXELS", "Y",
+        ]
+
         for tilename in tilenames:
-            cmd = self.swarp_cmd_root
-            mask_cmd = self.swarp_cmd_root
+            cmd = self.swarp_cmd_root + extra_cmd_line_args
+            mask_cmd = self.swarp_cmd_root + extra_cmd_line_args
             img_strings = []
             weight_strings = []
             mask_strings = []
@@ -312,12 +327,25 @@ class SWarpRunner(Step):
                 )
                 mask_strings.append("%s[%d]" % (mask_file, mask_ext))
 
+                # on first band, get the center, image_shape and pixel scale
+                if len(coadd_bands) == 1:
+                    coadd_center = stash.get_tile_info_quantity("tile_center", tilename)
+                    image_shape, pixel_scale = _get_file_dims_pixscale(
+                        im, ext, coadd_center
+                    )
+
             # Add image and weight info to cmd - image files should be first
             # argument
             cmd = [cmd[0]] + [",".join(img_strings)] + cmd[1:]
+            cmd += ["-CENTER", "%s,%s" % (coadd_center[0], coadd_center[1])]
+            cmd += ["-IMAGE_SIZE", "%d,%d" % image_shape]
+            cmd += ["-PIXEL_SCALE", "%0.16f" % pixel_scale]
             cmd += ["-WEIGHT_IMAGE", ",".join(weight_strings)]
 
             mask_cmd = [mask_cmd[0]] + [",".join(img_strings)] + mask_cmd[1:]
+            mask_cmd += ["-CENTER", "%s,%s" % (coadd_center[0], coadd_center[1])]
+            mask_cmd += ["-IMAGE_SIZE", "%d,%d" % image_shape]
+            mask_cmd += ["-PIXEL_SCALE", "%0.16f" % pixel_scale]
             mask_cmd += ["-WEIGHT_IMAGE", ",".join(mask_strings)]
 
             # Set output filenames
@@ -342,25 +370,10 @@ class SWarpRunner(Step):
             mask_cmd += ["-IMAGEOUT_NAME", mask_tmp_file]
             mask_cmd += ["-WEIGHTOUT_NAME", mask_file]
 
-            # Get center from image file by default
-            if self.config.get("center_from_header", True):
-                coadd_file_band_0, ext = stash.get_filepaths(
-                    "coadd_file", tilename, band=bands[0], with_fits_ext=True,
-                )
-                h = fitsio.read_header(coadd_file_band_0, ext)
-                cen_vals = (str(h["CRVAL1"]), str(h["CRVAL2"]))
-                self.logger.error(
-                    "Setting SWarp center: %s,%s from header of %s" % (
-                        cen_vals[0], cen_vals[1], coadd_file_band_0
-                    )
-                )
-                cen = ["-CENTER", "%s,%s" % (cen_vals)]
-                cmd += cen
-                mask_cmd += cen
-
             if self.logger is not None:
                 self.logger.error("calling swarp:")
                 self.logger.error(" ".join(cmd))
+                self.logger.error(" ".join(mask_cmd))
 
             # Move to the output directory to run swarp in case of
             # interference when running multiple tiles
