@@ -83,10 +83,13 @@ class SingleBandSwarpRunner(Step):
     def execute(self, stash, new_params=None):
         tilenames = stash["tilenames"]
 
-        extra_cmd_line_args = []
+        extra_cmd_line_args = [
+            "-COMBINE_TYPE", "WEIGHTED",
+            "-BLANK_BADPIXELS", "Y",
+        ]
         if not any(cv == "-NTHREADS" for cv in self.swarp_cmd_root):
             extra_cmd_line_args += [
-                "-NTHREADS", "%d" % multiprocessing.cpu_count()
+                "-NTHREADS", "%d" % multiprocessing.cpu_count(),
             ]
 
         for tilename in tilenames:
@@ -284,14 +287,15 @@ class SWarpRunner(Step):
         tilenames = stash["tilenames"]
 
         extra_cmd_line_args = [
-            "-RESAMPLE", "N",
+            "-RESAMPLE", "Y",
+            "-RESAMPLING_TYPE", "NEAREST",
             "-COPY_KEYWORDS", "BUNIT,TILENAME,TILEID",
-            "-COMBINE_TYPE", "CHI-MEAN",
+            "-COMBINE_TYPE", "AVERAGE",
             "-BLANK_BADPIXELS", "Y",
         ]
         if not any(cv == "-NTHREADS" for cv in self.swarp_cmd_root):
             extra_cmd_line_args += [
-                "-NTHREADS", "%d" % multiprocessing.cpu_count()
+                "-NTHREADS", "%d" % multiprocessing.cpu_count(),
             ]
 
         for tilename in tilenames:
