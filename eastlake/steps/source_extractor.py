@@ -37,7 +37,7 @@ class SrcExtractorRunner(Step):
         self.params_file = os.path.abspath(
             os.path.expanduser(
                 os.path.expandvars(
-                    self.config("params_file", _get_default("Y6A1_v1_srcex.param_diskonly"))
+                    self.config.get("params_file", _get_default("Y6A1_v1_srcex.param_diskonly"))
                 )
             )
         )
