@@ -209,6 +209,9 @@ class SingleBandSwarpRunner(Step):
                     mask_cmd += ["-IMAGEOUT_NAME", dummy_mask_coadd]
                     mask_cmd += ["-WEIGHT_IMAGE", "@%s" % msk_file_list]
                     # run swarp
+                    self.logger.error(
+                        "running swarp for tile %s, band %s w/ mask: %s" % (
+                            tilename, band, " ".join(mask_cmd)))
                     run_and_check(mask_cmd, "Mask SWarp", logger=self.logger)
                     # remove the dummy mask coadd
                     os.remove(dummy_mask_coadd)
@@ -226,7 +229,7 @@ class SingleBandSwarpRunner(Step):
                     msk_hdu = fits.ImageHDU(msk_fits.data, header=msk_fits.header)
                     hdus = [im_hdu, msk_hdu, wgt_hdu]
                     hdulist = fits.HDUList(hdus)
-                    self.logger.info(
+                    self.logger.error(
                         "writing assembled coadd for tilename %s, "
                         "band %s to %s" % (
                             tilename, band, output_coadd_path))
@@ -385,15 +388,24 @@ class SWarpRunner(Step):
             mask_cmd += ["-IMAGEOUT_NAME", mask_tmp_file]
             mask_cmd += ["-WEIGHTOUT_NAME", mask_file]
 
-            if self.logger is not None:
-                self.logger.error("calling swarp:")
-                self.logger.error(" ".join(cmd))
-                self.logger.error(" ".join(mask_cmd))
+            self.logger.error("calling swarp:")
+            self.logger.error(" ".join(cmd))
+            self.logger.error(" ".join(mask_cmd))
 
             # Move to the output directory to run swarp in case of
             # interference when running multiple tiles
             with pushd(os.path.realpath(coadd_dir)):
+                self.logger.error(
+                    "running swarp for tile %s: %s" % (
+                        tilename, " ".join(cmd)
+                    )
+                )
                 run_and_check(cmd, "SWarp", logger=self.logger)
+                self.logger.error(
+                    "running swarp for tile %s w/ mask: %s" % (
+                        tilename, " ".join(mask_cmd)
+                    )
+                )
                 run_and_check(mask_cmd, "SWarp", logger=self.logger)
 
             # remove tmp files

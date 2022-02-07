@@ -124,7 +124,7 @@ def main():
         new_params = None
 
     if (args.step_names is not None and
-            args.step_names[0] != 'galsim' and
+            "galsim" not in args.step_names[0] and
             args.resume_from is None):
         raise ValueError(
             "You must give a job record file if the first step is not galsim!")
@@ -133,18 +133,20 @@ def main():
         pipeline = EnsemblePipeline.from_record_file(
             config_file, args.resume_from, base_dir=base_dir,
             step_names=args.step_names, logger=logger,
-            new_params=new_params
-            )
+            new_params=new_params,
+        )
     else:
         assert args.skip_completed_steps is False
         pipeline = EnsemblePipeline.from_config_file(
             config_file, base_dir, logger=logger, new_params=new_params,
-            step_names=args.step_names, record_file=args.record_file)
+            step_names=args.step_names, record_file=args.record_file,
+        )
 
     # go ahead and execute
     pipeline.execute(
         no_overwrite_job_record=args.no_overwrite_job_record,
-        skip_completed_steps=args.skip_completed_steps)
+        skip_completed_steps=args.skip_completed_steps,
+    )
 
     # and we're done. hopefully.
     logger.error("Completed pipeline at %s" % (str(datetime.datetime.now())))

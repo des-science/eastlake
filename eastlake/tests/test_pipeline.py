@@ -370,7 +370,7 @@ def test_pipeline_from_record_file():
         pipe_cont = Pipeline.from_record_file(
             config_file_path, job_record_file_path, base_dir=None,
             logger=None, verbosity=1, log_file=None, name="pipeline_cont",
-            step_names=None, new_params=None, record_file=None,
+            step_names=None, new_params=None,
         )
         # When step_names is None, step_names is created in from_config_file().
         step_names = ["galsim", "single_band_swarp"]
