@@ -74,6 +74,16 @@ class SrcExtractorRunner(Step):
         self.srcex_cmd_root += ["-FILTER_NAME", self.filter_file]
         self.srcex_cmd_root += ["-STARNNW_NAME", self.star_nnw_file]
 
+        # add default command flags
+        self.srcex_cmd_root += [
+            "-CHECKIMAGE_TYPE", "SEGMENTATION",
+            "-MAG_ZEROPOINT", "30",
+            "-DEBLEND_MINCONT", "0.001",
+            "-DEBLEND_NTHRESH", "64",
+            "-DETECT_THRESH", "0.8",
+            "-ANALYSIS_THRESH", "0.8",
+        ]
+
     def execute(self, stash, new_params=None):
         # Loop through tiles calling SrcExtractor
         tilenames = stash["tilenames"]
