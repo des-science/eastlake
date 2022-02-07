@@ -193,10 +193,7 @@ class SrcExtractorRunner(Step):
                     seg_name = coadd_file.replace(".fits", "_seg.fits")
                     bkg_name = coadd_file.replace(".fits", "_bkg.fits")
                     bkg_rms_name = coadd_file.replace(".fits", "_bkg-rms.fits")
-                    cmd += ["-CHECKIMAGE_NAME", "%s,%s,%s" % (
-                        get_relpath(seg_name),
-                        get_relpath(bkg_name),
-                        get_relpath(bkg_rms_name))]
+                    cmd += ["-CHECKIMAGE_NAME", "%s" % get_relpath(seg_name)]
 
                     # and mask file
                     mask_file = "%s[%d]" % (get_relpath(det_mask_file),
