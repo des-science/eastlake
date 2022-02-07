@@ -1,6 +1,7 @@
 from __future__ import print_function, absolute_import
 import os
 import pkg_resources
+import multiprocessing
 
 import fitsio
 import astropy.io.fits as fits
@@ -82,13 +83,19 @@ class SingleBandSwarpRunner(Step):
     def execute(self, stash, new_params=None):
         tilenames = stash["tilenames"]
 
+        extra_cmd_line_args = []
+        if not any(cv == "-NTHREADS" for cv in self.swarp_cmd_root):
+            extra_cmd_line_args += [
+                "-NTHREADS", "%d" % multiprocessing.cpu_count()
+            ]
+
         for tilename in tilenames:
             # tile_info = stash["tile_info"][tilename]
             for band in stash["bands"]:
                 self.logger.error(
                     "running swarp for tile %s, band %s" % (
                         tilename, band))
-                cmd = self.swarp_cmd_root
+                cmd = self.swarp_cmd_root + extra_cmd_line_args
 
                 coadd_center = stash.get_tile_info_quantity("tile_center", tilename)
                 orig_coadd_path = stash.get_input_pizza_cutter_yaml(tilename, band)["image_path"]
@@ -190,7 +197,7 @@ class SingleBandSwarpRunner(Step):
                         output_coadd_dir, "%s_%s_msk-tmp.fits" % (tilename, band))
                     output_coadd_mask_file = os.path.join(
                         output_coadd_dir, "%s_%s_msk.fits" % (tilename, band))
-                    mask_cmd = self.swarp_cmd_root
+                    mask_cmd = self.swarp_cmd_root + extra_cmd_line_args
                     mask_cmd = (
                         [mask_cmd[0]] + ["@%s" % msk_file_list] + mask_cmd[1:])
                     mask_cmd += ["-WEIGHTOUT_NAME", output_coadd_mask_file]
@@ -282,6 +289,10 @@ class SWarpRunner(Step):
             "-COMBINE_TYPE", "CHI-MEAN",
             "-BLANK_BADPIXELS", "Y",
         ]
+        if not any(cv == "-NTHREADS" for cv in self.swarp_cmd_root):
+            extra_cmd_line_args += [
+                "-NTHREADS", "%d" % multiprocessing.cpu_count()
+            ]
 
         for tilename in tilenames:
             cmd = self.swarp_cmd_root + extra_cmd_line_args
