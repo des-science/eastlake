@@ -58,7 +58,7 @@ class SrcExtractorRunner(Step):
         # src_extractor command my be an environment variable
         # so use os.path.expandvars
         self.srcex_cmd = os.path.expandvars(
-            self.config.get("srcex_cmd", _get_default("eastlake-src-extractor"))
+            self.config.get("srcex_cmd", "eastlake-src-extractor")
         )
 
         # make sure SrcExtractor works...
