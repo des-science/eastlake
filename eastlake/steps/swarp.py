@@ -388,10 +388,6 @@ class SWarpRunner(Step):
             mask_cmd += ["-IMAGEOUT_NAME", mask_tmp_file]
             mask_cmd += ["-WEIGHTOUT_NAME", mask_file]
 
-            self.logger.error("calling swarp:")
-            self.logger.error(" ".join(cmd))
-            self.logger.error(" ".join(mask_cmd))
-
             # Move to the output directory to run swarp in case of
             # interference when running multiple tiles
             with pushd(os.path.realpath(coadd_dir)):
