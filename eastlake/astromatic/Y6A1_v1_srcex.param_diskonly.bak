@@ -1,6 +1,19 @@
 ##################
 # yet to be added
 
+FLAGS_MODEL
+ID_PARENT
+DURATION_ANALYSIS
+# Basic coordinates
+X_IMAGE
+Y_IMAGE
+XMIN_IMAGE
+XMAX_IMAGE
+YMIN_IMAGE
+YMAX_IMAGE
+X_WORLD
+Y_WORLD
+
 # Accurate coordinates
 XWIN_IMAGE
 YWIN_IMAGE
