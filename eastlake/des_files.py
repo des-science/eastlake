@@ -244,8 +244,8 @@ class Tile(dict):
             coadd_psfex_file_list.append(band_info["psf_path"])
 
             # Get coadd center
-            coadd_center_ra = coadd_header["RA_CENT"]*galsim.degrees
-            coadd_center_dec = coadd_header["DEC_CENT"]*galsim.degrees
+            coadd_center_ra = float(coadd_header["CRVAL1"])*galsim.degrees
+            coadd_center_dec = float(coadd_header["CRVAL2"])*galsim.degrees
             coadd_center = CelestialCoord(ra=coadd_center_ra,
                                           dec=coadd_center_dec)
 
