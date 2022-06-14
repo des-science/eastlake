@@ -215,29 +215,38 @@ class SingleBandSwarpRunner(Step):
                     # remove the dummy mask coadd
                     os.remove(dummy_mask_coadd)
 
-                    # We've done the swarping, now combine image, weight and
-                    # mask planes
-                    # generate an hdu list
-                    im_hdu = fits.open(output_coadd_sci_file)[0]
-                    # stupidly, if you ask me, we cannot simply read in the
-                    # weight and coadd hdus and add them directly to an HDUList
-                    # because they are PrimaryHDUs...
-                    wgt_fits = fits.open(output_coadd_weight_file)[0]
-                    wgt_hdu = fits.ImageHDU(wgt_fits.data, header=wgt_fits.header)
-                    msk_fits = fits.open(output_coadd_mask_file)[0]
-                    msk_hdu = fits.ImageHDU(msk_fits.data, header=msk_fits.header)
-                    hdus = [im_hdu, msk_hdu, wgt_hdu]
-                    hdulist = fits.HDUList(hdus)
-                    self.logger.error(
-                        "writing assembled coadd for tilename %s, "
-                        "band %s to %s" % (
-                            tilename, band, output_coadd_path))
-                    hdulist.writeto(output_coadd_path, overwrite=True)
+                    try:
+                        # We've done the swarping, now combine image, weight and
+                        # mask planes
+                        # generate an hdu list
+                        im_hdus = fits.open(output_coadd_sci_file)
+                        im_hdu = im_hdus[0]
+                        # stupidly, if you ask me, we cannot simply read in the
+                        # weight and coadd hdus and add them directly to an HDUList
+                        # because they are PrimaryHDUs...
+                        wgt_hdus = fits.open(output_coadd_weight_file)
+                        wgt_fits = wgt_hdus[0]
+                        wgt_hdu = fits.ImageHDU(wgt_fits.data, header=wgt_fits.header)
+                        msk_hdus = fits.open(output_coadd_mask_file)
+                        msk_fits = msk_hdus[0]
+                        msk_hdu = fits.ImageHDU(msk_fits.data, header=msk_fits.header)
+                        hdus = [im_hdu, msk_hdu, wgt_hdu]
+                        hdulist = fits.HDUList(hdus)
+                        self.logger.error(
+                            "writing assembled coadd for tilename %s, "
+                            "band %s to %s" % (
+                                tilename, band, output_coadd_path))
+                        hdulist.writeto(output_coadd_path, overwrite=True)
+                    finally:
+                        # close the open hdus
+                        im_hdus.close()
+                        wgt_hdus.close()
+                        msk_hdus.close()
 
-                    # delete intermediate files
-                    os.remove(output_coadd_sci_file)
-                    os.remove(output_coadd_weight_file)
-                    os.remove(output_coadd_mask_file)
+                        # delete intermediate files
+                        os.remove(output_coadd_sci_file)
+                        os.remove(output_coadd_weight_file)
+                        os.remove(output_coadd_mask_file)
 
                 with stash.update_output_pizza_cutter_yaml(tilename, band) as pyml:
                     pyml["image_path"] = output_coadd_path
