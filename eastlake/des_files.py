@@ -96,7 +96,7 @@ def get_pizza_cutter_yaml_path(imsim_data, desrun, tilename, band):
 def replace_imsim_data_in_pizza_cutter_yaml(
     band_info, output_imsim_data, old_imsim_data=None
 ):
-    """Replace the NERSC IMSIM_DATA path in a pizza cutter yaml file.
+    """Replace the IMSIM_DATA path in a pizza cutter yaml file.
 
     **This function operates in-place!**
 
