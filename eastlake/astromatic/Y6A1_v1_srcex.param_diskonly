@@ -1,6 +1,7 @@
 # ID and flags
 NUMBER
 FLAGS
+DURATION_ANALYSIS
 
 # Basic coordinates
 X_IMAGE
