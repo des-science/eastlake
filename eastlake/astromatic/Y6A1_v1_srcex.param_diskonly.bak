@@ -117,6 +117,8 @@ MAGERR_DETMODEL
 FLAGS_DETMODEL
 CHI2_DETMODEL
 
+IMAFLAGS_ISO
+
 
 #####################
 # this works
