@@ -389,6 +389,9 @@ class Tile(dict):
         tile_data["coadd_mag_zp_list"] = coadd_mag_zp_list
         tile_data["coadd_band_list"] = coadd_band_list
 
+        import pprint
+        print(pprint.pformat(tile_data), flush=True)
+
         # pizza cutter yaml
         tile_data["pizza_cutter_yaml"] = pizza_cutter_yaml
 
