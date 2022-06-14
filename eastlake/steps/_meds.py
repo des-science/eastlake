@@ -466,7 +466,7 @@ class MEDSRunner(Step):
             return self._make_psf_data_psfex(stash, coadd_wcs, tilename, band, is_rejectlisted, img_files, img_ext)
         elif stash["psf_config"]["type"] == "Gaussian":
             self.logger.error("Adding Gauss PSF info to meds file")
-            return self._make_psf_data_psfex(stash, coadd_wcs, tilename, band, is_rejectlisted, img_files, img_ext)
+            return self._make_psf_data_gauss(stash, coadd_wcs, tilename, band, is_rejectlisted, img_files, img_ext)
         else:
             raise RuntimeError(
                 "PSF config type '%s' not recognized!" % stash["psf_config"]["type"]
