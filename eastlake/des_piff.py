@@ -26,9 +26,9 @@ PIFF_SCALE = 0.25
 
 
 PSF_KWARGS = {
-    "g": {"GI_COLOR": 0.61},
-    "r": {"GI_COLOR": 0.61},
-    "i": {"GI_COLOR": 0.61},
+    "g": {"GI_COLOR": 1.1},
+    "r": {"GI_COLOR": 1.1},
+    "i": {"GI_COLOR": 1.1},
     "z": {"IZ_COLOR": 0.34},
 }
 
