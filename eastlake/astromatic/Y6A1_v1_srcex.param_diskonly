@@ -1,6 +1,7 @@
 # ID and flags
 NUMBER
 FLAGS
+ID_PARENT
 DURATION_ANALYSIS
 
 # Basic coordinates
