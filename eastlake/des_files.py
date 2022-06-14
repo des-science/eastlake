@@ -37,7 +37,7 @@ def replace_imsim_data(
     old_imsim_data : str, optional
         The IMSIM_DATA path to be replaced. If None, it will be inferred by splitting
         on "/sources-" and using the first part. If the old path cannot be inferred,
-        assume NERSC.
+        will raise an error.
 
     Returns
     -------
