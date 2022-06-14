@@ -26,7 +26,7 @@ def replace_imsim_data(
     imsim_data,
     old_imsim_data=None,
 ):
-    """Replace the NERSC IMSIM_DATA path if needed.
+    """Replace the IMSIM_DATA path if needed.
 
     Parameters
     ----------
