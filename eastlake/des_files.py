@@ -26,7 +26,7 @@ def replace_imsim_data(
     imsim_data,
     old_imsim_data=None,
 ):
-    """Replace the NERSC IMSIM_DATA path if needed.
+    """Replace the IMSIM_DATA path if needed.
 
     Parameters
     ----------
@@ -37,7 +37,7 @@ def replace_imsim_data(
     old_imsim_data : str, optional
         The IMSIM_DATA path to be replaced. If None, it will be inferred by splitting
         on "/sources-" and using the first part. If the old path cannot be inferred,
-        assume NERSC.
+        will raise an error.
 
     Returns
     -------
@@ -96,7 +96,7 @@ def get_pizza_cutter_yaml_path(imsim_data, desrun, tilename, band):
 def replace_imsim_data_in_pizza_cutter_yaml(
     band_info, output_imsim_data, old_imsim_data=None
 ):
-    """Replace the NERSC IMSIM_DATA path in a pizza cutter yaml file.
+    """Replace the IMSIM_DATA path in a pizza cutter yaml file.
 
     **This function operates in-place!**
 
@@ -109,7 +109,7 @@ def replace_imsim_data_in_pizza_cutter_yaml(
     old_imsim_data : str, optional
         The IMSIM_DATA path to be replaced. If None, it will be inferred by splitting
         on "/sources-" and using the first part. If the old path cannot be inferred,
-        assume NERSC.
+        will raise an error.
     """
 
     for key in PIZZA_CUTTER_YAML_PATH_KEYS:

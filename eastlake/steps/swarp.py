@@ -93,7 +93,6 @@ class SingleBandSwarpRunner(Step):
             ]
 
         for tilename in tilenames:
-            # tile_info = stash["tile_info"][tilename]
             for band in stash["bands"]:
                 self.logger.error(
                     "running swarp for tile %s, band %s" % (
