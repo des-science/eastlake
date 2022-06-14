@@ -187,7 +187,7 @@ class Stash(dict):
                 if not keyerror:
                     return None
                 else:
-                    raise(e)
+                    raise e
 
     def set_output_pizza_cutter_yaml(self, _data, tilename, band):
         data = copy.deepcopy(_data)
