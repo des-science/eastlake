@@ -179,7 +179,7 @@ class Stash(dict):
                 if not keyerror:
                     return None
                 else:
-                    raise(e)
+                    raise e
         else:
             try:
                 return self["tile_info"][tilename][key]
