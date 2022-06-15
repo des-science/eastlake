@@ -20,7 +20,7 @@ from .steps import (
     DeleteMeds,
     NewishMetcalRunner,
 )
-from .utils import get_logger, safe_mkdir
+from .utils import get_logger, safe_mkdir, pushd
 from .stash import Stash
 
 PANIC_STRING = "!!!!!!!!!!!!!!\nWTF*WTF*WTF*WTF*\n"
@@ -123,7 +123,7 @@ class Pipeline(object):
     @classmethod
     def from_record_file(cls, config_file, job_record_file, base_dir=None, logger=None, verbosity=1,
                          log_file=None, name="pipeline_cont", step_names=None,
-                         new_params=None, record_file=None):
+                         new_params=None):
         """
         Initialize pipeline from record file from previous simulation run
         """
@@ -133,9 +133,9 @@ class Pipeline(object):
 
         if base_dir is None:
             base_dir = os.path.dirname(job_record_file)
+
         # if record_file=None, assume we're using the same file we're resuming from
-        if record_file is None:
-            record_file = job_record_file
+        record_file = os.path.relpath(job_record_file, base_dir)
 
         pipe = cls.from_config_file(config_file, base_dir, logger=logger, verbosity=verbosity,
                                     log_file=log_file, name=name, step_names=step_names,
@@ -275,15 +275,14 @@ class Pipeline(object):
 
         # Loop through steps calling execute function. Pass self.stash and any new_params
         # Move to base_dir, first get cwd which we'll return to later
-        cwd = os.getcwd()
-        try:
-            os.chdir(self.base_dir)
-
+        with pushd(self.base_dir):
             for step, new_params in zip(self.steps, new_params_list):
                 if skip_completed_steps:
                     if (step.name, 0) in self.stash["completed_step_names"]:
-                        self.logger.error("""Skipping step %s since already completed with status 0,
-                        and you have skip_completed_steps=True""" % step.name)
+                        self.logger.error(
+                            "Skipping step %s since already completed with status 0, "
+                            "and you have skip_completed_steps=True." % step.name
+                        )
                         continue
                 self.logger.error(THINGS_GOING_FINE+"Running step %s\n" %
                                   step.name + THINGS_GOING_FINE)
@@ -301,9 +300,7 @@ class Pipeline(object):
                 self.stash["completed_step_names"].append((step.name, status))
                 # save stash
                 self._save_restart(no_overwrite_job_record)
-        finally:
-            # Return to the previous cwd
-            os.chdir(cwd)
+
         return 0
 
     def _save_restart(self, no_overwrite_job_record):

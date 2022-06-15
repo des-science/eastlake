@@ -4,6 +4,8 @@ import sys
 import logging
 import errno
 import os
+import subprocess
+import contextlib
 
 LOGGING_LEVELS = {
     '0': logging.CRITICAL,
@@ -49,4 +51,46 @@ def safe_mkdir(d):
         os.makedirs(d)
     except OSError as e:
         if e.errno != errno.EEXIST:
-            raise(e)
+            raise e
+
+
+def get_relpath(pth, start=None):
+    if start is not None:
+        real_rel = os.path.relpath(os.path.realpath(pth), os.path.realpath(start))
+        rel = os.path.relpath(pth, start)
+    else:
+        real_rel = os.path.relpath(os.path.realpath(pth))
+        rel = os.path.relpath(pth)
+    if len(real_rel) < len(rel):
+        return real_rel
+    else:
+        return rel
+
+
+# https://stackoverflow.com/questions/6194499/pushd-through-os-system
+@contextlib.contextmanager
+def pushd(new_dir):
+    previous_dir = os.getcwd()
+    os.chdir(new_dir)
+    try:
+        yield
+    finally:
+        os.chdir(previous_dir)
+
+
+def unpack_fits_file_if_needed(pth, ext):
+    if ".fits.fz" in pth:
+        pth_funpacked = pth.replace(".fits.fz", ".fits")
+        # There may already be a funpacked version there
+        if not os.path.isfile(pth_funpacked):
+            subprocess.check_output(
+                ["funpack", os.path.basename(pth)],
+                cwd=os.path.dirname(pth),
+            )
+        pth = pth_funpacked
+        # If we've funpacked, we'll also need to reduce the
+        # extension number by 1
+        if isinstance(ext, int):
+            ext -= 1
+
+    return pth, ext

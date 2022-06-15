@@ -29,6 +29,8 @@ jobs:
           channels: conda-forge,defaults
           channel-priority: strict
           show-channel-urls: true
+          miniforge-version: latest
+          miniforge-variant: Mambaforge
           environment-file: environment.yaml
 
       - name: configure conda and install code
@@ -47,8 +49,8 @@ jobs:
       - name: test
         shell: bash -l {0}
         run: |
-          git clone https://github.com/beckermr/des-y3-test-data.git
-          export TEST_DESDATA=`pwd`/des-y3-test-data
+          git clone https://github.com/beckermr/des-test-data
+          export TEST_DESDATA=`pwd`/des-test-data
           pytest -vvs eastlake
 
       - name: lint

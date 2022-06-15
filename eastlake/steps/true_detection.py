@@ -5,7 +5,6 @@ import shutil
 import fitsio
 import numpy as np
 
-from ..des_files import get_orig_coadd_file
 from ..step import Step
 from ..utils import safe_mkdir
 
@@ -100,18 +99,17 @@ class TrueDetectionRunner(Step):
         # now we add the new srcext catalog to the stash and
         # write it to disk
         srcext_cat_name = coadd_file.replace(".fits", "_sexcat.fits")
-        stash.set_filepaths(
-            "srcex_cat", srcext_cat_name, tilename, band=band)
+        with stash.update_output_pizza_cutter_yaml(tilename, band) as pyml:
+            pyml["cat_path"] = srcext_cat_name
         fitsio.write(srcext_cat_name, srcext_cat, clobber=True)
 
     def _copy_and_munge_coadd_data(self, stash, tilename, band):
         # we need to set the coadd path and img ext for downstrem code
-        orig_coadd_path = get_orig_coadd_file(
-            stash["desdata"], stash["desrun"], tilename, band)
-        coadd_path_from_desdata = os.path.relpath(
-            orig_coadd_path, stash["desdata"])
+        orig_coadd_path = stash.get_input_pizza_cutter_yaml(tilename, band)["image_path"]
+        coadd_path_from_imsim_data = os.path.relpath(
+            orig_coadd_path, stash["imsim_data"])
         coadd_file = os.path.join(
-            stash["base_dir"], coadd_path_from_desdata)
+            stash["base_dir"], coadd_path_from_imsim_data)
 
         # make a copy, decompress it if needed,
         if coadd_file[-3:] != '.fz':
@@ -143,16 +141,13 @@ class TrueDetectionRunner(Step):
             fp[0].write(
                 np.zeros((10000, 10000)))
 
-        # mock up the info for the file stash
-        tile_info = stash["tile_info"][tilename]
-        stash.set_filepaths(
-            "coadd_file", coadd_file, tilename, band=band)
-        tile_info[band]["coadd_ext"] = 0
-        stash.set_filepaths(
-            "coadd_mask_file", coadd_file, tilename, band=band)
-        tile_info[band]["coadd_mask_ext"] = 1
-        stash.set_filepaths(
-            "coadd_weight_file", coadd_file, tilename, band=band)
-        tile_info[band]["coadd_weight_ext"] = 2
+        # update the file paths
+        with stash.update_output_pizza_cutter_yaml(tilename, band) as pyml:
+            pyml["image_path"] = coadd_file
+            pyml["image_ext"] = 0
+            pyml["bmask_path"] = coadd_file
+            pyml["bmask_ext"] = 1
+            pyml["weight_path"] = coadd_file
+            pyml["weight_ext"] = 2
 
         return coadd_file

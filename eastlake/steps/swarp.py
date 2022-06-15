@@ -1,17 +1,58 @@
 from __future__ import print_function, absolute_import
 import os
-import subprocess
 import pkg_resources
+import multiprocessing
 
 import fitsio
 import astropy.io.fits as fits
+import galsim
+import numpy as np
 
-from ..utils import safe_mkdir
-from ..step import Step, run_and_check, _get_relpath
-from ..des_files import get_orig_coadd_file
+from ..utils import safe_mkdir, get_relpath, unpack_fits_file_if_needed, pushd
+from ..step import Step, run_and_check
+from ..des_files import MAGZP_REF
 
 
 DEFAULT_SWARP_CONFIG = pkg_resources.resource_filename("eastlake", "astromatic/Y6A1_v1_swarp.config")
+
+
+# Swarp is annoying and can vomit a segfault if the paths
+# to the input images are too long. This can happen with the
+# paths in e.g. im_file_list which are absolute paths which
+# generally seems a safe thing to use but anyway. So re-make
+# the file lists with paths relative to the current working
+# directory
+def _write_relpath_file_list(lines, output_file_list):
+    output_lines = []
+    for ln in lines:
+        rel_str = get_relpath(ln.strip())
+        if len(ln.strip()) < len(rel_str):
+            output_lines.append("%s\n" % ln.strip())
+        else:
+            output_lines.append("%s\n" % rel_str)
+        assert (
+            os.path.exists(os.path.abspath(output_lines[-1])[:-4])
+        ), os.path.abspath(output_lines[-1][:-4])
+    with open(output_file_list, 'w') as f:
+        f.writelines(output_lines)
+
+
+def _get_file_dims_pixscale(pth, ext, world_center):
+    h = fitsio.read_header(pth, ext=ext)
+    if "ZNAXIS1" in h:
+        image_shape = (h["ZNAXIS1"], h["ZNAXIS2"])
+    else:
+        image_shape = (h["NAXIS1"], h["NAXIS2"])
+
+    coadd_header = galsim.fits.FitsHeader(pth)
+    coadd_wcs, _ = galsim.wcs.readFromFitsHeader(coadd_header)
+    pixel_scale = np.sqrt(coadd_wcs.pixelArea(
+        world_pos=galsim.CelestialCoord(
+            world_center[0] * galsim.degrees,
+            world_center[1] * galsim.degrees,
+        )
+    ))
+    return image_shape, pixel_scale
 
 
 class SingleBandSwarpRunner(Step):
@@ -32,8 +73,6 @@ class SingleBandSwarpRunner(Step):
         )
         self.swarp_cmd_root = [
             "%s" % (self.swarp_cmd), "-c", "%s" % (self.swarp_config_file)]
-        if "mag_zp_ref" not in config:
-            config["mag_zp_ref"] = 30.
 
         if "update" in self.config:
             for key, val in self.config["update"].items():
@@ -44,25 +83,39 @@ class SingleBandSwarpRunner(Step):
     def execute(self, stash, new_params=None):
         tilenames = stash["tilenames"]
 
-        orig_working_dir = os.getcwd()
+        extra_cmd_line_args = [
+            "-COMBINE_TYPE", "WEIGHTED",
+            "-BLANK_BADPIXELS", "Y",
+        ]
+        if not any(cv == "-NTHREADS" for cv in self.swarp_cmd_root):
+            extra_cmd_line_args += [
+                "-NTHREADS", "%d" % multiprocessing.cpu_count(),
+            ]
+
         for tilename in tilenames:
-            tile_info = stash["tile_info"][tilename]
             for band in stash["bands"]:
                 self.logger.error(
                     "running swarp for tile %s, band %s" % (
                         tilename, band))
-                cmd = self.swarp_cmd_root
-                im_file_list, wgt_file_list, msk_file_list, magzp_list_file \
-                    = tile_info[band]["source_list_files"]
+                cmd = self.swarp_cmd_root + extra_cmd_line_args
 
-                coadd_center = tile_info["tile_center"]
+                coadd_center = stash.get_tile_info_quantity("tile_center", tilename)
+                orig_coadd_path = stash.get_input_pizza_cutter_yaml(tilename, band)["image_path"]
+                orig_coadd_ext = stash.get_input_pizza_cutter_yaml(tilename, band)["image_ext"]
+                image_shape, pixel_scale = _get_file_dims_pixscale(
+                    orig_coadd_path,
+                    orig_coadd_ext,
+                    coadd_center
+                )
 
-                orig_coadd_path = get_orig_coadd_file(
-                    stash["desdata"], stash["desrun"], tilename, band)
-                coadd_path_from_desdata = _get_relpath(
-                    orig_coadd_path, stash["desdata"])
+                self.logger.error(
+                    "inferred image size|pixel scale: %s|%s", image_shape, pixel_scale,
+                )
+
+                coadd_path_from_imsim_data = get_relpath(
+                    orig_coadd_path, stash["imsim_data"])
                 output_coadd_path = os.path.join(
-                    stash["base_dir"], coadd_path_from_desdata)
+                    stash["base_dir"], coadd_path_from_imsim_data)
                 if output_coadd_path.endswith("fits.fz"):
                     output_coadd_path = output_coadd_path[:-3]
                 output_coadd_dir = os.path.dirname(output_coadd_path)
@@ -76,126 +129,132 @@ class SingleBandSwarpRunner(Step):
                 # this prevents the intermediate files being fucked up by
                 # other processes.
                 safe_mkdir(output_coadd_dir)
-                os.chdir(os.path.realpath(output_coadd_dir))
+                with pushd(os.path.realpath(output_coadd_dir)):
 
-                # Swarp is annoying and can vomit a segfault if the paths
-                # to the input images are too long. This can happen with the
-                # paths in e.g. im_file_list which are absolute paths which
-                # generally seems a safe thing to use but anyway. So re-make
-                # the file lists with paths relative to the current working
-                # directory
-                def write_relpath_file_list(orig_file_list, output_file_list):
-                    with open(orig_file_list, 'r') as f:
-                        lines = f.readlines()
-                    output_lines = []
-                    for ln in lines:
-                        rel_str = _get_relpath(ln.strip())
-                        if len(ln.strip()) < len(rel_str):
-                            output_lines.append("%s\n" % ln.strip())
-                        else:
-                            output_lines.append("%s\n" % rel_str)
-                        assert (
-                            os.path.exists(os.path.abspath(output_lines[-1])[:-4])
-                        ), os.path.abspath(output_lines[-1][:-4])
-                    with open(output_file_list, 'w') as f:
-                        f.writelines(output_lines)
+                    # Swarp is annoying and can vomit a segfault if the paths
+                    # to the input images are too long. This can happen with the
+                    # paths in e.g. im_file_list which are absolute paths which
+                    # generally seems a safe thing to use but anyway. So re-make
+                    # the file lists with paths relative to the current working
+                    # directory
+                    output_pyml = stash.get_output_pizza_cutter_yaml(tilename, band)
 
-                rel_im_file_list = "im_file_list.dat"
-                rel_wgt_file_list = "wgt_file_list.dat"
-                rel_msk_file_list = "msk_file_list.dat"
-                write_relpath_file_list(im_file_list, rel_im_file_list)
-                im_file_list = rel_im_file_list
-                write_relpath_file_list(wgt_file_list, rel_wgt_file_list)
-                wgt_file_list = rel_wgt_file_list
-                write_relpath_file_list(msk_file_list, rel_msk_file_list)
-                msk_file_list = rel_msk_file_list
+                    im_file_list = "im_file_list.dat"
+                    _write_relpath_file_list(
+                        [
+                            "%s[%d]" % (src["image_path"], src["image_ext"])
+                            for src in output_pyml["src_info"]
+                        ],
+                        im_file_list,
+                    )
 
-                cmd = [cmd[0]] + ["@%s" % im_file_list] + cmd[1:]
-                cmd += ["-WEIGHTOUT_NAME", output_coadd_weight_file]
-                cmd += ["-CENTER", "%s,%s" % (
-                    coadd_center[0], coadd_center[1])]
-                cmd += ["-IMAGEOUT_NAME", output_coadd_sci_file]
-                cmd += ["-WEIGHT_IMAGE", "@%s" % wgt_file_list]
+                    wgt_file_list = "wgt_file_list.dat"
+                    _write_relpath_file_list(
+                        [
+                            "%s[%d]" % (src["weight_path"], src["weight_ext"])
+                            for src in output_pyml["src_info"]
+                        ],
+                        wgt_file_list,
+                    )
 
-                # Zeropoints...
-                with open(magzp_list_file, 'r') as f:
-                    lines = f.readlines()
-                mag_zp_list = [float(ln) for ln in lines]
-                # We need to scale images to all have common zeropoint
-                fscale_list = [
-                    10**(0.4*(self.config["mag_zp_ref"]-mag_zp))
-                    for mag_zp in mag_zp_list]
+                    msk_file_list = "msk_file_list.dat"
+                    _write_relpath_file_list(
+                        [
+                            "%s[%d]" % (src["bmask_path"], src["bmask_ext"])
+                            for src in output_pyml["src_info"]
+                        ],
+                        msk_file_list,
+                    )
 
-                cmd += ["-FSCALE_DEFAULT", ",".join(
-                    ["%f" % _f for _f in fscale_list])]
+                    cmd = [cmd[0]] + ["@%s" % im_file_list] + cmd[1:]
+                    cmd += ["-IMAGE_SIZE", "%d,%d" % image_shape]
+                    cmd += ["-PIXEL_SCALE", "%0.16f" % pixel_scale]
+                    cmd += ["-WEIGHTOUT_NAME", output_coadd_weight_file]
+                    cmd += ["-CENTER", "%s,%s" % (
+                        coadd_center[0], coadd_center[1])]
+                    cmd += ["-IMAGEOUT_NAME", output_coadd_sci_file]
+                    cmd += ["-WEIGHT_IMAGE", "@%s" % wgt_file_list]
 
-                # run swarp
-                self.logger.error(
-                    "running swarp for tile %s, band %s: %s" % (
-                        tilename, band, " ".join(cmd)))
-                run_and_check(cmd, "SWarp", logger=self.logger)
+                    # We need to scale images to all have common zeropoint
+                    mag_zp_list = [src["magzp"] for src in output_pyml["src_info"]]
+                    fscale_list = [10**(0.4*(MAGZP_REF-mag_zp)) for mag_zp in mag_zp_list]
 
-                # Do the same for the masks
-                # Not sure exactly what I should be doing here...for now try
-                # setting mask files as weight images and use
-                # weightout_image....
-                dummy_mask_coadd = os.path.join(
-                    output_coadd_dir, "%s_%s_msk-tmp.fits" % (tilename, band))
-                output_coadd_mask_file = os.path.join(
-                    output_coadd_dir, "%s_%s_msk.fits" % (tilename, band))
-                stash.set_filepaths(
-                    "coadd_mask_file", output_coadd_mask_file, tilename,
-                    band=band)
-                mask_cmd = self.swarp_cmd_root
-                mask_cmd = (
-                    [mask_cmd[0]] + ["@%s" % msk_file_list] + mask_cmd[1:])
-                mask_cmd += ["-WEIGHTOUT_NAME", output_coadd_mask_file]
-                mask_cmd += ["-CENTER", "%s,%s" % (
-                    coadd_center[0], coadd_center[1])]
-                mask_cmd += ["-IMAGEOUT_NAME", dummy_mask_coadd]
-                mask_cmd += ["-WEIGHT_IMAGE", "@%s" % msk_file_list]
-                # run swarp
-                run_and_check(mask_cmd, "Mask SWarp", logger=self.logger)
-                # remove the dummy mask coadd
-                os.remove(dummy_mask_coadd)
+                    cmd += [
+                        "-FSCALE_DEFAULT", ",".join(
+                            ["%f" % _f for _f in fscale_list]
+                        )
+                    ]
 
-                # We've done the swarping, now combine image, weight and
-                # mask planes
-                # generate an hdu list
-                im_hdu = fits.open(output_coadd_sci_file)[0]
-                # stupidly, if you ask me, we cannot simply read in the
-                # weight and coadd hdus and add them directly to an HDUList
-                # because they are PrimaryHDUs...
-                wgt_fits = fits.open(output_coadd_weight_file)[0]
-                wgt_hdu = fits.ImageHDU(wgt_fits.data, header=wgt_fits.header)
-                msk_fits = fits.open(output_coadd_mask_file)[0]
-                msk_hdu = fits.ImageHDU(msk_fits.data, header=msk_fits.header)
-                hdus = [im_hdu, msk_hdu, wgt_hdu]
-                hdulist = fits.HDUList(hdus)
-                # output file for coadd
-                stash.set_filepaths(
-                    "coadd_file", output_coadd_path, tilename, band=band)
-                tile_info[band]["coadd_ext"] = 0
-                self.logger.info(
-                    "writing assembled coadd for tilename %s, "
-                    "band %s to %s" % (
-                        tilename, band, output_coadd_path))
-                hdulist.writeto(output_coadd_path, overwrite=True)
-                stash.set_filepaths(
-                    "coadd_mask_file", output_coadd_path, tilename, band=band)
-                tile_info[band]["coadd_mask_ext"] = 1
-                stash.set_filepaths(
-                    "coadd_weight_file", output_coadd_path, tilename,
-                    band=band)
-                tile_info[band]["coadd_weight_ext"] = 2
+                    # run swarp
+                    self.logger.error(
+                        "running swarp for tile %s, band %s: %s" % (
+                            tilename, band, " ".join(cmd)))
+                    run_and_check(cmd, "SWarp", logger=self.logger)
 
-                # delete intermediate files
-                os.remove(output_coadd_sci_file)
-                os.remove(output_coadd_weight_file)
-                os.remove(output_coadd_mask_file)
+                    # Do the same for the masks
+                    # Not sure exactly what I should be doing here...for now try
+                    # setting mask files as weight images and use
+                    # weightout_image....
+                    dummy_mask_coadd = os.path.join(
+                        output_coadd_dir, "%s_%s_msk-tmp.fits" % (tilename, band))
+                    output_coadd_mask_file = os.path.join(
+                        output_coadd_dir, "%s_%s_msk.fits" % (tilename, band))
+                    mask_cmd = self.swarp_cmd_root + extra_cmd_line_args
+                    mask_cmd = (
+                        [mask_cmd[0]] + ["@%s" % msk_file_list] + mask_cmd[1:])
+                    mask_cmd += ["-WEIGHTOUT_NAME", output_coadd_mask_file]
+                    mask_cmd += ["-CENTER", "%s,%s" % (
+                        coadd_center[0], coadd_center[1])]
+                    mask_cmd += ["-IMAGEOUT_NAME", dummy_mask_coadd]
+                    mask_cmd += ["-WEIGHT_IMAGE", "@%s" % msk_file_list]
+                    # run swarp
+                    self.logger.error(
+                        "running swarp for tile %s, band %s w/ mask: %s" % (
+                            tilename, band, " ".join(mask_cmd)))
+                    run_and_check(mask_cmd, "Mask SWarp", logger=self.logger)
+                    # remove the dummy mask coadd
+                    os.remove(dummy_mask_coadd)
 
-                # move back to orig_working_dor
-                os.chdir(orig_working_dir)
+                    try:
+                        # We've done the swarping, now combine image, weight and
+                        # mask planes
+                        # generate an hdu list
+                        im_hdus = fits.open(output_coadd_sci_file)
+                        im_hdu = im_hdus[0]
+                        # stupidly, if you ask me, we cannot simply read in the
+                        # weight and coadd hdus and add them directly to an HDUList
+                        # because they are PrimaryHDUs...
+                        wgt_hdus = fits.open(output_coadd_weight_file)
+                        wgt_fits = wgt_hdus[0]
+                        wgt_hdu = fits.ImageHDU(wgt_fits.data, header=wgt_fits.header)
+                        msk_hdus = fits.open(output_coadd_mask_file)
+                        msk_fits = msk_hdus[0]
+                        msk_hdu = fits.ImageHDU(msk_fits.data, header=msk_fits.header)
+                        hdus = [im_hdu, msk_hdu, wgt_hdu]
+                        hdulist = fits.HDUList(hdus)
+                        self.logger.error(
+                            "writing assembled coadd for tilename %s, "
+                            "band %s to %s" % (
+                                tilename, band, output_coadd_path))
+                        hdulist.writeto(output_coadd_path, overwrite=True)
+                    finally:
+                        # close the open hdus
+                        im_hdus.close()
+                        wgt_hdus.close()
+                        msk_hdus.close()
+
+                        # delete intermediate files
+                        os.remove(output_coadd_sci_file)
+                        os.remove(output_coadd_weight_file)
+                        os.remove(output_coadd_mask_file)
+
+                with stash.update_output_pizza_cutter_yaml(tilename, band) as pyml:
+                    pyml["image_path"] = output_coadd_path
+                    pyml["image_ext"] = 0
+                    pyml["bmask_path"] = output_coadd_path
+                    pyml["bmask_ext"] = 1
+                    pyml["weight_path"] = output_coadd_path
+                    pyml["weight_ext"] = 2
 
             self.logger.error(
                 "%s complete for tile %s" % (self.name, tilename))
@@ -238,11 +297,21 @@ class SWarpRunner(Step):
         # Loop through tiles
         tilenames = stash["tilenames"]
 
-        orig_working_dir = os.getcwd()
+        extra_cmd_line_args = [
+            "-RESAMPLE", "Y",
+            "-RESAMPLING_TYPE", "NEAREST",
+            "-COPY_KEYWORDS", "BUNIT,TILENAME,TILEID",
+            "-COMBINE_TYPE", "AVERAGE",
+            "-BLANK_BADPIXELS", "Y",
+        ]
+        if not any(cv == "-NTHREADS" for cv in self.swarp_cmd_root):
+            extra_cmd_line_args += [
+                "-NTHREADS", "%d" % multiprocessing.cpu_count(),
+            ]
+
         for tilename in tilenames:
-            tile_file_info = stash["tile_info"][tilename]
-            cmd = self.swarp_cmd_root
-            mask_cmd = self.swarp_cmd_root
+            cmd = self.swarp_cmd_root + extra_cmd_line_args
+            mask_cmd = self.swarp_cmd_root + extra_cmd_line_args
             img_strings = []
             weight_strings = []
             mask_strings = []
@@ -262,43 +331,47 @@ class SWarpRunner(Step):
                 coadd_bands.append(band)
 
                 # Get image and weight files
-                im, ext = (
-                    stash.get_filepaths("coadd_file", tilename, band=band),
-                    tile_file_info[band]["coadd_ext"])
+                im, ext = stash.get_filepaths(
+                    "coadd_file", tilename, band=band, with_fits_ext=True,
+                )
                 img_strings.append("%s[%d]" % (im, ext))
 
-                weight_file, weight_ext = (
-                    stash.get_filepaths(
-                        "coadd_weight_file", tilename, band=band),
-                    tile_file_info[band]["coadd_weight_ext"])
-
+                weight_file, weight_ext = stash.get_filepaths(
+                    "coadd_weight_file", tilename, band=band, with_fits_ext=True,
+                )
                 # Astromatic doesn't like compressed fits files, so we may
                 # need to unpack here if the weight file is .fits.fz. In this
                 # case we also need to subtract 1 from the weight extension
-                if ".fits.fz" in weight_file:
-                    wf_funpacked = weight_file.replace(".fits.fz", ".fits")
-                    if not os.path.isfile(wf_funpacked):
-                        subprocess.check_output(["funpack", weight_file])
-                    weight_file = wf_funpacked
-                    weight_ext -= 1
-                    stash.set_filepaths(
-                        "coadd_weight_file", weight_file, tilename, band=band)
-                    tile_file_info[band]["coadd_weight_ext"] = weight_ext
+                weight_file, weight_ext = unpack_fits_file_if_needed(
+                    weight_file, weight_ext,
+                )
                 weight_strings.append("%s[%d]" % (weight_file, weight_ext))
 
                 # We also need to coadd the masks, so get mask filenames.
-                mask_file, mask_ext = (
-                    stash.get_filepaths(
-                        "coadd_mask_file", tilename, band=band),
-                    tile_file_info[band]["coadd_mask_ext"])
+                mask_file, mask_ext = stash.get_filepaths(
+                    "coadd_mask_file", tilename, band=band, with_fits_ext=True,
+                )
                 mask_strings.append("%s[%d]" % (mask_file, mask_ext))
+
+                # on first band, get the center, image_shape and pixel scale
+                if len(coadd_bands) == 1:
+                    coadd_center = stash.get_tile_info_quantity("tile_center", tilename)
+                    image_shape, pixel_scale = _get_file_dims_pixscale(
+                        im, ext, coadd_center
+                    )
 
             # Add image and weight info to cmd - image files should be first
             # argument
             cmd = [cmd[0]] + [",".join(img_strings)] + cmd[1:]
+            cmd += ["-CENTER", "%s,%s" % (coadd_center[0], coadd_center[1])]
+            cmd += ["-IMAGE_SIZE", "%d,%d" % image_shape]
+            cmd += ["-PIXEL_SCALE", "%0.16f" % pixel_scale]
             cmd += ["-WEIGHT_IMAGE", ",".join(weight_strings)]
 
             mask_cmd = [mask_cmd[0]] + [",".join(img_strings)] + mask_cmd[1:]
+            mask_cmd += ["-CENTER", "%s,%s" % (coadd_center[0], coadd_center[1])]
+            mask_cmd += ["-IMAGE_SIZE", "%d,%d" % image_shape]
+            mask_cmd += ["-PIXEL_SCALE", "%0.16f" % pixel_scale]
             mask_cmd += ["-WEIGHT_IMAGE", ",".join(mask_strings)]
 
             # Set output filenames
@@ -323,44 +396,29 @@ class SWarpRunner(Step):
             mask_cmd += ["-IMAGEOUT_NAME", mask_tmp_file]
             mask_cmd += ["-WEIGHTOUT_NAME", mask_file]
 
-            # Get center from image file by default
-            if self.config.get("center_from_header", True):
-                coadd_file_band_0 = stash.get_filepaths(
-                        "coadd_file", tilename, band=bands[0])
-                ext = tile_file_info[bands[0]]["coadd_ext"]
-                h = fitsio.read_header(coadd_file_band_0, ext)
-                cen_vals = (str(h["CRVAL1"]), str(h["CRVAL2"]))
-                self.logger.error(
-                    "Setting SWarp center: %s,%s from header of %s" % (
-                        cen_vals[0], cen_vals[1],
-                        tile_file_info[bands[0]]["coadd_file"]))
-                cen = ["-CENTER", "%s,%s" % (cen_vals)]
-                cmd += cen
-                mask_cmd += cen
-
-            if self.logger is not None:
-                self.logger.error("calling swarp:")
-                self.logger.error(" ".join(cmd))
-
             # Move to the output directory to run swarp in case of
             # interference when running multiple tiles
-            os.chdir(os.path.realpath(coadd_dir))
-
-            run_and_check(cmd, "SWarp", logger=self.logger)
-            run_and_check(mask_cmd, "SWarp", logger=self.logger)
+            with pushd(os.path.realpath(coadd_dir)):
+                self.logger.error(
+                    "running swarp for tile %s: %s" % (
+                        tilename, " ".join(cmd)
+                    )
+                )
+                run_and_check(cmd, "SWarp", logger=self.logger)
+                self.logger.error(
+                    "running swarp for tile %s w/ mask: %s" % (
+                        tilename, " ".join(mask_cmd)
+                    )
+                )
+                run_and_check(mask_cmd, "SWarp", logger=self.logger)
 
             # remove tmp files
             os.remove(mask_tmp_file)
 
-            stash.set_filepaths("det_image_file", coadd_file, tilename)
-            tile_file_info["det_image_ext"] = 0
-            stash.set_filepaths("det_weight_file", weight_file, tilename)
-            tile_file_info["det_weight_ext"] = 0
-            stash.set_filepaths("det_mask_file", mask_file, tilename)
-            tile_file_info["det_mask_ext"] = 0
+            stash.set_filepaths("det_image_file", coadd_file, tilename, ext=0)
+            stash.set_filepaths("det_weight_file", weight_file, tilename, ext=0)
+            stash.set_filepaths("det_mask_file", mask_file, tilename, ext=0)
 
             self.logger.error("swarp complete for tile %s" % tilename)
-
-        os.chdir(orig_working_dir)
 
         return 0, stash
