@@ -9,7 +9,7 @@ dependencies:
   - esutil
   - fitsio
   - galsim
-  - importlib_metadata  
+  - importlib_metadata
   - joblib
   - meds
   - ngmix
@@ -30,3 +30,4 @@ dependencies:
   - cfitsio
   - compilers
   - fftw
+  - libtool
