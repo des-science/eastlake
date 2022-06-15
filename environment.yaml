@@ -2,38 +2,31 @@ channels:
   - conda-forge
   - defaults
 dependencies:
+  # run
   - astropy
+  - lsstdesc-coord
+  - des-desmeds
+  - esutil
+  - fitsio
+  - galsim
+  - importlib_metadata  
+  - joblib
+  - meds
+  - ngmix
+  - numpy
+  - piff
+  - pixmappy
+  - setuptools
+  - psfex
+  - pyyaml
+  - scipy
+  # host setup.py
+  - setuptools_scm
+  - setuptools_scm_git_archive
+  # host build
   - autoconf
   - automake
   - blas-devel=*=*openblas
   - cfitsio
   - compilers
-  - cython
-  - des-desmeds
-  - des-pizza-cutter
-  - esutil
-  - fitsio
   - fftw
-  - galsim
-  - h5py
-  - joblib
-  - libtool
-  - mamba
-  - matplotlib
-  - meds
-  - metadetect
-  - ngmix=1.3
-  - numpy
-  - numba
-  - piff
-  - psfex
-  - pixmappy
-  - pip
-  - pyyaml
-  - python=3.8
-  - pybind11
-  - scipy
-  - tqdm
-  - setuptools_scm
-  - setuptools_scm_git_archive
-  - importlib_metadata
