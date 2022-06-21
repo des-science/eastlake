@@ -65,7 +65,7 @@ class PizzaCutterRunner(Step):
                     "%s_%s_%s_meds-pizza-slices.fits.fz" % (
                         tilename,
                         band,
-                        os.basename(self.pizza_cutter_config_file.replace(".yaml", ""))
+                        os.path.basename(self.pizza_cutter_config_file.replace(".yaml", ""))
                     ),
                 )
                 safe_mkdir(odir)
