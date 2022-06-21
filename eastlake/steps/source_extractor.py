@@ -8,7 +8,7 @@ import numpy as np
 
 from ..step import Step, run_and_check
 from ..stash import Stash
-from ..utils import get_relpath, pushd, unpack_fits_file_if_needed
+from ..utils import get_relpath, pushd
 
 
 def _get_default(nm):
@@ -96,34 +96,30 @@ class SrcExtractorRunner(Step):
                     "coadd_file", tilename,
                     band=self.config["single_band_det"],
                     with_fits_ext=True,
+                    funpack=True,
                 )
                 det_weight_file, det_weight_ext = stash.get_filepaths(
                     "coadd_weight_file", tilename,
                     band=self.config["single_band_det"],
                     with_fits_ext=True,
+                    funpack=True,
                 )
                 det_mask_file, det_mask_ext = stash.get_filepaths(
                     "coadd_mask_file", tilename,
                     band=self.config["single_band_det"],
                     with_fits_ext=True,
+                    funpack=True,
                 )
             else:
                 det_image_file, det_image_ext = stash.get_filepaths(
-                    "det_image_file", tilename, with_fits_ext=True
+                    "det_image_file", tilename, with_fits_ext=True, funpack=True,
                 )
                 det_weight_file, det_weight_ext = stash.get_filepaths(
-                    "det_weight_file", tilename, with_fits_ext=True
+                    "det_weight_file", tilename, with_fits_ext=True, funpack=True,
                 )
                 det_mask_file, det_mask_ext = stash.get_filepaths(
-                    "det_mask_file", tilename, with_fits_ext=True
+                    "det_mask_file", tilename, with_fits_ext=True, funpack=True,
                 )
-
-            # Astromatic doesn't like compressed fits files, so we may
-            # need to unpack here if the weight file is .fits.fz. In this
-            # case we also need to subtract 1 from the weight extension
-            det_weight_file, det_weight_ext = unpack_fits_file_if_needed(
-                det_weight_file, det_weight_ext,
-            )
 
             # Assoc mode hack
             srcex_cmd_root = copy.copy(self.srcex_cmd_root)
@@ -160,18 +156,12 @@ class SrcExtractorRunner(Step):
             for band in stash["bands"]:
                 cmd = copy.copy(srcex_cmd_root)
                 weight_file, weight_ext = stash.get_filepaths(
-                    "coadd_weight_file", tilename, band=band, with_fits_ext=True,
-                )
-                # Astromatic doesn't like compressed fits files, so we may
-                # need to unpack here if the weight file is .fits.fz. In this
-                # case we also need to subtract 1 from the weight extension
-                weight_file, weight_ext = unpack_fits_file_if_needed(
-                    weight_file, weight_ext,
+                    "coadd_weight_file", tilename, band=band, with_fits_ext=True, funpack=True,
                 )
 
                 # set catalog name
                 coadd_file, coadd_ext = stash.get_filepaths(
-                    "coadd_file", tilename, band=band, with_fits_ext=True,
+                    "coadd_file", tilename, band=band, with_fits_ext=True, funpack=True,
                 )
                 # SrcExtractor is annoying and can vomit a segfault if the paths
                 # to the input images are too long. So change to the

@@ -8,7 +8,7 @@ import astropy.io.fits as fits
 import galsim
 import numpy as np
 
-from ..utils import safe_mkdir, get_relpath, unpack_fits_file_if_needed, pushd, safe_rm
+from ..utils import safe_mkdir, get_relpath, pushd, safe_rm
 from ..step import Step, run_and_check
 from ..des_files import MAGZP_REF
 
@@ -256,7 +256,6 @@ class SingleBandSwarpRunner(Step):
                             ["fpack", os.path.basename(output_coadd_path)],
                             "fpack SWarp"
                         )
-                        safe_rm(output_coadd_path)
                     finally:
                         # close the open hdus
                         im_hdus.close()
@@ -264,7 +263,6 @@ class SingleBandSwarpRunner(Step):
                         msk_hdus.close()
 
                         # delete intermediate files
-                        safe_rm(output_coadd_path)
                         safe_rm(output_coadd_sci_file)
                         safe_rm(output_coadd_weight_file)
                         safe_rm(output_coadd_mask_file)
@@ -353,24 +351,18 @@ class SWarpRunner(Step):
 
                 # Get image and weight files
                 im, ext = stash.get_filepaths(
-                    "coadd_file", tilename, band=band, with_fits_ext=True,
+                    "coadd_file", tilename, band=band, with_fits_ext=True, funpack=True,
                 )
                 img_strings.append("%s[%d]" % (im, ext))
 
                 weight_file, weight_ext = stash.get_filepaths(
-                    "coadd_weight_file", tilename, band=band, with_fits_ext=True,
-                )
-                # Astromatic doesn't like compressed fits files, so we may
-                # need to unpack here if the weight file is .fits.fz. In this
-                # case we also need to subtract 1 from the weight extension
-                weight_file, weight_ext = unpack_fits_file_if_needed(
-                    weight_file, weight_ext,
+                    "coadd_weight_file", tilename, band=band, with_fits_ext=True, funpack=True,
                 )
                 weight_strings.append("%s[%d]" % (weight_file, weight_ext))
 
                 # We also need to coadd the masks, so get mask filenames.
                 mask_file, mask_ext = stash.get_filepaths(
-                    "coadd_mask_file", tilename, band=band, with_fits_ext=True,
+                    "coadd_mask_file", tilename, band=band, with_fits_ext=True, funpack=True,
                 )
                 mask_strings.append("%s[%d]" % (mask_file, mask_ext))
 
