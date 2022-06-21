@@ -55,6 +55,14 @@ def safe_mkdir(d):
             raise e
 
 
+def safe_rm(pth):
+    try:
+        os.remove(pth)
+    except Exception as e:
+        print("removing file %s failed w/ error %r" % (pth, e))
+        pass
+
+
 def safe_copy(src, dst):
     safe_mkdir(os.path.dirname(dst))
     shutil.copy2(src, dst)

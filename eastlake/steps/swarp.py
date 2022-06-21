@@ -8,7 +8,7 @@ import astropy.io.fits as fits
 import galsim
 import numpy as np
 
-from ..utils import safe_mkdir, get_relpath, unpack_fits_file_if_needed, pushd
+from ..utils import safe_mkdir, get_relpath, unpack_fits_file_if_needed, pushd, safe_rm
 from ..step import Step, run_and_check
 from ..des_files import MAGZP_REF
 
@@ -134,12 +134,9 @@ class SingleBandSwarpRunner(Step):
                 output_coadd_mask_file = os.path.join(
                     output_coadd_dir, "%s_%s_msk.fits" % (tilename, band))
 
-                try:
-                    os.remove(output_coadd_sci_file)
-                    os.remove(output_coadd_weight_file)
-                    os.remove(output_coadd_mask_file)
-                except Exception:
-                    pass
+                safe_rm(output_coadd_sci_file)
+                safe_rm(output_coadd_weight_file)
+                safe_rm(output_coadd_mask_file)
 
                 # make the output directory and then move here to run swarp
                 # this prevents the intermediate files being fucked up by
@@ -227,7 +224,7 @@ class SingleBandSwarpRunner(Step):
                             tilename, band, " ".join(mask_cmd)))
                     run_and_check(mask_cmd, "Mask SWarp", logger=self.logger)
                     # remove the dummy mask coadd
-                    os.remove(dummy_mask_coadd)
+                    safe_rm(dummy_mask_coadd)
 
                     try:
                         # We've done the swarping, now combine image, weight and
@@ -259,12 +256,7 @@ class SingleBandSwarpRunner(Step):
                             ["fpack", os.path.basename(output_coadd_path)],
                             "fpack SWarp"
                         )
-
-                        try:
-                            os.remove(output_coadd_path)
-                        except Exception:
-                            pass
-
+                        safe_rm(output_coadd_path)
                     finally:
                         # close the open hdus
                         im_hdus.close()
@@ -272,14 +264,10 @@ class SingleBandSwarpRunner(Step):
                         msk_hdus.close()
 
                         # delete intermediate files
-                        try:
-                            os.remove(output_coadd_path)
-                            os.remove(output_coadd_sci_file)
-                            os.remove(output_coadd_weight_file)
-                            os.remove(output_coadd_mask_file)
-                            os.remove(dummy_mask_coadd)
-                        except Exception:
-                            pass
+                        safe_rm(output_coadd_path)
+                        safe_rm(output_coadd_sci_file)
+                        safe_rm(output_coadd_weight_file)
+                        safe_rm(output_coadd_mask_file)
 
                 with stash.update_output_pizza_cutter_yaml(tilename, band) as pyml:
                     pyml["image_path"] = output_coadd_path + ".fz"
@@ -446,7 +434,7 @@ class SWarpRunner(Step):
                 run_and_check(mask_cmd, "SWarp", logger=self.logger)
 
             # remove tmp files
-            os.remove(mask_tmp_file)
+            safe_rm(mask_tmp_file)
 
             stash.set_filepaths("det_image_file", coadd_file, tilename, ext=0)
             stash.set_filepaths("det_weight_file", weight_file, tilename, ext=0)
