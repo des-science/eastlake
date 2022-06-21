@@ -3,7 +3,7 @@ import os
 import copy
 import pkg_resources
 import shutil
-from ..step import Step, run_and_check
+from ..step import Step, run_and_check, safe_mkdir
 
 
 def _get_default_data(nm):
@@ -87,6 +87,7 @@ class CoaddNwgintRunner(Step):
                             pass
 
                         # copy scamp header
+                        safe_mkdir(os.path.dirname(pyml["src_info"][i]["head_path"]))
                         shutil.copy2(
                             in_pyml["src_info"][i]["head_path"],
                             pyml["src_info"][i]["head_path"],
