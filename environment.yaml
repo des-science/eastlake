@@ -4,6 +4,7 @@ channels:
 dependencies:
   # run
   - astropy
+  - cfitsio  # for fpack and builds
   - des-desmeds
   - des-pixcorrect
   - des-pizza-cutter-metadetect
@@ -29,7 +30,6 @@ dependencies:
   - autoconf
   - automake
   - blas-devel=*=*openblas
-  - cfitsio
   - compilers
   - fftw
   - libtool

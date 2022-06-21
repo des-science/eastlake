@@ -55,6 +55,13 @@ def _get_file_dims_pixscale(pth, ext, world_center):
     return image_shape, pixel_scale
 
 
+def _set_fpack_headers(hdu):
+    hdu.header["FZALGOR"] = ('RICE_1', "Compression type")
+    hdu.header["FZDTHRSD"] = ('CHECKSUM', 'Dithering seed value')
+    hdu.header["FZQVALUE"] = (16, "Compression quantization factor")
+    hdu.header["FZQMETHD"] = ('SUBTRACTIVE_DITHER_2', 'Compression quantization method')
+
+
 class SingleBandSwarpRunner(Step):
     def __init__(self, config, base_dir, name="single_band_swarp", logger=None,
                  verbosity=0, log_file=None):
@@ -221,15 +228,18 @@ class SingleBandSwarpRunner(Step):
                         # generate an hdu list
                         im_hdus = fits.open(output_coadd_sci_file)
                         im_hdu = im_hdus[0]
+                        _set_fpack_headers(im_hdu)
                         # stupidly, if you ask me, we cannot simply read in the
                         # weight and coadd hdus and add them directly to an HDUList
                         # because they are PrimaryHDUs...
                         wgt_hdus = fits.open(output_coadd_weight_file)
                         wgt_fits = wgt_hdus[0]
                         wgt_hdu = fits.ImageHDU(wgt_fits.data, header=wgt_fits.header)
+                        _set_fpack_headers(wgt_hdu)
                         msk_hdus = fits.open(output_coadd_mask_file)
                         msk_fits = msk_hdus[0]
                         msk_hdu = fits.ImageHDU(msk_fits.data, header=msk_fits.header)
+                        _set_fpack_headers(msk_hdu)
                         hdus = [im_hdu, msk_hdu, wgt_hdu]
                         hdulist = fits.HDUList(hdus)
                         self.logger.error(
@@ -237,6 +247,17 @@ class SingleBandSwarpRunner(Step):
                             "band %s to %s" % (
                                 tilename, band, output_coadd_path))
                         hdulist.writeto(output_coadd_path, overwrite=True)
+
+                        run_and_check(
+                            ["fpack", os.path.basename(output_coadd_path)],
+                            "fpack SWarp"
+                        )
+
+                        try:
+                            os.remove(output_coadd_path)
+                        except Exception:
+                            pass
+
                     finally:
                         # close the open hdus
                         im_hdus.close()
@@ -249,12 +270,12 @@ class SingleBandSwarpRunner(Step):
                         os.remove(output_coadd_mask_file)
 
                 with stash.update_output_pizza_cutter_yaml(tilename, band) as pyml:
-                    pyml["image_path"] = output_coadd_path
-                    pyml["image_ext"] = 0
-                    pyml["bmask_path"] = output_coadd_path
-                    pyml["bmask_ext"] = 1
-                    pyml["weight_path"] = output_coadd_path
-                    pyml["weight_ext"] = 2
+                    pyml["image_path"] = output_coadd_path + ".fz"
+                    pyml["image_ext"] = 1
+                    pyml["bmask_path"] = output_coadd_path + ".fz"
+                    pyml["bmask_ext"] = 2
+                    pyml["weight_path"] = output_coadd_path + ".fz"
+                    pyml["weight_ext"] = 3
 
             self.logger.error(
                 "%s complete for tile %s" % (self.name, tilename))

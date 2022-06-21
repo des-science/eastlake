@@ -184,7 +184,7 @@ class SrcExtractorRunner(Step):
                         get_relpath(det_weight_file), det_weight_ext,
                         get_relpath(weight_file), weight_ext)]
 
-                    catalog_name = coadd_file.replace(".fits", "_sexcat.fits")
+                    catalog_name = coadd_file.replace(".fits", "_cat.fits")
 
                     cmd += ["-CATALOG_NAME", get_relpath(catalog_name)]
                     cmd += ["-CATALOG_TYPE", "FITS_1.0"]
