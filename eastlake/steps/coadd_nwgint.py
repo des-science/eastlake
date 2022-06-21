@@ -79,15 +79,19 @@ class CoaddNwgintRunner(Step):
                         if self.logger is not None:
                             self.logger.info("coadd null weight filename: %s", ofile)
 
+                        try:
+                            os.remove(ofile)
+                        except Exception:
+                            pass
+
                         cmd = copy.deepcopy(self.coadd_nwgint_cmd)
                         cmd += [
                             "--tilename",
                             tilename,
                         ]
-                        tileid = -9999
                         cmd += [
                             "--tileid",
-                            tileid,
+                            "-9999",
                         ]
                         cmd += [
                             "-i",
