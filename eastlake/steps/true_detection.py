@@ -5,7 +5,7 @@ import fitsio
 import numpy as np
 
 from ..step import Step
-from ..utils import copy_ifnotexists
+from ..utils import safe_copy
 
 
 class TrueDetectionRunner(Step):
@@ -128,7 +128,7 @@ class TrueDetectionRunner(Step):
         except Exception:
             pass
 
-        copy_ifnotexists(
+        safe_copy(
             orig_coadd_path,
             dest_coadd_file,
         )

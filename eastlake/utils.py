@@ -55,10 +55,14 @@ def safe_mkdir(d):
             raise e
 
 
+def safe_copy(src, dst):
+    safe_mkdir(os.path.dirname(dst))
+    shutil.copy2(src, dst)
+
+
 def copy_ifnotexists(src, dst):
     if not os.path.exists(dst):
-        safe_mkdir(os.path.dirname(dst))
-        shutil.copy2(src, dst)
+        safe_copy(src, dst)
 
 
 def get_relpath(pth, start=None):
