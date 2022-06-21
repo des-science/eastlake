@@ -2,6 +2,7 @@ from __future__ import print_function, absolute_import
 import os
 import copy
 import pkg_resources
+import shutil
 from ..step import Step, run_and_check
 
 
@@ -62,6 +63,7 @@ class CoaddNwgintRunner(Step):
         # Loop through tiles calling SrcExtractor
         for tilename in stash["tilenames"]:
             for band in stash["bands"]:
+                in_pyml = stash.get_input_pizza_cutter_yaml(tilename, band)
 
                 with stash.update_output_pizza_cutter_yaml(tilename, band) as pyml:
                     for i in range(len(pyml["src_info"])):
@@ -83,6 +85,12 @@ class CoaddNwgintRunner(Step):
                             os.remove(ofile)
                         except Exception:
                             pass
+
+                        # copy scamp header
+                        shutil.copy2(
+                            in_pyml["src_info"][i]["head_path"],
+                            pyml["src_info"][i]["head_path"],
+                        )
 
                         cmd = copy.deepcopy(self.coadd_nwgint_cmd)
                         cmd += [
