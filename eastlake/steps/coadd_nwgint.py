@@ -135,7 +135,7 @@ class CoaddNwgintRunner(Step):
                             )
                         )
 
-                    with joblib.Parallel(n_jobs=-1, backend="threading", verbose=100) as par:
+                    with joblib.Parallel(n_jobs=-1, backend="multiprocessing", verbose=100) as par:
                         par(jobs)
 
         return 0, stash
