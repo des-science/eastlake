@@ -4,22 +4,23 @@ channels:
 dependencies:
   # run
   - astropy
-  - lsstdesc-coord
   - des-desmeds
+  - des-pixcorrect
   - esutil
   - fitsio
   - galsim
   - importlib_metadata
   - joblib
+  - lsstdesc-coord
   - meds
   - ngmix
   - numpy
   - piff
   - pixmappy
-  - setuptools
   - psfex
   - pyyaml
   - scipy
+  - setuptools
   # host setup.py
   - setuptools_scm
   - setuptools_scm_git_archive
