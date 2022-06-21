@@ -3,6 +3,9 @@ import os
 import copy
 import pkg_resources
 import shutil
+
+import joblib
+
 from ..step import Step, run_and_check, safe_mkdir
 
 
@@ -66,6 +69,7 @@ class CoaddNwgintRunner(Step):
                 in_pyml = stash.get_input_pizza_cutter_yaml(tilename, band)
 
                 with stash.update_output_pizza_cutter_yaml(tilename, band) as pyml:
+                    jobs = []
                     for i in range(len(pyml["src_info"])):
                         src_info = pyml["src_info"][i]
 
@@ -77,7 +81,7 @@ class CoaddNwgintRunner(Step):
                             ofile = ofile[:-5]
                         if ofile.endswith("_immasked"):
                             ofile = ofile[:-len("_immasked")]
-                        ofile = ofile + "_ngwint.fits"
+                        ofile = ofile + "_nwgint.fits"
                         if self.logger is not None:
                             self.logger.info("coadd null weight filename: %s", ofile)
 
@@ -115,7 +119,11 @@ class CoaddNwgintRunner(Step):
                             ofile,
                         ]
 
-                        run_and_check(cmd, "CoaddNwgint")
+                        jobs.append(joblib.delayed(run_and_check)(cmd, "CoaddNwgint"))
+
                         pyml["src_info"][i]["coadd_nwgint_path"] = ofile
+
+                    with joblib.Parallel(njobs=-1, backend="threading") as par:
+                        par(jobs)
 
         return 0, stash
