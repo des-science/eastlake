@@ -55,11 +55,12 @@ def safe_mkdir(d):
             raise e
 
 
-def safe_rm(pth):
+def safe_rm(pth, verbose=False):
     try:
         os.remove(pth)
     except Exception as e:
-        print("removing file %s failed w/ error %r" % (pth, e))
+        if verbose:
+            print("removing file %s failed w/ error %r" % (pth, e))
         pass
 
 
