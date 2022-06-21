@@ -6,3 +6,4 @@ from .delete_images import DeleteImages  # noqa
 from .true_detection import TrueDetectionRunner  # noqa
 from .delete_meds import DeleteMeds  # noqa
 from .newish_metacal import NewishMetcalRunner  # noqa
+from .coadd_nwgint import CoaddNwgintRunner  # noqa
