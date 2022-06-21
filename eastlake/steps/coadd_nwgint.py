@@ -91,11 +91,12 @@ class CoaddNwgintRunner(Step):
                             pass
 
                         # copy scamp header
-                        safe_mkdir(os.path.dirname(pyml["src_info"][i]["head_path"]))
-                        shutil.copy2(
-                            in_pyml["src_info"][i]["head_path"],
-                            pyml["src_info"][i]["head_path"],
-                        )
+                        if not os.path.exists(pyml["src_info"][i]["head_path"]):
+                            safe_mkdir(os.path.dirname(pyml["src_info"][i]["head_path"]))
+                            shutil.copy2(
+                                in_pyml["src_info"][i]["head_path"],
+                                pyml["src_info"][i]["head_path"],
+                            )
 
                         cmd = copy.deepcopy(self.coadd_nwgint_cmd)
                         cmd += [
