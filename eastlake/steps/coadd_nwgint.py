@@ -10,7 +10,7 @@ def _get_default_data(nm):
 
 
 def _get_default_config(nm):
-    return pkg_resources.resource_filename("eastlake", "data/%s" % nm)
+    return pkg_resources.resource_filename("eastlake", "config/%s" % nm)
 
 
 class CoaddNwgintRunner(Step):
