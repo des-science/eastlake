@@ -252,6 +252,7 @@ class SingleBandSwarpRunner(Step):
                                 tilename, band, output_coadd_path))
                         hdulist.writeto(output_coadd_path, overwrite=True)
 
+                        safe_rm(output_coadd_path + ".fz")
                         run_and_check(
                             ["fpack", os.path.basename(output_coadd_path)],
                             "fpack SWarp"
