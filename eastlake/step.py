@@ -21,7 +21,7 @@ def run_and_check(command, command_name, logger=None):
         print("Failed calling %s using command %s, output follows:" % (
             command_name, command))
         if hasattr(e, "output"):
-            print(e.output)
+            print(e.output.decode("utf-8"))
         else:
             print(repr(e))
 
@@ -29,7 +29,7 @@ def run_and_check(command, command_name, logger=None):
             logger.error("Failed calling %s using command %s, output follows:" % (
                 command_name, command))
             if hasattr(e, "output"):
-                logger.error(e.output)
+                logger.error(e.output.decode("utf-8"))
             else:
                 logger.error(repr(e))
 

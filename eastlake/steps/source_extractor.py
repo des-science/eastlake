@@ -190,7 +190,7 @@ class SrcExtractorRunner(Step):
                     cmd += ["-CATALOG_TYPE", "FITS_1.0"]
 
                     # and seg name
-                    seg_name = coadd_file.replace(".fits", "_seg.fits")
+                    seg_name = coadd_file.replace(".fits", "_segmap.fits")
                     bkg_name = coadd_file.replace(".fits", "_bkg.fits")
                     bkg_rms_name = coadd_file.replace(".fits", "_bkg-rms.fits")
                     cmd += ["-CHECKIMAGE_NAME", "%s" % get_relpath(seg_name)]
