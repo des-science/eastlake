@@ -63,7 +63,6 @@ class CoaddNwgintRunner(Step):
         ]
 
     def execute(self, stash, new_params=None):
-        # Loop through tiles calling SrcExtractor
         for tilename in stash["tilenames"]:
             for band in stash["bands"]:
                 in_pyml = stash.get_input_pizza_cutter_yaml(tilename, band)

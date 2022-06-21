@@ -99,6 +99,7 @@ class NewishMetcalRunner(Step):
 
     def execute(self, stash, new_params=None):
         self.clear_stash(stash)
+        rng = np.random.RandomState(seed=stash["step_primary_seed"])
 
         base_output_dir = os.path.join(self.base_dir, "newish-metacal")
         safe_mkdir(base_output_dir)
@@ -134,8 +135,8 @@ class NewishMetcalRunner(Step):
                     staged_meds_files.append(
                         os.path.join(tmpdir, os.path.basename(fname))
                     )
-                # FIXME hard coded seed
-                output = _run_metacal(staged_meds_files, 42)
+                seed = rng.randint(1, 2**31)
+                output = _run_metacal(staged_meds_files, seed)
             finally:
                 for fname in staged_meds_files:
                     os.system("rm -f %s" % fname)

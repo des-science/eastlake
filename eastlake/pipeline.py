@@ -7,6 +7,8 @@ import galsim.config.process
 import os
 import yaml
 import pickle
+import numpy as np
+
 # for metacal
 from collections import OrderedDict
 from .steps import (
@@ -20,6 +22,7 @@ from .steps import (
     DeleteMeds,
     NewishMetcalRunner,
     CoaddNwgintRunner,
+    PizzaCutterRunner,
 )
 from .utils import get_logger, safe_mkdir, pushd
 from .stash import Stash
@@ -39,6 +42,7 @@ STEP_CLASSES = OrderedDict([
     ('delete_meds', DeleteMeds),
     ('newish_metacal', NewishMetcalRunner),
     ('coadd_nwgint', CoaddNwgintRunner),
+    ('pizza_cutter', PizzaCutterRunner),
 ])
 
 STEP_IS_GALSIM = set(["galsim"])
@@ -70,8 +74,11 @@ def register_pipeline_step(step_name, step_class, is_galsim=False):
 
 
 class Pipeline(object):
-    def __init__(self, steps, base_dir, logger=None, verbosity=1, log_file=None, name="pipeline", config=None,
-                 record_file="job_record.pkl"):
+    def __init__(
+        self, steps, base_dir, seed=None,
+        logger=None, verbosity=1, log_file=None, name="pipeline", config=None,
+        record_file="job_record.pkl",
+    ):
         """Class for running an image simulation pipeline.
         @param steps    List of Step instances (see step.py)
         @base_dir       Path base output directory for this pipeline
@@ -118,6 +125,8 @@ class Pipeline(object):
         # stash is a dictionary that gets passed to and updated by pipeline steps.
         # It is also what is saved as the job_record, allowing restarting the pipeline
         self.init_stash()
+        if "step_primary_seed" not in self.stash:
+            self.stash["step_primary_seed"] = np.random.randint(1, 2**31)
 
     def init_stash(self):
         self.stash = Stash(self.base_dir, self.step_names)
@@ -152,6 +161,11 @@ class Pipeline(object):
         # Reset environment variables that were set in previous pipeline
         for key, val in stash["env"]:
             os.environ[key] = val
+
+        # make sure a seed exists
+        if "step_primary_seed" not in pipe.stash:
+            pipe.stash["step_primary_seed"] = np.random.randint(1, 2**31)
+
         return pipe
 
     @classmethod

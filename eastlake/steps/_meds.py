@@ -88,11 +88,10 @@ class MEDSRunner(Step):
         super(MEDSRunner, self).__init__(
             config, base_dir, name=name,
             logger=logger, verbosity=verbosity, log_file=log_file)
-        # setup meds_dir environment variable
-        if not os.path.isabs(self.config["meds_dir"]):
-            self.config["meds_dir"] = os.path.join(
-                self.base_dir, self.config["meds_dir"])
-            os.environ["MEDS_DIR"] = self.config["meds_dir"]
+
+        self.config["meds_dir"] = self.base_dir
+        os.environ["MEDS_DIR"] = self.config["meds_dir"]
+
         # And set some defaults in the config
         if "allowed_box_sizes" not in self.config:
             self.config["allowed_box_sizes"] = [
@@ -136,6 +135,7 @@ class MEDSRunner(Step):
             pr = None
 
         # And add meds_run and MEDS_DIR to stash for later
+        self.config["meds_run"] = stash["desrun"]
         stash["meds_run"] = self.config["meds_run"]
         stash["env"].append(("MEDS_DIR", os.environ["MEDS_DIR"]))
 
@@ -428,7 +428,7 @@ class MEDSRunner(Step):
                 # as we're not running multiple sims on the same machine....
                 t0 = timer()
                 meds_file = os.path.join(
-                    os.environ.get("MEDS_DIR"), self.config["meds_run"], tilename,
+                    self.config["meds_dir"], self.config["meds_run"], tilename,
                     "%s_%s_meds-%s.fits.fz" % (tilename, band, self.config["meds_run"]))
                 meds_files.append(meds_file)
 

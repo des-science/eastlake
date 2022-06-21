@@ -6,6 +6,7 @@ dependencies:
   - astropy
   - des-desmeds
   - des-pixcorrect
+  - des-pizza-cutter-metadetect
   - esutil
   - fitsio
   - galsim
