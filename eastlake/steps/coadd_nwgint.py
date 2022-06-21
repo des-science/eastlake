@@ -85,10 +85,7 @@ class CoaddNwgintRunner(Step):
                             self.logger.info("coadd null weight filename: %s", ofile)
 
                         safe_mkdir(os.path.dirname(ofile))
-                        try:
-                            os.remove(ofile)
-                        except Exception:
-                            pass
+                        safe_rm(ofile)
 
                         # copy scamp header
                         copy_ifnotexists(

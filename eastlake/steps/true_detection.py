@@ -5,7 +5,7 @@ import fitsio
 import numpy as np
 
 from ..step import Step
-from ..utils import safe_copy
+from ..utils import safe_copy, safe_rm
 
 
 class TrueDetectionRunner(Step):
@@ -118,15 +118,8 @@ class TrueDetectionRunner(Step):
             coadd_file = coadd_file[:-3]
 
         # delete them here to make sure things work ok
-        try:
-            os.remove(coadd_file)
-        except Exception:
-            pass
-
-        try:
-            os.remove(dest_coadd_file)
-        except Exception:
-            pass
+        safe_rm(coadd_file)
+        safe_rm(dest_coadd_file)
 
         safe_copy(
             orig_coadd_path,
