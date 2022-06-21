@@ -1,12 +1,11 @@
 from __future__ import print_function, absolute_import
 import os
-import shutil
 
 import fitsio
 import numpy as np
 
 from ..step import Step
-from ..utils import safe_mkdir
+from ..utils import copy_ifnotexists
 
 
 class TrueDetectionRunner(Step):
@@ -129,9 +128,10 @@ class TrueDetectionRunner(Step):
         except Exception:
             pass
 
-        safe_mkdir(os.path.dirname(dest_coadd_file))
-
-        shutil.copy(orig_coadd_path, dest_coadd_file)
+        copy_ifnotexists(
+            orig_coadd_path,
+            dest_coadd_file,
+        )
 
         if orig_coadd_path.endswith('.fz'):
             os.system('funpack %s' % dest_coadd_file)

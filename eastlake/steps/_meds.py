@@ -148,14 +148,14 @@ class MEDSRunner(Step):
             except AssertionError as e:
                 self.logger.error("""Found the psf type DES_Piff,
                 but use_rejectlist is set to False. This will not stand""")
-                raise(e)
+                raise e
         if self.config["use_rejectlist"]:
             try:
                 assert "rejectlist" in stash
             except AssertionError as e:
                 self.logger.error("""use_rejectlist is True, but no 'rejectlist'
                 entry found in stash""")
-                raise(e)
+                raise e
 
         # https://github.com/esheldon/meds/wiki/Creating-MEDS-Files-in-Python
         # Need to generate
@@ -564,7 +564,7 @@ class MEDSRunner(Step):
                     self.logger.error(
                         "couldn't interpret psf %s "
                         "as float" % (size_key))
-                    raise(e)
+                    raise e
                 break
         psf = galsim.Gaussian(**{size_key: stash["psf_config"][size_key]})
 

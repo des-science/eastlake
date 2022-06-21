@@ -2,11 +2,10 @@ from __future__ import print_function, absolute_import
 import os
 import copy
 import pkg_resources
-import shutil
 
 import joblib
 
-from ..step import Step, run_and_check, safe_mkdir
+from ..step import Step, run_and_check, safe_mkdir, copy_ifnotexists
 
 
 def _get_default_data(nm):
@@ -85,18 +84,17 @@ class CoaddNwgintRunner(Step):
                         if self.logger is not None:
                             self.logger.info("coadd null weight filename: %s", ofile)
 
+                        safe_mkdir(os.path.dirname(ofile))
                         try:
                             os.remove(ofile)
                         except Exception:
                             pass
 
                         # copy scamp header
-                        if not os.path.exists(pyml["src_info"][i]["head_path"]):
-                            safe_mkdir(os.path.dirname(pyml["src_info"][i]["head_path"]))
-                            shutil.copy2(
-                                in_pyml["src_info"][i]["head_path"],
-                                pyml["src_info"][i]["head_path"],
-                            )
+                        copy_ifnotexists(
+                            in_pyml["src_info"][i]["head_path"],
+                            pyml["src_info"][i]["head_path"],
+                        )
 
                         cmd = copy.deepcopy(self.coadd_nwgint_cmd)
                         cmd += [
@@ -123,6 +121,18 @@ class CoaddNwgintRunner(Step):
                         jobs.append(joblib.delayed(run_and_check)(cmd, "CoaddNwgint"))
 
                         pyml["src_info"][i]["coadd_nwgint_path"] = ofile
+
+                    if self.logger is not None:
+                        self.logger.warning(
+                            "making null weight images for tile %s band %s",
+                            tilename, band,
+                        )
+                    else:
+                        print(
+                            "making null weight images for tile %s band %s" % (
+                                tilename, band,
+                            )
+                        )
 
                     with joblib.Parallel(n_jobs=-1, backend="threading", verbose=100) as par:
                         par(jobs)

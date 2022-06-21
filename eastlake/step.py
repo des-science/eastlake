@@ -33,7 +33,7 @@ def run_and_check(command, command_name, logger=None):
             else:
                 logger.error(repr(e))
 
-        raise(e)
+        raise e
 
 
 def run_subprocess(command):

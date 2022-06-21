@@ -238,7 +238,7 @@ class Pipeline(object):
                         step_class = STEP_CLASSES[step_config["step_class"]]
                     except KeyError as e:
                         print("step_class must be in %s" % (str(STEP_CLASSES.keys())))
-                        raise(e)
+                        raise e
                 else:
                     step_class = STEP_CLASSES[step_name]
                 if "verbosity" in step_config:

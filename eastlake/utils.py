@@ -6,6 +6,7 @@ import errno
 import os
 import subprocess
 import contextlib
+import shutil
 
 LOGGING_LEVELS = {
     '0': logging.CRITICAL,
@@ -52,6 +53,12 @@ def safe_mkdir(d):
     except OSError as e:
         if e.errno != errno.EEXIST:
             raise e
+
+
+def copy_ifnotexists(src, dst):
+    if not os.path.exists(dst):
+        safe_mkdir(os.path.dirname(dst))
+        shutil.copy2(src, dst)
 
 
 def get_relpath(pth, start=None):

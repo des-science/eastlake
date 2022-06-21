@@ -107,7 +107,7 @@ class Stash(dict):
                 if not keyerror:
                     return None
                 else:
-                    raise(e)
+                    raise e
         else:
             try:
                 filepaths_in_stash = self["tile_info"][tilename][file_key]
@@ -119,7 +119,7 @@ class Stash(dict):
                 if not keyerror:
                     return None
                 else:
-                    raise(e)
+                    raise e
         islist = True
         if not isinstance(filepaths_in_stash, list):
             islist = False
