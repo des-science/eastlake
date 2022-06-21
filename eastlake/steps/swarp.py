@@ -131,6 +131,15 @@ class SingleBandSwarpRunner(Step):
                     output_coadd_dir, "%s_%s_sci.fits" % (tilename, band))
                 output_coadd_weight_file = os.path.join(
                     output_coadd_dir, "%s_%s_wgt.fits" % (tilename, band))
+                output_coadd_mask_file = os.path.join(
+                    output_coadd_dir, "%s_%s_msk.fits" % (tilename, band))
+
+                try:
+                    os.remove(output_coadd_sci_file)
+                    os.remove(output_coadd_weight_file)
+                    os.remove(output_coadd_mask_file)
+                except Exception:
+                    pass
 
                 # make the output directory and then move here to run swarp
                 # this prevents the intermediate files being fucked up by
@@ -204,8 +213,6 @@ class SingleBandSwarpRunner(Step):
                     # weightout_image....
                     dummy_mask_coadd = os.path.join(
                         output_coadd_dir, "%s_%s_msk-tmp.fits" % (tilename, band))
-                    output_coadd_mask_file = os.path.join(
-                        output_coadd_dir, "%s_%s_msk.fits" % (tilename, band))
                     mask_cmd = self.swarp_cmd_root + extra_cmd_line_args
                     mask_cmd = (
                         [mask_cmd[0]] + ["@%s" % msk_file_list] + mask_cmd[1:])
@@ -265,9 +272,14 @@ class SingleBandSwarpRunner(Step):
                         msk_hdus.close()
 
                         # delete intermediate files
-                        os.remove(output_coadd_sci_file)
-                        os.remove(output_coadd_weight_file)
-                        os.remove(output_coadd_mask_file)
+                        try:
+                            os.remove(output_coadd_path)
+                            os.remove(output_coadd_sci_file)
+                            os.remove(output_coadd_weight_file)
+                            os.remove(output_coadd_mask_file)
+                            os.remove(dummy_mask_coadd)
+                        except Exception:
+                            pass
 
                 with stash.update_output_pizza_cutter_yaml(tilename, band) as pyml:
                     pyml["image_path"] = output_coadd_path + ".fz"
