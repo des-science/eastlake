@@ -5,7 +5,8 @@ import pkg_resources
 
 import joblib
 
-from ..step import Step, run_and_check, safe_mkdir, copy_ifnotexists
+from ..step import Step, run_and_check
+from ..utils import safe_mkdir, copy_ifnotexists
 
 
 def _get_default_data(nm):
