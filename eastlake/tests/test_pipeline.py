@@ -338,7 +338,9 @@ def test_pipeline_state(capsys):
                         config=None, record_file=None).record_file == rec
 
         # init stash. Use pl.
-        assert pl.stash == Stash(base_dir, [s.name for s in steps])
+        stsh = Stash(base_dir, [s.name for s in steps])
+        stsh["step_primary_seed"] = pl.stash["step_primary_seed"]
+        assert pl.stash == stsh
 
 
 def test_pipeline_from_record_file():
