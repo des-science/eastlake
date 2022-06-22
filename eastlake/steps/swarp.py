@@ -210,19 +210,19 @@ class SingleBandSwarpRunner(Step):
                             tilename, band, " ".join(cmd)))
                     run_and_check(cmd, "SWarp", logger=self.logger)
 
-                    # Do the same for the masks
-                    # Not sure exactly what I should be doing here...for now try
-                    # setting mask files as weight images and use
-                    # weightout_image....
+
+                    # TODO FIXME This is a total hack.
                     dummy_mask_coadd = os.path.join(
                         output_coadd_dir, "%s_%s_msk-tmp.fits" % (tilename, band))
                     mask_cmd = self.swarp_cmd_root + extra_cmd_line_args
                     mask_cmd = (
                         [mask_cmd[0]] + ["@%s" % msk_file_list] + mask_cmd[1:])
-                    mask_cmd += ["-WEIGHTOUT_NAME", output_coadd_mask_file]
+                    mask_cmd += ["-IMAGE_SIZE", "%d,%d" % image_shape]
+                    mask_cmd += ["-PIXEL_SCALE", "%0.16f" % pixel_scale]
                     mask_cmd += ["-CENTER", "%s,%s" % (
                         coadd_center[0], coadd_center[1])]
                     mask_cmd += ["-IMAGEOUT_NAME", dummy_mask_coadd]
+                    mask_cmd += ["-WEIGHTOUT_NAME", output_coadd_mask_file]
                     mask_cmd += ["-WEIGHT_IMAGE", "@%s" % msk_file_list]
                     # run swarp
                     self.logger.error(
