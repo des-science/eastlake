@@ -357,15 +357,15 @@ class MEDSRunner(Step):
 
                 # fill coadd quantities
                 image_info["image_path"][0] = coadd_file
-                image_info["image_ext"][0] = coadd_ext
+                image_info["image_ext"][0] = FITSEXTMAP[coadd_ext]
                 image_info["weight_path"][0] = coadd_weight_file
-                image_info["weight_ext"][0] = coadd_weight_ext
+                image_info["weight_ext"][0] = FITSEXTMAP[coadd_weight_ext]
                 image_info["bmask_path"][0] = coadd_bmask_file
-                image_info["bmask_ext"][0] = coadd_bmask_ext
+                image_info["bmask_ext"][0] = FITSEXTMAP[coadd_bmask_ext]
                 image_info["bkg_path"][0] = ""  # No bkg file for coadd
                 image_info["bkg_ext"][0] = -1
                 image_info["seg_path"][0] = seg_file
-                image_info["seg_ext"][0] = seg_ext
+                image_info["seg_ext"][0] = FITSEXTMAP[seg_ext]
                 image_info["wcs"][0] = wcs_json[0]
                 image_info["magzp"][0] = MAGZP_REF
                 image_info["scale"][0] = 1.
@@ -373,11 +373,11 @@ class MEDSRunner(Step):
                 for i in range(n_images):
                     ind = i+1
                     image_info["image_path"][ind] = img_files[i]
-                    image_info["image_ext"][ind] = img_ext
+                    image_info["image_ext"][ind] = FITSEXTMAP[img_ext]
                     image_info["weight_path"][ind] = wgt_files[i]
-                    image_info["weight_ext"][ind] = wgt_ext
+                    image_info["weight_ext"][ind] = FITSEXTMAP[wgt_ext]
                     image_info["bmask_path"][ind] = msk_files[i]
-                    image_info["bmask_ext"][ind] = msk_ext
+                    image_info["bmask_ext"][ind] = FITSEXTMAP[msk_ext]
 
                     image_info["bkg_path"][ind] = bkg_files[i]
                     image_info["bkg_ext"][ind] = bkg_ext
