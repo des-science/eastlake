@@ -1,6 +1,8 @@
 from __future__ import print_function
 import os
 import subprocess
+from subprocess import Popen, PIPE, CalledProcessError
+
 from .utils import get_logger, safe_mkdir
 
 from timeit import default_timer as timer
@@ -14,7 +16,26 @@ def run_and_check(command, command_name, logger=None):
         print("running cmd: %s" % (" ".join(command),))
 
     try:
-        output = subprocess.check_output(command, stderr=subprocess.STDOUT)
+        with Popen(
+            command,
+            stdout=PIPE,
+            bufsize=1,
+            universal_newlines=True,
+            encoding="utf-8",
+            stderr=subprocess.STDOUT,
+        ) as p:
+            output = ""
+            for line in p.stdout:
+                print(line, end='', flush=True)
+                output += line
+
+            output = output.encode("utf-8")
+
+        if p.returncode != 0:
+            e = CalledProcessError(p.returncode, p.args)
+            e.output = output
+            raise e
+
         return output
     except Exception as e:
 
