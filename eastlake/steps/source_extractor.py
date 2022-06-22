@@ -9,6 +9,7 @@ import numpy as np
 from ..step import Step, run_and_check
 from ..stash import Stash
 from ..utils import get_relpath, pushd
+from .swarp import FITSEXTMAP
 
 
 def _get_default(nm):
@@ -172,7 +173,7 @@ class SrcExtractorRunner(Step):
                     # Add weight file stuff to command string
                     cmd += ["-WEIGHT_IMAGE", "%s[%d],%s[%d]" % (
                         get_relpath(det_weight_file), det_weight_ext,
-                        get_relpath(weight_file), weight_ext)]
+                        get_relpath(weight_file), FITSEXTMAP[weight_ext])]
 
                     catalog_name = coadd_file.replace(".fits", "_cat.fits")
 
@@ -197,7 +198,7 @@ class SrcExtractorRunner(Step):
                     image_arg = "%s[%d],%s[%d]" % (get_relpath(det_image_file),
                                                    det_image_ext,
                                                    get_relpath(coadd_file),
-                                                   coadd_ext)
+                                                   FITSEXTMAP[coadd_ext])
                     cmd = [cmd[0]] + [image_arg] + cmd[1:]
 
                     if self.logger is not None:

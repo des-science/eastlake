@@ -15,6 +15,12 @@ from ..des_files import MAGZP_REF
 
 DEFAULT_SWARP_CONFIG = pkg_resources.resource_filename("eastlake", "astromatic/Y6A1_v1_swarp.config")
 
+FITSEXTMAP = {
+    "sci": 0,
+    "msk": 1,
+    "wgt": 2,
+}
+
 
 # Swarp is annoying and can vomit a segfault if the paths
 # to the input images are too long. This can happen with the
@@ -357,18 +363,18 @@ class SWarpRunner(Step):
                 im, ext = stash.get_filepaths(
                     "coadd_file", tilename, band=band, with_fits_ext=True, funpack=True,
                 )
-                img_strings.append("%s[%d]" % (im, ext))
+                img_strings.append("%s[%d]" % (im, FITSEXTMAP[ext]))
 
                 weight_file, weight_ext = stash.get_filepaths(
                     "coadd_weight_file", tilename, band=band, with_fits_ext=True, funpack=True,
                 )
-                weight_strings.append("%s[%d]" % (weight_file, weight_ext))
+                weight_strings.append("%s[%d]" % (weight_file, FITSEXTMAP[weight_ext]))
 
                 # We also need to coadd the masks, so get mask filenames.
                 mask_file, mask_ext = stash.get_filepaths(
                     "coadd_mask_file", tilename, band=band, with_fits_ext=True, funpack=True,
                 )
-                mask_strings.append("%s[%d]" % (mask_file, mask_ext))
+                mask_strings.append("%s[%d]" % (mask_file, FITSEXTMAP[mask_ext]))
 
                 # on first band, get the center, image_shape and pixel scale
                 if len(coadd_bands) == 1:
