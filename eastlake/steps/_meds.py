@@ -256,13 +256,13 @@ class MEDSRunner(Step):
 
                 # coadd stuff
                 coadd_file, coadd_ext = stash.get_filepaths(
-                    "coadd_file", tilename, band=band, with_fits_ext=True,
+                    "coadd_file", tilename, band=band, with_fits_ext=True, funpack=True,
                 )
                 coadd_weight_file, coadd_weight_ext = stash.get_filepaths(
-                    "coadd_weight_file", tilename, band=band, with_fits_ext=True,
+                    "coadd_weight_file", tilename, band=band, with_fits_ext=True, funpack=True,
                 )
                 coadd_bmask_file, coadd_bmask_ext = stash.get_filepaths(
-                    "coadd_mask_file", tilename, band=band, with_fits_ext=True,
+                    "coadd_mask_file", tilename, band=band, with_fits_ext=True, funpack=True,
                 )
 
                 # headers and WCS
