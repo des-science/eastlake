@@ -233,6 +233,7 @@ class SingleBandSwarpRunner(Step):
                         im_hdus = fits.open(output_coadd_sci_file)
                         im_hdu = im_hdus[0]
                         _set_fpack_headers(im_hdu)
+                        im_hdu.header["EXTNAME"] = "sci"
                         # stupidly, if you ask me, we cannot simply read in the
                         # weight and coadd hdus and add them directly to an HDUList
                         # because they are PrimaryHDUs...
@@ -240,10 +241,12 @@ class SingleBandSwarpRunner(Step):
                         wgt_fits = wgt_hdus[0]
                         wgt_hdu = fits.ImageHDU(wgt_fits.data, header=wgt_fits.header)
                         _set_fpack_headers(wgt_hdu)
+                        wgt_hdu.header["EXTNAME"] = "wgt"
                         msk_hdus = fits.open(output_coadd_mask_file)
                         msk_fits = msk_hdus[0]
                         msk_hdu = fits.ImageHDU(msk_fits.data, header=msk_fits.header)
                         _set_fpack_headers(msk_hdu)
+                        msk_hdu.header["EXTNAME"] = "msk"
                         hdus = [im_hdu, msk_hdu, wgt_hdu]
                         hdulist = fits.HDUList(hdus)
                         self.logger.error(
@@ -270,11 +273,11 @@ class SingleBandSwarpRunner(Step):
 
                 with stash.update_output_pizza_cutter_yaml(tilename, band) as pyml:
                     pyml["image_path"] = output_coadd_path + ".fz"
-                    pyml["image_ext"] = 1
+                    pyml["image_ext"] = "sci"
                     pyml["bmask_path"] = output_coadd_path + ".fz"
-                    pyml["bmask_ext"] = 2
+                    pyml["bmask_ext"] = "msk"
                     pyml["weight_path"] = output_coadd_path + ".fz"
-                    pyml["weight_ext"] = 3
+                    pyml["weight_ext"] = "wgt"
 
             self.logger.error(
                 "%s complete for tile %s" % (self.name, tilename))

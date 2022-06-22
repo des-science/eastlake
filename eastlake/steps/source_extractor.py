@@ -205,10 +205,13 @@ class SrcExtractorRunner(Step):
                         self.logger.error(" ".join(cmd))
                     run_and_check(cmd, "SrcExtractor")
 
+                    with fitsio.FITS(seg_name, "rw") as fits:
+                        fits[0].write_key("EXTNAME", "sci")
+
                 with stash.update_output_pizza_cutter_yaml(tilename, band) as pyml:
                     pyml["cat_path"] = catalog_name
                     pyml["seg_path"] = seg_name
-                    pyml["seg_ext"] = 0
+                    pyml["seg_ext"] = "sci"
                 stash.set_filepaths("bkg_file", bkg_name, tilename, band=band)
                 stash.set_filepaths(
                     "bkg_rms_file", bkg_rms_name, tilename, band=band)
