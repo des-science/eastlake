@@ -79,6 +79,7 @@ class PizzaCutterRunner(Step):
                     "--n-jobs=%d" % self.config["n_jobs"],
                     "--n-chunks=%d" % self.config["n_chunks"],
                     "--seed=%d" % rng.randint(1, 2**31),
+                    "--log-level=INFO",
                 ]
                 if tmpdir is not None:
                     cmd += ["--tmpdir=%s" % tmpdir]
