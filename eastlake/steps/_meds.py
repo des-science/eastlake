@@ -273,7 +273,7 @@ class MEDSRunner(Step):
                     coadd_header)
 
                 coadd_wcs, _ = galsim.wcs.readFromFitsHeader(
-                    galsim.FitsHeader(coadd_file, coadd_ext))
+                    galsim.FitsHeader(file_name=coadd_file, hdu=coadd_ext))
 
                 if (
                     stash.has_tile_info_quantity("coadd_bkg_file", tilename, band=band)
@@ -506,7 +506,7 @@ class MEDSRunner(Step):
                     psf_kwargs=PSF_KWARGS[band],
                 )
                 img_wcs, _ = galsim.wcs.readFromFitsHeader(
-                        galsim.FitsHeader(img_file, img_ext)
+                        galsim.FitsHeader(file_name=img_file, hdu=img_ext)
                     )
                 psf_data.append(PSFForMeds(psf, img_wcs, stash["draw_method"]))
 
@@ -545,7 +545,7 @@ class MEDSRunner(Step):
                     psf = galsim.des.DES_PSFEx(
                         psfex_file, image_file_name=img_file)
                     img_wcs, img_origin = galsim.wcs.readFromFitsHeader(
-                        galsim.FitsHeader(img_file, img_ext)
+                        galsim.FitsHeader(file_name=img_file, hdu=img_ext)
                     )
                     psf_data.append(PSFForMeds(psf, img_wcs, "no_pixel"))
                 else:
@@ -579,7 +579,7 @@ class MEDSRunner(Step):
         if stash.has_tile_info_quantity("img_files", tilename, band=band):
             for img_file in img_files:
                 wcs, origin = galsim.wcs.readFromFitsHeader(
-                    galsim.FitsHeader(img_file, hdu=img_ext)
+                    galsim.FitsHeader(file_name=img_file, hdu=img_ext)
                 )
                 psf_data.append(
                     PSFForMeds(
