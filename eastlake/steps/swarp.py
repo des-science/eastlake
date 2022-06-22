@@ -210,7 +210,6 @@ class SingleBandSwarpRunner(Step):
                             tilename, band, " ".join(cmd)))
                     run_and_check(cmd, "SWarp", logger=self.logger)
 
-
                     # TODO FIXME This is a total hack.
                     dummy_mask_coadd = os.path.join(
                         output_coadd_dir, "%s_%s_msk-tmp.fits" % (tilename, band))
