@@ -167,7 +167,7 @@ class SingleBandSwarpRunner(Step):
                     im_file_list = "im_file_list.dat"
                     _write_relpath_file_list(
                         [
-                            "%s[%d]" % (src["image_path"], src["image_ext"])
+                            "%s[%d]" % (src["image_path"], FITSEXTMAP[src["image_ext"]])
                             for src in output_pyml["src_info"]
                         ],
                         im_file_list,
@@ -176,7 +176,7 @@ class SingleBandSwarpRunner(Step):
                     wgt_file_list = "wgt_file_list.dat"
                     _write_relpath_file_list(
                         [
-                            "%s[%d]" % (src["weight_path"], src["weight_ext"])
+                            "%s[%d]" % (src["weight_path"], FITSEXTMAP[src["weight_ext"]])
                             for src in output_pyml["src_info"]
                         ],
                         wgt_file_list,
@@ -185,7 +185,7 @@ class SingleBandSwarpRunner(Step):
                     msk_file_list = "msk_file_list.dat"
                     _write_relpath_file_list(
                         [
-                            "%s[%d]" % (src["bmask_path"], src["bmask_ext"])
+                            "%s[%d]" % (src["bmask_path"], FITSEXTMAP[src["bmask_ext"]])
                             for src in output_pyml["src_info"]
                         ],
                         msk_file_list,
