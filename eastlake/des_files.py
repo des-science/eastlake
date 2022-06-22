@@ -155,6 +155,24 @@ def read_pizza_cutter_yaml(imsim_data, desrun, tilename, band):
     return band_info
 
 
+def get_tile_center(coadd_file):
+    """Get the center of the coadd tile from the coadd WCS header values.
+
+    Parameters
+    ----------
+    coadd_file : str
+        The path the coadd file to read.
+
+    Returns
+    -------
+    center : tuple of floats
+        A tuple of floats with the values of ('CRVAL1', 'CRVAL2') from the
+        coadd image header.
+    """
+    coadd_header = galsim.fits.FitsHeader(coadd_file)
+    return (str(coadd_header["CRVAL1"]), str(coadd_header["CRVAL2"]))
+
+
 class Tile(dict):
     """
     Class for storing tile info.

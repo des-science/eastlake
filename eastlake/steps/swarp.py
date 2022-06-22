@@ -10,7 +10,7 @@ import numpy as np
 
 from ..utils import safe_mkdir, get_relpath, pushd, safe_rm
 from ..step import Step, run_and_check
-from ..des_files import MAGZP_REF
+from ..des_files import MAGZP_REF, get_tile_center
 
 
 DEFAULT_SWARP_CONFIG = pkg_resources.resource_filename("eastlake", "astromatic/Y6A1_v1_swarp.config")
@@ -107,6 +107,12 @@ class SingleBandSwarpRunner(Step):
 
         for tilename in tilenames:
             for band in stash["bands"]:
+                if not stash.has_tile_info_quantity("tile_center", tilename, band=band):
+                    tile_center = get_tile_center(
+                        stash.get_input_pizza_cutter_yaml(tilename, band)["image_path"]
+                    )
+                    stash.set_tile_info_quantity("tile_center", tile_center, tilename)
+
                 self.logger.error(
                     "running swarp for tile %s, band %s" % (
                         tilename, band))
@@ -348,6 +354,12 @@ class SWarpRunner(Step):
             coadd_bands = []
             # Loop through bands collecting image, weight and mask names
             for band in bands:
+                if not stash.has_tile_info_quantity("tile_center", tilename, band=band):
+                    tile_center = get_tile_center(
+                        stash.get_input_pizza_cutter_yaml(tilename, band)["image_path"]
+                    )
+                    stash.set_tile_info_quantity("tile_center", tile_center, tilename)
+
                 # We may not want to coadd all bands - e.g. DES just does riz
                 # for the detection image. So check the coadd_bands entry in
                 # the config
