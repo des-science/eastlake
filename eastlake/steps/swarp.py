@@ -338,7 +338,7 @@ class SingleBandSwarpRunner(Step):
                     ]
                     self.logger.error(
                         "running coadd_assemble for tile %s, band %s:\n\t%s" % (
-                            tilename, band, " ".join(mask_cmd)))
+                            tilename, band, " ".join(asmb_cmd)))
                     run_and_check(asmb_cmd, "coadd_assemble", logger=self.logger)
 
                     # set headers and fpack
@@ -350,7 +350,11 @@ class SingleBandSwarpRunner(Step):
                     safe_rm(output_coadd_path + ".fz")
                     self.logger.error(
                         "running fpack for tile %s, band %s:\n\t%s" % (
-                            tilename, band, " ".join(mask_cmd)))
+                            tilename, band, " ".join(
+                                ["fpack", os.path.basename(output_coadd_path)]
+                            )
+                        )
+                    )
                     run_and_check(
                         ["fpack", os.path.basename(output_coadd_path)],
                         "fpack SWarp",
