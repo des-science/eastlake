@@ -40,7 +40,6 @@ meds:
     cutout_types: ['image','weight','seg','bmask']
     meds_dir: meds
     meds_run: y3v02
-    sub_bkg: False
     add_psf_data: True
     use_joblib: True
 

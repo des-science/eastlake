@@ -109,8 +109,6 @@ class MEDSRunner(Step):
             self.config["sigma_fac"] = 5.0
         if "refband" not in self.config:
             self.config["refband"] = "r"
-        if "sub_bkg" not in self.config:
-            self.config["sub_bkg"] = False
         if "stage_output" not in self.config:
             self.config["stage_output"] = False
         if "use_rejectlist" not in self.config:
@@ -312,18 +310,14 @@ class MEDSRunner(Step):
                     )
                     mag_zps = stash.get_tile_info_quantity("mag_zps", tilename, band=band)
 
-                    if self.config.get("sub_bkg", True):
-                        bkg_files, bkg_ext = stash.get_filepaths(
-                            "bkg_files", tilename, band=band, with_fits_ext=True,
-                        )
-                        if not isinstance(bkg_ext, int):
-                            if bkg_files[0].endswith(".fits.fz"):
-                                bkg_ext = 1
-                            else:
-                                bkg_ext = 0
-                    else:
-                        bkg_files = [""]*len(img_files)
-                        bkg_ext = -1
+                    bkg_files, bkg_ext = stash.get_filepaths(
+                        "bkg_files", tilename, band=band, with_fits_ext=True,
+                    )
+                    if not isinstance(bkg_ext, int):
+                        if bkg_files[0].endswith(".fits.fz"):
+                            bkg_ext = 1
+                        else:
+                            bkg_ext = 0
 
                     img_files = [f for (i, f) in enumerate(img_files) if not is_rejectlisted[i]]
                     wgt_files = [f for (i, f) in enumerate(wgt_files) if not is_rejectlisted[i]]
