@@ -6,7 +6,7 @@ import multiprocessing
 import numpy as np
 
 from ..step import Step, run_and_check
-from ..utils import safe_mkdir
+from ..utils import safe_mkdir, safe_copy, copy_ifnotexists
 from ..des_files import get_pizza_cutter_yaml_path
 
 
@@ -69,6 +69,28 @@ class PizzaCutterRunner(Step):
                     ),
                 )
                 safe_mkdir(odir)
+
+                # copy input files
+                in_pyml = stash.get_input_pizza_cutter_yaml(tilename, band)
+                pyml = stash.get_output_pizza_cutter_yaml(tilename, band)
+                safe_copy(
+                    in_pyml["gaia_stars_file"],
+                    pyml["gaia_stars_file"],
+                )
+                for i in range(len(pyml["src_info"])):
+                    # we don't overwrite these since we could have estimated them
+                    copy_ifnotexists(
+                        in_pyml["src_info"][i]["head_path"],
+                        pyml["src_info"][i]["head_path"],
+                    )
+                    copy_ifnotexists(
+                        in_pyml["src_info"][i]["piff_path"],
+                        pyml["src_info"][i]["piff_path"],
+                    )
+                    copy_ifnotexists(
+                        in_pyml["src_info"][i]["psf_path"],
+                        pyml["src_info"][i]["psf_path"],
+                    )
 
                 cmd = [
                     "des-pizza-cutter",
