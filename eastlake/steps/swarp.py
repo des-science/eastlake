@@ -330,7 +330,7 @@ class SingleBandSwarpRunner(Step):
                         "--maxcols", "100",
                         "--mincols", "1",
                         "--no-keep_sci_zeros",
-                        "--magzero 30",
+                        "--magzero", "30",
                         "--tilename", tilename,
                         "--tileid", "-9999",
                         "--interp_image", "MSK",
