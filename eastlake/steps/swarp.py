@@ -289,7 +289,7 @@ class SingleBandSwarpRunner(Step):
                     cmd += ["-IMAGEOUT_NAME", output_coadd_sci_file]
                     cmd += ["-WEIGHTOUT_NAME", output_coadd_weight_file]
                     self.logger.error(
-                        "running swarp for tile %s, band %s: %s" % (
+                        "running swarp for tile %s, band %s:\n\t%s" % (
                             tilename, band, " ".join(cmd)))
                     run_and_check(cmd, "SWarp", logger=self.logger)
 
@@ -312,7 +312,7 @@ class SingleBandSwarpRunner(Step):
                     mask_cmd += ["-IMAGEOUT_NAME", dummy_mask_coadd]
                     mask_cmd += ["-WEIGHTOUT_NAME", output_coadd_mask_file]
                     self.logger.error(
-                        "running swarp for tile %s, band %s w/ mask: %s" % (
+                        "running swarp for tile %s, band %s w/ mask:\n\t%s" % (
                             tilename, band, " ".join(mask_cmd)))
                     run_and_check(mask_cmd, "Mask SWarp", logger=self.logger)
                     safe_rm(dummy_mask_coadd)
@@ -337,7 +337,7 @@ class SingleBandSwarpRunner(Step):
                         "--ydilate", "3",
                     ]
                     self.logger.error(
-                        "running coadd_assemble for tile %s, band %s w/ mask: %s" % (
+                        "running coadd_assemble for tile %s, band %s:\n\t%s" % (
                             tilename, band, " ".join(mask_cmd)))
                     run_and_check(asmb_cmd, "coadd_assemble", logger=self.logger)
 
@@ -349,7 +349,7 @@ class SingleBandSwarpRunner(Step):
 
                     safe_rm(output_coadd_path + ".fz")
                     self.logger.error(
-                        "running fpack for tile %s, band %s w/ mask: %s" % (
+                        "running fpack for tile %s, band %s:\n\t%s" % (
                             tilename, band, " ".join(mask_cmd)))
                     run_and_check(
                         ["fpack", os.path.basename(output_coadd_path)],
