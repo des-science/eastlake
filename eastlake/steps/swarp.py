@@ -69,6 +69,76 @@ def _set_fpack_headers(hdu):
 
 
 class SingleBandSwarpRunner(Step):
+    """Notes from Robert on what should be done here:
+
+    # this breakdown is based on a Y6A2 coadd tile (it was DES0130-4623) but I have stripped out lots of
+    obscurring details from the file names.
+
+    swarp @list/wgt-sci.list \
+        -c config/Y6A1_v1_swarp.config \
+        -WEIGHTOUT_NAME wgt.fits \
+        -CENTER 22.632611,-46.386111  -PIXEL_SCALE 0.263 \
+        -FSCALE_DEFAULT @list/wgt-flx.list \
+        -IMAGE_SIZE 10000,10000 \
+        -IMAGEOUT_NAME sci.fits \
+        -COMBINE_TYPE WEIGHTED \
+        -WEIGHT_IMAGE @list/wgt-wgt.list \
+        -NTHREADS 8  -BLANK_BADPIXELS Y
+
+    swarp @list/msk-sci.list \
+        -c config/Y6A1_v1_swarp.config \
+        -WEIGHTOUT_NAME msk.fits  \
+        -CENTER 22.632611,-46.386111  -PIXEL_SCALE 0.263  \
+        -FSCALE_DEFAULT @lists/msk-flx.list \
+        -IMAGE_SIZE 10000,10000 \
+        -IMAGEOUT_NAME  tmp-sci.fits \
+        -COMBINE_TYPE WEIGHTED \
+        -WEIGHT_IMAGE @list/msk-wgt.list \
+        -NTHREADS 8  -BLANK_BADPIXELS Y
+
+    coadd_assemble  --sci_file sci.fits
+        --wgt_file wgt.fits
+        --msk_file msk.fits
+        --outname  coadd.fits
+        --xblock 10  --yblock 3  --maxcols 100  --mincols 1  --no-keep_sci_zeros \
+        --magzero 30  --tilename DES0130-4623  --tileid 119590  --interp_image MSK  --ydilate 3
+
+
+    So the first SWarp execution:
+        inputs:
+            wgt-sci.list:   comprised of  *nwgint.fits[0]  <-- so reading the SCI hdu
+            wgt-flx.list:   comprised of  fluxscale values   <-- 10. ** (0.4 * (30.0 - ZP))
+            wgt-wgt.list:   comprised of  *nwgint.fits[2]  <-- so reading the WGT_ME hdu
+        output:
+            wgt.fits:  (through the WEIGHTOUT side of SWarp)     feeds the --wgt_file in coadd_assemble
+            sci.fits:  (through the IMAGEOUT  side of SWarp) feeds the --sci_file in coadd_assemble
+
+
+    Now the second SWarp execution:
+        inputs:
+            msk-sci.list:   comprised of *nwgint.fits[0]  <-- so again reading the SCI hdu
+            msk-flx.list:   comprised of fluxscale values   (identical to other call)
+            msk-wgt.list:   comprised of *nwgint.fits[1]  <-- so reading the WGT hdu
+        output:
+            msk.fits:     (through the WEIGHTOUT side of SWarp)  feeds the --msk_file in coadd_assemble
+            tmp-sci.fits: (through the IMAGEOUT side of SWarp)  THIS IS BEING THROWN AWAY
+
+    The tricky bits:
+        coadd_nwgint --> the WGT_ME plane preserves WGT (rather than set to 0) wherever BADPIX_STAR is set
+                         (so for instance when a BADPIX_TRAIL) intersects a star (BADPIX_STAR) the WGT is not set to 0)
+                     --> the WGT plane takes all flags (from cmdline) and sets WGT=0
+
+        coadd_assemble --> takes that thing called msk.fits above which used the WGT plane and sets the outtput
+                    mask plane = 1 wherever the resulting SWarp WGT == 0
+                 (i.e. all input images that overlapped that spot had WGT=0 --> no data -->  MSK=1 set
+                  - however, WGT_ME will have values if a STAR was present... so the output WGT!=0
+                  - later when detection runs those bright stars don't become odd collections of detections i
+                        of the edges that do make it into an image
+
+        it comes out as an int because:
+            MSK = numpy.where(mask.fits == 0, 1, 0)
+            MSK = MSK.astype(numpy.int32)
+    """
     def __init__(self, config, base_dir, name="single_band_swarp", logger=None,
                  verbosity=0, log_file=None):
         super(SingleBandSwarpRunner, self).__init__(
@@ -167,7 +237,7 @@ class SingleBandSwarpRunner(Step):
                     im_file_list = "im_file_list.dat"
                     _write_relpath_file_list(
                         [
-                            "%s[%d]" % (src["image_path"], FITSEXTMAP[src["image_ext"]])
+                            "%s[%d]" % (src["coadd_nwgint_path"], 0)
                             for src in output_pyml["src_info"]
                         ],
                         im_file_list,
@@ -176,111 +246,114 @@ class SingleBandSwarpRunner(Step):
                     wgt_file_list = "wgt_file_list.dat"
                     _write_relpath_file_list(
                         [
-                            "%s[%d]" % (src["weight_path"], FITSEXTMAP[src["weight_ext"]])
+                            "%s[%d]" % (src["coadd_nwgint_path"], 1)
                             for src in output_pyml["src_info"]
                         ],
                         wgt_file_list,
                     )
 
+                    wgt_me_file_list = "wgt_me_file_list.dat"
+                    _write_relpath_file_list(
+                        [
+                            "%s[%d]" % (src["coadd_nwgint_path"], 2)
+                            for src in output_pyml["src_info"]
+                        ],
+                        wgt_me_file_list,
+                    )
+
                     msk_file_list = "msk_file_list.dat"
                     _write_relpath_file_list(
                         [
-                            "%s[%d]" % (src["bmask_path"], FITSEXTMAP[src["bmask_ext"]])
+                            "%s[%d]" % (src["coadd_nwgint_path"], 3)
                             for src in output_pyml["src_info"]
                         ],
                         msk_file_list,
                     )
 
-                    cmd = [cmd[0]] + ["@%s" % im_file_list] + cmd[1:]
-                    cmd += ["-IMAGE_SIZE", "%d,%d" % image_shape]
-                    cmd += ["-PIXEL_SCALE", "%0.16f" % pixel_scale]
-                    cmd += ["-WEIGHTOUT_NAME", output_coadd_weight_file]
-                    cmd += ["-CENTER", "%s,%s" % (
-                        coadd_center[0], coadd_center[1])]
-                    cmd += ["-IMAGEOUT_NAME", output_coadd_sci_file]
-                    cmd += ["-WEIGHT_IMAGE", "@%s" % wgt_file_list]
-
                     # We need to scale images to all have common zeropoint
                     mag_zp_list = [src["magzp"] for src in output_pyml["src_info"]]
                     fscale_list = [10**(0.4*(MAGZP_REF-mag_zp)) for mag_zp in mag_zp_list]
 
+                    # the first call
+                    cmd = [cmd[0]] + ["@%s" % im_file_list] + cmd[1:]
+                    cmd += ["-IMAGE_SIZE", "%d,%d" % image_shape]
+                    cmd += ["-PIXEL_SCALE", "%0.16f" % pixel_scale]
+                    cmd += ["-CENTER", "%s,%s" % (
+                        coadd_center[0], coadd_center[1])]
                     cmd += [
                         "-FSCALE_DEFAULT", ",".join(
                             ["%f" % _f for _f in fscale_list]
                         )
                     ]
-
-                    # run swarp
+                    cmd += ["-WEIGHT_IMAGE", "@%s" % wgt_me_file_list]
+                    cmd += ["-IMAGEOUT_NAME", output_coadd_sci_file]
+                    cmd += ["-WEIGHTOUT_NAME", output_coadd_weight_file]
                     self.logger.error(
                         "running swarp for tile %s, band %s: %s" % (
                             tilename, band, " ".join(cmd)))
                     run_and_check(cmd, "SWarp", logger=self.logger)
 
-                    # TODO FIXME This is a total hack.
+                    # the second call
                     dummy_mask_coadd = os.path.join(
                         output_coadd_dir, "%s_%s_msk-tmp.fits" % (tilename, band))
                     mask_cmd = self.swarp_cmd_root + extra_cmd_line_args
                     mask_cmd = (
-                        [mask_cmd[0]] + ["@%s" % msk_file_list] + mask_cmd[1:])
+                        [mask_cmd[0]] + ["@%s" % im_file_list] + mask_cmd[1:])
                     mask_cmd += ["-IMAGE_SIZE", "%d,%d" % image_shape]
                     mask_cmd += ["-PIXEL_SCALE", "%0.16f" % pixel_scale]
                     mask_cmd += ["-CENTER", "%s,%s" % (
                         coadd_center[0], coadd_center[1])]
+                    cmd += [
+                        "-FSCALE_DEFAULT", ",".join(
+                            ["%f" % _f for _f in fscale_list]
+                        )
+                    ]
+                    mask_cmd += ["-WEIGHT_IMAGE", "@%s" % wgt_file_list]
                     mask_cmd += ["-IMAGEOUT_NAME", dummy_mask_coadd]
                     mask_cmd += ["-WEIGHTOUT_NAME", output_coadd_mask_file]
-                    mask_cmd += ["-WEIGHT_IMAGE", "@%s" % msk_file_list]
-                    # run swarp
                     self.logger.error(
                         "running swarp for tile %s, band %s w/ mask: %s" % (
                             tilename, band, " ".join(mask_cmd)))
                     run_and_check(mask_cmd, "Mask SWarp", logger=self.logger)
-                    # remove the dummy mask coadd
                     safe_rm(dummy_mask_coadd)
 
-                    try:
-                        # We've done the swarping, now combine image, weight and
-                        # mask planes
-                        # generate an hdu list
-                        im_hdus = fits.open(output_coadd_sci_file)
-                        im_hdu = im_hdus[0]
-                        _set_fpack_headers(im_hdu)
-                        im_hdu.header["EXTNAME"] = "sci"
-                        # stupidly, if you ask me, we cannot simply read in the
-                        # weight and coadd hdus and add them directly to an HDUList
-                        # because they are PrimaryHDUs...
-                        wgt_hdus = fits.open(output_coadd_weight_file)
-                        wgt_fits = wgt_hdus[0]
-                        wgt_hdu = fits.ImageHDU(wgt_fits.data, header=wgt_fits.header)
-                        _set_fpack_headers(wgt_hdu)
-                        wgt_hdu.header["EXTNAME"] = "wgt"
-                        msk_hdus = fits.open(output_coadd_mask_file)
-                        msk_fits = msk_hdus[0]
-                        msk_hdu = fits.ImageHDU(msk_fits.data, header=msk_fits.header)
-                        _set_fpack_headers(msk_hdu)
-                        msk_hdu.header["EXTNAME"] = "msk"
-                        hdus = [im_hdu, msk_hdu, wgt_hdu]
-                        hdulist = fits.HDUList(hdus)
-                        self.logger.error(
-                            "writing assembled coadd for tilename %s, "
-                            "band %s to %s" % (
-                                tilename, band, output_coadd_path))
-                        hdulist.writeto(output_coadd_path, overwrite=True)
+                    # now run coadd_assemble
+                    safe_rm(output_coadd_path)
+                    asmb_cmd = [
+                        "coadd_assemble",
+                        "--sci_file", output_coadd_sci_file,
+                        "--wgt_file", output_coadd_weight_file,
+                        "--msk_file", output_coadd_mask_file,
+                        "--outname", output_coadd_path,
+                        "--xblock", "10",
+                        "--yblock", "3",
+                        "--maxcols", "100"
+                        "--mincols", "1"
+                        "--no-keep_sci_zeros",
+                        "--magzero 30",
+                        "--tilename", tilename,
+                        "--tileid", "-9999"
+                        "--interp_image", "MSK",
+                        "--ydilate", "3"
+                    ]
+                    run_and_check(asmb_cmd, "coadd_assemble", logger=self.logger)
 
-                        safe_rm(output_coadd_path + ".fz")
-                        run_and_check(
-                            ["fpack", os.path.basename(output_coadd_path)],
-                            "fpack SWarp"
-                        )
-                    finally:
-                        # close the open hdus
-                        im_hdus.close()
-                        wgt_hdus.close()
-                        msk_hdus.close()
+                    # set headers and fpack
+                    with fits.open(output_coadd_path, mode="update") as hdus:
+                        for hdu in hdus:
+                            _set_fpack_headers(hdu)
+                            assert "EXTNAME" in hdu.header
 
-                        # delete intermediate files
-                        safe_rm(output_coadd_sci_file)
-                        safe_rm(output_coadd_weight_file)
-                        safe_rm(output_coadd_mask_file)
+                    safe_rm(output_coadd_path + ".fz")
+                    run_and_check(
+                        ["fpack", os.path.basename(output_coadd_path)],
+                        "fpack SWarp"
+                    )
+
+                    # delete intermediate files
+                    safe_rm(output_coadd_sci_file)
+                    safe_rm(output_coadd_weight_file)
+                    safe_rm(output_coadd_mask_file)
 
                 with stash.update_output_pizza_cutter_yaml(tilename, band) as pyml:
                     pyml["image_path"] = output_coadd_path + ".fz"
