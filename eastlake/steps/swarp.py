@@ -327,14 +327,14 @@ class SingleBandSwarpRunner(Step):
                         "--outname", output_coadd_path,
                         "--xblock", "10",
                         "--yblock", "3",
-                        "--maxcols", "100"
-                        "--mincols", "1"
+                        "--maxcols", "100",
+                        "--mincols", "1",
                         "--no-keep_sci_zeros",
                         "--magzero 30",
                         "--tilename", tilename,
-                        "--tileid", "-9999"
+                        "--tileid", "-9999",
                         "--interp_image", "MSK",
-                        "--ydilate", "3"
+                        "--ydilate", "3",
                     ]
                     run_and_check(asmb_cmd, "coadd_assemble", logger=self.logger)
 
