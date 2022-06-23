@@ -1,6 +1,7 @@
 from __future__ import print_function
 import os
 import subprocess
+import logging
 from subprocess import Popen, PIPE, CalledProcessError
 
 from .utils import get_logger, safe_mkdir
@@ -9,11 +10,21 @@ from timeit import default_timer as timer
 from datetime import timedelta
 
 
-def run_and_check(command, command_name, logger=None):
+def run_and_check(command, command_name, logger=None, verbose=None):
     if logger is not None:
         logger.info("running cmd: %s" % (" ".join(command),))
     else:
         print("running cmd: %s" % (" ".join(command),))
+
+    if logger is not None and logger.isEnabledFor(logging.DEBUG):
+        rc_verbose = True
+    else:
+        rc_verbose = False
+
+    if verbose is None and logger is not None:
+        verbose = rc_verbose
+    elif verbose is None:
+        verbose = False
 
     try:
         with Popen(
@@ -26,7 +37,8 @@ def run_and_check(command, command_name, logger=None):
         ) as p:
             output = ""
             for line in p.stdout:
-                print(line, end='', flush=True)
+                if verbose:
+                    print(line, end='', flush=True)
                 output += line
 
             output = output.encode("utf-8")

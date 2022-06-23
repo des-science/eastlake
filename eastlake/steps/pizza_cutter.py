@@ -106,7 +106,7 @@ class PizzaCutterRunner(Step):
                 if tmpdir is not None:
                     cmd += ["--tmpdir=%s" % tmpdir]
 
-                run_and_check(cmd, "PizzaCutterRunner")
+                run_and_check(cmd, "PizzaCutterRunner", verbose=True)
                 pz_meds.append(ofile)
 
             stash.set_filepaths("pizza_cutter_meds_files", pz_meds, tilename)

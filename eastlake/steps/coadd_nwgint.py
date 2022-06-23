@@ -1,6 +1,7 @@
 from __future__ import print_function, absolute_import
 import os
 import copy
+import logging
 import pkg_resources
 
 import joblib
@@ -115,7 +116,12 @@ class CoaddNwgintRunner(Step):
                             ofile,
                         ]
 
-                        jobs.append(joblib.delayed(run_and_check)(cmd, "CoaddNwgint"))
+                        if self.logger is not None and self.logger.isEnabledFor(logging.DEBUG):
+                            verbose = True
+                        else:
+                            verbose = False
+
+                        jobs.append(joblib.delayed(run_and_check)(cmd, "CoaddNwgint", verbose=verbose))
 
                         pyml["src_info"][i]["coadd_nwgint_path"] = ofile
 
