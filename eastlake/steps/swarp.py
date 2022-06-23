@@ -336,6 +336,9 @@ class SingleBandSwarpRunner(Step):
                         "--interp_image", "MSK",
                         "--ydilate", "3",
                     ]
+                    self.logger.error(
+                        "running coadd_assemble for tile %s, band %s w/ mask: %s" % (
+                            tilename, band, " ".join(mask_cmd)))
                     run_and_check(asmb_cmd, "coadd_assemble", logger=self.logger)
 
                     # set headers and fpack
@@ -345,9 +348,13 @@ class SingleBandSwarpRunner(Step):
                             assert "EXTNAME" in hdu.header
 
                     safe_rm(output_coadd_path + ".fz")
+                    self.logger.error(
+                        "running fpack for tile %s, band %s w/ mask: %s" % (
+                            tilename, band, " ".join(mask_cmd)))
                     run_and_check(
                         ["fpack", os.path.basename(output_coadd_path)],
-                        "fpack SWarp"
+                        "fpack SWarp",
+                        logger=self.logger
                     )
 
                     # delete intermediate files
