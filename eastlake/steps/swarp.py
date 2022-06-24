@@ -108,6 +108,9 @@ class SWarpRunner(Step):
                 for fn in fns.values():
                     safe_rm(fn)
 
+            self.logger.error(
+                "%s complete for tile %s" % (self.name, tilename))
+
         return 0, stash
 
     def _single_band_coadd(self, tilename, band, stash):
@@ -381,9 +384,6 @@ class SWarpRunner(Step):
             pyml["weight_path"] = output_coadd_path + ".fz"
             pyml["weight_ext"] = "wgt"
 
-        self.logger.error(
-            "%s complete for tile %s" % (self.name, tilename))
-
         return {
             "sci": output_coadd_sci_file,
             "wgt": output_coadd_weight_file,
@@ -547,7 +547,7 @@ class SWarpRunner(Step):
                 "--xblock", "10",
                 "--yblock", "3",
                 "--maxcols", "100",
-                "--mincols", "1"
+                "--mincols", "1",
                 "--no-keep_sci_zeros",
                 "--magzero", "30",
                 "--tilename", tilename,
@@ -569,5 +569,3 @@ class SWarpRunner(Step):
             safe_rm(mask_file)
 
         stash.set_filepaths("det_coadd_file", det_coadd_file, tilename)
-
-        self.logger.error("swarp complete for tile %s" % tilename)
