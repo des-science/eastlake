@@ -2,6 +2,7 @@ from __future__ import print_function, absolute_import
 import os
 import pkg_resources
 import multiprocessing
+import logging
 
 import numpy as np
 
@@ -92,6 +93,11 @@ class PizzaCutterRunner(Step):
                         pyml["src_info"][i]["psf_path"],
                     )
 
+                if self.logger is not None:
+                    llevel = logging.getLevelName(self.logger.getEffectiveLevel())
+                else:
+                    llevel = "WARNING"
+
                 cmd = [
                     "des-pizza-cutter",
                     "--config", self.pizza_cutter_config_file,
@@ -101,7 +107,7 @@ class PizzaCutterRunner(Step):
                     "--n-jobs=%d" % self.config["n_jobs"],
                     "--n-chunks=%d" % self.config["n_chunks"],
                     "--seed=%d" % rng.randint(1, 2**31),
-                    "--log-level=%s" % self.config.get("log_level", "WARNING").upper(),
+                    "--log-level=%s" % llevel,
                 ]
                 if tmpdir is not None:
                     cmd += ["--tmpdir=%s" % tmpdir]
