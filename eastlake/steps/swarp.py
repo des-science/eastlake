@@ -102,7 +102,7 @@ class SWarpRunner(Step):
             for band in stash["bands"]:
                 band_coadd_data[band] = self._single_band_coadd(tilename, band, stash)
 
-            self._det_coadd(self, tilename, stash, band_coadd_data)
+            self._det_coadd(tilename, stash, band_coadd_data)
 
             for band, fns in band_coadd_data.items():
                 for fn in fns.values():
