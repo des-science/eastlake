@@ -90,37 +90,9 @@ class SrcExtractorRunner(Step):
         tilenames = stash["tilenames"]
 
         for tilename in tilenames:
-            # Get detection weight file. SrcExtractor doesn't like compressed
-            # fits files, so may need to funpack
-            if "single_band_det" in self.config:
-                det_image_file, det_image_ext = stash.get_filepaths(
-                    "coadd_file", tilename,
-                    band=self.config["single_band_det"],
-                    with_fits_ext=True,
-                    funpack=True,
-                )
-                det_weight_file, det_weight_ext = stash.get_filepaths(
-                    "coadd_weight_file", tilename,
-                    band=self.config["single_band_det"],
-                    with_fits_ext=True,
-                    funpack=True,
-                )
-                det_mask_file, det_mask_ext = stash.get_filepaths(
-                    "coadd_mask_file", tilename,
-                    band=self.config["single_band_det"],
-                    with_fits_ext=True,
-                    funpack=True,
-                )
-            else:
-                det_image_file, det_image_ext = stash.get_filepaths(
-                    "det_image_file", tilename, with_fits_ext=True, funpack=True,
-                )
-                det_weight_file, det_weight_ext = stash.get_filepaths(
-                    "det_weight_file", tilename, with_fits_ext=True, funpack=True,
-                )
-                det_mask_file, det_mask_ext = stash.get_filepaths(
-                    "det_mask_file", tilename, with_fits_ext=True, funpack=True,
-                )
+            det_coadd_file = stash.get_filepaths(
+                "det_coadd_file", tilename,
+            )
 
             # Assoc mode hack
             srcex_cmd_root = copy.copy(self.srcex_cmd_root)
@@ -156,54 +128,52 @@ class SrcExtractorRunner(Step):
             # Now loop through bands calling SrcExtractor in dual image mode
             for band in stash["bands"]:
                 cmd = copy.copy(srcex_cmd_root)
-                weight_file, weight_ext = stash.get_filepaths(
-                    "coadd_weight_file", tilename, band=band, with_fits_ext=True, funpack=True,
-                )
-
-                # set catalog name
-                coadd_file, coadd_ext = stash.get_filepaths(
+                coadd_file, _ = stash.get_filepaths(
                     "coadd_file", tilename, band=band, with_fits_ext=True, funpack=True,
                 )
+
                 # SrcExtractor is annoying and can vomit a segfault if the paths
                 # to the input images are too long. So change to the
                 # band coadd directory and use relative paths from there
                 coadd_dir = os.path.realpath(os.path.dirname(coadd_file))
                 with pushd(coadd_dir):
-
                     # Add weight file stuff to command string
                     cmd += ["-WEIGHT_IMAGE", "%s[%d],%s[%d]" % (
-                        get_relpath(det_weight_file), det_weight_ext,
-                        get_relpath(weight_file), FITSEXTMAP[weight_ext])]
+                        get_relpath(det_coadd_file), FITSEXTMAP["wgt"],
+                        get_relpath(coadd_file), FITSEXTMAP["wgt"])]
 
+                    # catalog items
                     catalog_name = coadd_file.replace(".fits", "_cat.fits")
-
                     cmd += ["-CATALOG_NAME", get_relpath(catalog_name)]
                     cmd += ["-CATALOG_TYPE", "FITS_1.0"]
 
-                    # and seg name
+                    # and bkg+seg name
                     seg_name = coadd_file.replace(".fits", "_segmap.fits")
                     bkg_name = coadd_file.replace(".fits", "_bkg.fits")
                     bkg_rms_name = coadd_file.replace(".fits", "_bkg-rms.fits")
                     cmd += ["-CHECKIMAGE_NAME", "%s" % get_relpath(seg_name)]
 
                     # and mask file
-                    mask_file = "%s[%d]" % (get_relpath(det_mask_file),
-                                            det_mask_ext)
-                    if mask_file is not None:
-                        cmd += ["-FLAG_IMAGE", get_relpath(mask_file)]
-                    else:
-                        self.logger.error("No mask for detection image")
+                    mask_file = "%s[%d]" % (
+                        get_relpath(det_coadd_file),
+                        FITSEXTMAP["msk"],
+                    )
+                    cmd += ["-FLAG_IMAGE", get_relpath(mask_file)]
 
                     # image name should be first argument
-                    image_arg = "%s[%d],%s[%d]" % (get_relpath(det_image_file),
-                                                   det_image_ext,
-                                                   get_relpath(coadd_file),
-                                                   FITSEXTMAP[coadd_ext])
+                    image_arg = "%s[%d],%s[%d]" % (
+                        get_relpath(det_coadd_file),
+                        FITSEXTMAP["sci"],
+                        get_relpath(coadd_file),
+                        FITSEXTMAP["sci"]
+                    )
                     cmd = [cmd[0]] + [image_arg] + cmd[1:]
 
                     if self.logger is not None:
-                        self.logger.error("calling source extractor with command:")
-                        self.logger.error(" ".join(cmd))
+                        self.logger.error(
+                            "calling source extractor with command:\n\t%s",
+                            " ".join(cmd)
+                        )
                     run_and_check(cmd, "SrcExtractor")
 
                     with fitsio.FITS(seg_name, "rw") as fits:
