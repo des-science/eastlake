@@ -8,3 +8,4 @@ from .delete_meds import DeleteMeds  # noqa
 from .newish_metacal import NewishMetcalRunner  # noqa
 from .coadd_nwgint import CoaddNwgintRunner  # noqa
 from .pizza_cutter import PizzaCutterRunner  # noqa
+from .mdet import MetadetectRunner  # noqa
