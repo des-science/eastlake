@@ -524,13 +524,13 @@ class SWarpRunner(Step):
         # interference when running multiple tiles
         with pushd(os.path.realpath(coadd_dir)):
             self.logger.error(
-                "running swarp for tile %s: %s" % (
+                "running DET swarp for tile %s: %s" % (
                     tilename, " ".join(cmd)
                 )
             )
             run_and_check(cmd, "SWarp", logger=self.logger)
             self.logger.error(
-                "running swarp for tile %s w/ mask: %s" % (
+                "running DET swarp for tile %s w/ mask: %s" % (
                     tilename, " ".join(mask_cmd)
                 )
             )
@@ -556,7 +556,7 @@ class SWarpRunner(Step):
                 "--ydilate", "3",
             ]
             self.logger.error(
-                "running coadd_assemble for tile %s: %s" % (
+                "running DET coadd_assemble for tile %s: %s" % (
                     tilename, " ".join(asmb_cmd)
                 )
             )
