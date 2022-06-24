@@ -1,0 +1,44 @@
+model: pgauss
+
+metacal:
+  psf: fitgauss
+  types: [noshear, 1p, 1m, 2p, 2m]
+  use_noise_image: True
+
+# use defaults in sxdes package
+sx: null
+
+weight:
+  fwhm: 2.0  # arcsec
+
+# any regions where the bmask is set with one of these flags will be masked
+# out of detection
+nodet_flags: 33554432  # 2**25 is GAIA stars
+
+# check for hitting the edge when fitting
+bmask_flags: 1610612736  # 2**29 | 2**30 edge in either MEDS of pizza cutter
+
+mfrac_fwhm: 2  # arcsec
+
+meds:
+  box_padding: 2
+  box_type: iso_radius
+  max_box_size: 48
+  min_box_size: 48
+  rad_fac: 2
+  rad_min: 4
+
+pizza-cutter-preprocessing:
+  gaia_star_masks:
+    poly_coeffs: [ 1.36055007e-03, -1.55098040e-01,  3.46641671e+00]
+    max_g_mag: 18.0
+    symmetrize: False
+    # interp:
+    #   fill_isolated_with_noise: False
+    #   iso_buff: 1
+    apodize:
+      ap_rad: 1
+    mask_expand_rad: 16
+
+  slice_apodization:
+    ap_rad: 1
