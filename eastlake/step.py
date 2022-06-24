@@ -125,7 +125,7 @@ class Step(object):
         status, stash = self.execute(stash, new_params=new_params)
         step_end_time = timer()
         time_for_step = step_end_time-step_start_time
-        self.logger.error("Completed step %s in %s updated tile: %s" % (
+        self.logger.error("\nCompleted step %s in %s updated tile: %s" % (
             self.name, str(timedelta(seconds=time_for_step)),
             stash.get("tilenames", None)))
         return status, stash
