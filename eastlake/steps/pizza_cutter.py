@@ -95,7 +95,7 @@ class PizzaCutterRunner(Step):
                     )
 
                 pzyml_pth = self._prep_input_config_and_info_file(
-                    tilename, band, stash, odir
+                    tilename, band, stash, odir, stash["bands"],
                 )
 
                 if self.logger is not None:
@@ -124,7 +124,7 @@ class PizzaCutterRunner(Step):
 
         return 0, stash
 
-    def _prep_input_config_and_info_file(self, tilename, band, stash, odir):
+    def _prep_input_config_and_info_file(self, tilename, band, stash, odir, allbands):
         pzyml_pth = os.path.join(odir, "pizza-cutter-config.yaml")
         safe_copy(
             self.pizza_cutter_config_file,
@@ -137,7 +137,7 @@ class PizzaCutterRunner(Step):
             # this is the default and let's make sure
             assert pzyml["single_epoch"]["psf_type"] == "piff"
         else:
-            pzyml["single_epoch"]["psf_kwargs"] = {}
+            pzyml["single_epoch"]["psf_kwargs"] = {b: {} for b in allbands}
 
             if stash["psf_config"]["type"] in ["DES_PSFEx", "DES_PSFEx_perturbed"]:
                 pzyml["single_epoch"]["psf_type"] = "psfex"
