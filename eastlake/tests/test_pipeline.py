@@ -6,7 +6,7 @@ from unittest import mock
 import yaml
 import galsim
 
-from ..steps import GalSimRunner, CoaddNwgint
+from ..steps import GalSimRunner, CoaddNwgintRunner
 from ..step import Step
 from ..stash import Stash
 from ..pipeline import Pipeline, DEFAULT_STEPS
@@ -402,7 +402,7 @@ def test_pipeline_from_config_file():
         # 'galsim' is going to be added to steps first, and then step_class(other steps) is going to be added.
         # assumes step_class is not in step_config. skip line 203-208 and go to line 209.
         assert isinstance(pipe_conf.steps[0], GalSimRunner)
-        assert isinstance(pipe_conf.steps[1], CoaddNwgint)
+        assert isinstance(pipe_conf.steps[1], CoaddNwgintRunner)
 
         # len(config) is 1.
         # assert config == galsim.config.ReadConfig(config_file_path)[0]
