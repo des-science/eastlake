@@ -95,7 +95,7 @@ class MetadetectRunner(Step):
                 "run-metadetect-on-slices",
                 "--config=%s" % self.metadetect_config_file,
                 "--seed=%d" % seed,
-                "--n-jobs=%d" % self.n_jobs,
+                "--n-jobs=%d" % self.config["n_jobs"],
                 "--log-level=%s" % llevel,
                 "--use-tmpdir",
                 "--output-path=%s" % odir,
