@@ -61,7 +61,7 @@ def parse_args():
         '--no_overwrite_job_record', action='store_true', default=False)
     parser.add_argument('-v', '--verbosity', default=1)
     parser.add_argument('-l', '--logfile', default=None)
-    parser.add_argument('--seed', default=None)
+    parser.add_argument('--seed', type=int, default=None)
     return parser.parse_args()
 
 
