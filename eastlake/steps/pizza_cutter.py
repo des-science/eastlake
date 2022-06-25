@@ -4,6 +4,7 @@ import pkg_resources
 import multiprocessing
 import logging
 
+import yaml
 import numpy as np
 
 from ..step import Step, run_and_check
@@ -93,6 +94,10 @@ class PizzaCutterRunner(Step):
                         pyml["src_info"][i]["psf_path"],
                     )
 
+                pzyml_pth = self._prep_input_config_and_info_file(
+                    tilename, band, stash, odir
+                )
+
                 if self.logger is not None:
                     llevel = logging.getLevelName(self.logger.getEffectiveLevel())
                 else:
@@ -100,7 +105,7 @@ class PizzaCutterRunner(Step):
 
                 cmd = [
                     "des-pizza-cutter",
-                    "--config", self.pizza_cutter_config_file,
+                    "--config", pzyml_pth,
                     "--info=%s" % info_file,
                     "--output-path=%s" % ofile,
                     "--use-tmpdir",
@@ -118,3 +123,48 @@ class PizzaCutterRunner(Step):
             stash.set_filepaths("pizza_cutter_meds_files", pz_meds, tilename)
 
         return 0, stash
+
+    def _prep_input_config_and_info_file(self, tilename, band, stash, odir):
+        pzyml_pth = os.path.join(odir, "pizza-cutter-config.yaml")
+        safe_copy(
+            self.pizza_cutter_config_file,
+            pzyml_pth,
+        )
+        with open(pzyml_pth, "r") as fp:
+            pzyml = yaml.safe_load(fp.read())
+
+        if stash["psf_config"]["type"] in ["DES_Piff"]:
+            # this is the default and let's make sure
+            assert pzyml["single_epoch"]["psf_type"] == "piff"
+        else:
+            for key in ["psf_kwargs", "piff_cuts", "mask_piff_failure"]:
+                if key in pzyml["single_epoch"]:
+                    del pzyml["single_epoch"][key]
+
+            if stash["psf_config"]["type"] in ["DES_PSFEx", "DES_PSFEx_perturbed"]:
+                pzyml["single_epoch"]["psf_type"] = "psfex"
+            else:
+                pzyml["single_epoch"]["psf_type"] = "galsim"
+
+                # do this check to ensure things are ~constant
+                # not perfect but ok
+                for size_key in ["half_light_radius", "sigma", "fwhm"]:
+                    if size_key in stash["psf_config"]:
+                        try:
+                            float(stash["psf_config"][size_key])
+                        except ValueError as e:
+                            self.logger.error(
+                                "couldn't interpret psf %s "
+                                "as float" % (size_key))
+                            raise e
+                        break
+
+                # write the config info for later
+                with stash.update_output_pizza_cutter_yaml(tilename, band) as pyml:
+                    for i in range(len(pyml["src_info"])):
+                        pyml["src_info"][i]["galsim_psf_config"] = stash["psf_config"]
+
+        with open(pzyml_pth, "w") as fp:
+            yaml.dump(pzyml, fp)
+
+        return pzyml_pth
