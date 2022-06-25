@@ -137,7 +137,7 @@ class PizzaCutterRunner(Step):
             # this is the default and let's make sure
             assert pzyml["single_epoch"]["psf_type"] == "piff"
         else:
-            for key in ["psf_kwargs", "piff_cuts", "mask_piff_failure"]:
+            for key in ["psf_kwargs"]:
                 if key in pzyml["single_epoch"]:
                     del pzyml["single_epoch"][key]
 
