@@ -105,7 +105,7 @@ class MetadetectRunner(Step):
                 cmd += ["--tmpdir=%s" % tmpdir]
             cmd += mfiles
 
-            run_and_check(cmd, "PizzaCutterRunner", verbose=True)
+            run_and_check(cmd, "MetadetectRunner", verbose=True)
 
             mdetfiles = glob.glob("%s/*_mdetcat_*.fits.fz" % odir)
             stash.set_filepaths("metadetect_files", mdetfiles, tilename)
