@@ -61,6 +61,7 @@ def parse_args():
         '--no_overwrite_job_record', action='store_true', default=False)
     parser.add_argument('-v', '--verbosity', default=1)
     parser.add_argument('-l', '--logfile', default=None)
+    parser.add_argument('--seed', default=None)
     return parser.parse_args()
 
 
@@ -140,6 +141,7 @@ def main():
         pipeline = EnsemblePipeline.from_config_file(
             config_file, base_dir, logger=logger, new_params=new_params,
             step_names=args.step_names, record_file=args.record_file,
+            seed=args.seed,
         )
 
     # go ahead and execute

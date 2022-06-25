@@ -125,8 +125,10 @@ class Pipeline(object):
         # stash is a dictionary that gets passed to and updated by pipeline steps.
         # It is also what is saved as the job_record, allowing restarting the pipeline
         self.init_stash()
-        if "step_primary_seed" not in self.stash:
-            self.stash["step_primary_seed"] = np.random.randint(1, 2**31)
+        if seed is None:
+            seed = np.random.randint(1, 2**31)
+        self.logger.error("RNG seed = %d" % seed)
+        self.stash["step_primary_seed"] = seed
 
     def init_stash(self):
         self.stash = Stash(self.base_dir, self.step_names)
@@ -162,16 +164,12 @@ class Pipeline(object):
         for key, val in stash["env"]:
             os.environ[key] = val
 
-        # make sure a seed exists
-        if "step_primary_seed" not in pipe.stash:
-            pipe.stash["step_primary_seed"] = np.random.randint(1, 2**31)
-
         return pipe
 
     @classmethod
     def from_config_file(cls, config_file, base_dir, logger=None, verbosity=1,
                          log_file=None, name="pipeline", step_names=None,
-                         new_params=None, record_file=None):
+                         new_params=None, record_file=None, seed=None):
         """
         Initialize a pipeline from a config file.
         """
@@ -271,7 +269,7 @@ class Pipeline(object):
             steps, base_dir,
             logger=logger, verbosity=verbosity,
             log_file=log_file, name=name, config=config,
-            record_file=record_file
+            record_file=record_file, seed=seed,
         )
 
     def execute(self, new_params_list=None, base_dir=None, no_overwrite_job_record=False,
