@@ -127,7 +127,7 @@ class Pipeline(object):
         self.init_stash()
         if seed is None:
             seed = np.random.randint(1, 2**31)
-        self.logger.error("RNG seed = %d" % seed)
+        self.logger.error("step primary RNG seed = %d" % seed)
         self.stash["step_primary_seed"] = seed
 
     def init_stash(self):
