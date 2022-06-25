@@ -6,7 +6,7 @@ from unittest import mock
 import yaml
 import galsim
 
-from ..steps import GalSimRunner, SingleBandSwarpRunner
+from ..steps import GalSimRunner, CoaddNwgint
 from ..step import Step
 from ..stash import Stash
 from ..pipeline import Pipeline, DEFAULT_STEPS
@@ -19,7 +19,7 @@ modules:
     - numpy
 
 pipeline:
-    steps: [galsim, single_band_swarp]
+    steps: [galsim, coadd_nwgint]
 
 delete_images:
     delete_coadd: True
@@ -48,12 +48,7 @@ sof:
     clobber: True
     use_joblib: True
 
-single_band_swarp:
-    ref_mag_zp: 30.
-    update:
-        NTHREADS: 8
-        PIXEL_SCALE : 0.263
-        IMAGE_SIZE : 10000,10000
+coadd_nwgint: {}
 
 swarp:
     center_from_header: True
@@ -374,7 +369,7 @@ def test_pipeline_from_record_file():
             step_names=None, new_params=None,
         )
         # When step_names is None, step_names is created in from_config_file().
-        step_names = ["galsim", "single_band_swarp"]
+        step_names = ["galsim", "coadd_nwgint"]
         stsh = Stash.load(job_record_file_path, base_dir, step_names)
         assert pipe_cont.stash == stsh
 
@@ -407,7 +402,7 @@ def test_pipeline_from_config_file():
         # 'galsim' is going to be added to steps first, and then step_class(other steps) is going to be added.
         # assumes step_class is not in step_config. skip line 203-208 and go to line 209.
         assert isinstance(pipe_conf.steps[0], GalSimRunner)
-        assert isinstance(pipe_conf.steps[1], SingleBandSwarpRunner)
+        assert isinstance(pipe_conf.steps[1], CoaddNwgint)
 
         # len(config) is 1.
         # assert config == galsim.config.ReadConfig(config_file_path)[0]
@@ -459,9 +454,9 @@ def test_pipeline_from_config_file():
 
 @mock.patch("eastlake.pipeline.STEP_CLASSES")
 def test_pipeline_from_config_file_execute(classes_mock):
-    singlebandswarp_step_mock = classes_mock["single_band_swarp"]
-    singlebandswarp_step_mock.return_value.name = "single_band_swarp"
-    singlebandswarp_step_mock.return_value.execute_step.return_value = (0, Stash('foo', ["single_band_swarp"]))
+    coadd_nwgint_step_mock = classes_mock["coadd_nwgint"]
+    coadd_nwgint_step_mock.return_value.name = "coadd_nwgint"
+    coadd_nwgint_step_mock.return_value.execute_step.return_value = (0, Stash('foo', ["coadd_nwgint"]))
 
     with tempfile.TemporaryDirectory() as tmpdir:
         config_file_path = os.path.join(tmpdir, "cfg.yaml")
@@ -472,16 +467,16 @@ def test_pipeline_from_config_file_execute(classes_mock):
 
         pl = Pipeline.from_config_file(
             config_file_path, base_dir, logger=None, verbosity=1,
-            log_file=None, name="pipeline", step_names=["single_band_swarp"], new_params=None,
+            log_file=None, name="pipeline", step_names=["coadd_nwgint"], new_params=None,
             record_file=None,
         )
 
         pl.execute()
-        singlebandswarp_step_mock.return_value.execute_step.assert_called()
+        coadd_nwgint_step_mock.return_value.execute_step.assert_called()
 
         # testing line 260.
-        # steps would be ["galsim", "single_band_swarp"].
-        assert pl.stash["completed_step_names"] == [("single_band_swarp", 0)]
+        # steps would be ["galsim", "coadd_nwgint"].
+        assert pl.stash["completed_step_names"] == [("coadd_nwgint", 0)]
         # testing line 262. Does the file exist?
         assert os.path.isfile(os.path.join(tmpdir, "job_record.pkl"))
         # testing line 238,239 and 265?

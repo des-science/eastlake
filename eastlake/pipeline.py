@@ -47,7 +47,7 @@ STEP_CLASSES = OrderedDict([
 
 STEP_IS_GALSIM = set(["galsim"])
 
-DEFAULT_STEPS = ["galsim", "swarp", "src_extractor", "meds"]
+DEFAULT_STEPS = ["galsim", "coadd_nwgint", "swarp", "src_extractor", "meds"]
 
 
 def register_pipeline_step(step_name, step_class, is_galsim=False):
