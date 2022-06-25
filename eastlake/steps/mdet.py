@@ -42,7 +42,7 @@ class MetadetectRunner(Step):
                 multiprocessing.cpu_count(),
             )
         )
-        self.config["bands"] = self.config.get("bands", ["g", "r", "i", "z"])
+        self.config["bands"] = self.config.get("bands", None)
 
     def execute(self, stash, new_params=None):
         rng = np.random.RandomState(seed=stash["step_primary_seed"])
@@ -69,8 +69,13 @@ class MetadetectRunner(Step):
                 _mf = os.path.basename(mf)
                 in_bands.append(_mf.split("_")[1])
 
+            if self.config["bands"] is None:
+                mdet_bands = in_bands
+            else:
+                mdet_bands = self.config["bands"]
+
             mfiles = []
-            for band in self.bands:
+            for band in mdet_bands:
                 for i in range(len(in_bands)):
                     found = None
                     if band == in_bands[i]:
@@ -85,7 +90,7 @@ class MetadetectRunner(Step):
                     )
                 mfiles.append(in_mfiles[found])
 
-            bn = "".join(self.bands)
+            bn = "".join(mdet_bands)
             cmd = [
                 "run-metadetect-on-slices",
                 "--config=%s" % self.metadetect_config_file,
@@ -102,7 +107,7 @@ class MetadetectRunner(Step):
 
             run_and_check(cmd, "PizzaCutterRunner", verbose=True)
 
-            mdetfiles = glob.glob("%s/*.fits.fz" % odir)
+            mdetfiles = glob.glob("%s/*_mdetcat_*.fits.fz" % odir)
             stash.set_filepaths("metadetect_files", mdetfiles, tilename)
 
             maskfiles = glob.glob("%s/*.hs" % odir)
