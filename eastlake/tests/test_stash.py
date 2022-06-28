@@ -148,7 +148,7 @@ def test_stash_io_pizza_cutter_yaml(pizza_cutter_yaml):
         assert stsh.has_output_pizza_cutter_yaml(tilename, band)
 
         assert os.path.exists(
-            get_pizza_cutter_yaml_path(tmpdir, stsh["desrun"], tilename, band)
+            get_pizza_cutter_yaml_path(str(tmpdir) + "/base_dir", stsh["desrun"], tilename, band)
         )
 
         # the set copy has imsim_data -> base_dir
