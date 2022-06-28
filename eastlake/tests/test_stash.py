@@ -129,8 +129,8 @@ def test_stash_io():
 
 def test_stash_io_pizza_cutter_yaml(pizza_cutter_yaml):
     with tempfile.TemporaryDirectory() as tmpdir:
-        stsh = Stash(str(tmpdir), ["foo1", "bar1"])
-        stsh["imsim_data"] = "/imsim_data"
+        stsh = Stash(str(tmpdir) + "/base_dir", ["foo1", "bar1"])
+        stsh["imsim_data"] = str(tmpdir) + "/imsim_data"
         stsh["desrun"] = "deeeesssssruuuuunnnnn"
         tilename = "ddd"
         band = "g"
@@ -148,7 +148,7 @@ def test_stash_io_pizza_cutter_yaml(pizza_cutter_yaml):
         assert stsh.has_output_pizza_cutter_yaml(tilename, band)
 
         assert os.path.exists(
-            get_pizza_cutter_yaml_path(tmpdir, stsh["desrun"], tilename, band)
+            get_pizza_cutter_yaml_path(str(tmpdir) + "/base_dir", stsh["desrun"], tilename, band)
         )
 
         # the set copy has imsim_data -> base_dir
@@ -193,10 +193,121 @@ def test_stash_io_pizza_cutter_yaml(pizza_cutter_yaml):
         assert new_yaml["image_ext"] == 10
 
 
+def test_stash_io_pizza_cutter_yaml_lists_maps_symlinks(pizza_cutter_yaml):
+    with tempfile.TemporaryDirectory() as tmpdir:
+        stsh = Stash(str(tmpdir) + "/base_dir", ["foo1", "bar1"])
+        stsh["imsim_data"] = str(tmpdir) + "/imsim_data"
+        stsh["desrun"] = "test-y6-sims"
+        tilename = "DES0131-3206"
+        band = "r"
+
+        for i in range(len(pizza_cutter_yaml["src_info"])):
+            pizza_cutter_yaml["src_info"][i]["coadd_nwgint_path"] \
+                = pizza_cutter_yaml["src_info"][i]["image_path"].replace(".fits.fz", "_nullwt.fits")
+
+        stsh.set_input_pizza_cutter_yaml(pizza_cutter_yaml, tilename, band)
+
+        for bd in [stsh["imsim_data"], stsh["base_dir"]]:
+            # bkg list
+            bkg_fn = os.path.join(
+                bd, stsh["desrun"], tilename, "lists",
+                f"{tilename}_{band}_bkg-flist-{stsh['desrun']}.dat"
+            )
+            with open(bkg_fn, "r") as fp:
+                fns = fp.readlines()
+            fns = [os.path.basename(fn.strip()) for fn in fns]
+            true_fns = [
+                os.path.basename(sri["bkg_path"])
+                for sri in pizza_cutter_yaml["src_info"]
+            ]
+            assert fns == true_fns
+
+            # null wgt list
+            nw_fn = os.path.join(
+                bd, stsh["desrun"], tilename, "lists",
+                f"{tilename}_{band}_nullwt-flist-{stsh['desrun']}.dat"
+            )
+            with open(nw_fn, "r") as fp:
+                _fns = fp.readlines()
+            fns = [os.path.basename(fn.strip().split(" ")[0]) for fn in _fns]
+            true_fns = [
+                os.path.basename(sri["coadd_nwgint_path"])
+                for sri in pizza_cutter_yaml["src_info"]
+            ]
+            assert fns == true_fns
+
+            zps = [os.path.basename(fn.strip().split(" ")[1]) for fn in _fns]
+            true_zps = [
+                "%r" % sri["magzp"]
+                for sri in pizza_cutter_yaml["src_info"]
+            ]
+            assert zps == true_zps
+
+            # null wgt links
+            for sri in pizza_cutter_yaml["src_info"]:
+                assert os.path.islink(
+                    os.path.join(
+                        bd, stsh["desrun"], tilename, "nullwt-r",
+                        os.path.basename(sri["coadd_nwgint_path"])
+                    )
+                )
+
+            # psf links
+            assert os.path.islink(
+                os.path.join(
+                    bd, stsh["desrun"], tilename, "psfs",
+                    os.path.basename(pizza_cutter_yaml["psf_path"])
+                )
+            )
+            for sri in pizza_cutter_yaml["src_info"]:
+                assert os.path.islink(
+                    os.path.join(
+                        bd, stsh["desrun"], tilename, "psfs",
+                        os.path.basename(sri["psf_path"])
+                    )
+                )
+
+            # psf maps
+            pmap_fn = os.path.join(
+                bd, stsh["desrun"], tilename,
+                f"{tilename}_{band}_psfmap-{stsh['desrun']}.dat"
+            )
+            with open(pmap_fn, "r") as fp:
+                _fns = fp.readlines()
+            ens = [fn.strip().split(" ")[0].strip() for fn in _fns]
+            true_ens = ["-9999"] + [
+                os.path.basename(sri["psf_path"]).split("_")[0][1:]
+                for sri in pizza_cutter_yaml["src_info"]
+            ]
+            assert ens == true_ens
+
+            cns = [fn.strip().split(" ")[1].strip() for fn in _fns]
+            true_cns = ["-9999"] + [
+                os.path.basename(sri["psf_path"]).split("_")[2][1:]
+                for sri in pizza_cutter_yaml["src_info"]
+            ]
+            assert cns == true_cns
+
+            fns = [os.path.basename(fn.strip().split(" ")[2]) for fn in _fns]
+            true_fns = [os.path.basename(pizza_cutter_yaml["psf_path"])] + [
+                os.path.basename(sri["psf_path"])
+                for sri in pizza_cutter_yaml["src_info"]
+            ]
+            assert fns == true_fns
+
+            pmap_fn = os.path.join(
+                bd, stsh["desrun"], tilename,
+                f"{tilename}_all_psfmap.dat"
+            )
+            with open(pmap_fn, "r") as fp:
+                all_fns = fp.readlines()
+            assert all_fns == _fns
+
+
 def test_set_output_pizza_cutter_yaml_tile_info(pizza_cutter_yaml):
     with tempfile.TemporaryDirectory() as tmpdir:
-        stsh = Stash(str(tmpdir), ["foo1", "bar1"])
-        stsh["imsim_data"] = "/imsim_data"
+        stsh = Stash(str(tmpdir) + "/base_dir", ["foo1", "bar1"])
+        stsh["imsim_data"] = str(tmpdir) + "/imsim_data"
         stsh["desrun"] = "deeeesssssruuuuunnnnn"
         tilename = "ddd"
         band = "g"

@@ -23,6 +23,7 @@ from .steps import (
     CoaddNwgintRunner,
     PizzaCutterRunner,
     MetadetectRunner,
+    StashPrep,
 )
 from .utils import get_logger, safe_mkdir, pushd
 from .stash import Stash
@@ -43,6 +44,7 @@ STEP_CLASSES = OrderedDict([
     ('coadd_nwgint', CoaddNwgintRunner),
     ('pizza_cutter', PizzaCutterRunner),
     ('metadetect', MetadetectRunner),
+    ('stash_prep', StashPrep),
 ])
 
 STEP_IS_GALSIM = set(["galsim"])
