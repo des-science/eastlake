@@ -127,7 +127,7 @@ def replace_imsim_data_in_pizza_cutter_yaml(
                 )
 
 
-def read_pizza_cutter_yaml(imsim_data, desrun, tilename, band):
+def read_pizza_cutter_yaml(imsim_data, desrun, tilename, band, n_se_test=None):
     """Read the pizza-cutter YAML file for this tile and band.
 
     Parameters
@@ -140,6 +140,8 @@ def read_pizza_cutter_yaml(imsim_data, desrun, tilename, band):
         The name of the coadd tile.
     band : str
         The desired band (e.g., 'r').
+    n_se_test : int, optional
+        If not None, then cut down the number of SE images to this many for testing.
 
     Returns
     -------
@@ -152,7 +154,29 @@ def read_pizza_cutter_yaml(imsim_data, desrun, tilename, band):
 
     replace_imsim_data_in_pizza_cutter_yaml(band_info, imsim_data)
 
+    if n_se_test is not None:
+        n_se = len(band_info["src_info"])
+        band_info["src_info"] = band_info["src_info"][:min(n_se_test, n_se)]
+
     return band_info
+
+
+def get_tile_center(coadd_file):
+    """Get the center of the coadd tile from the coadd WCS header values.
+
+    Parameters
+    ----------
+    coadd_file : str
+        The path the coadd file to read.
+
+    Returns
+    -------
+    center : tuple of floats
+        A tuple of floats with the values of ('CRVAL1', 'CRVAL2') from the
+        coadd image header.
+    """
+    coadd_header = galsim.fits.FitsHeader(coadd_file)
+    return (str(coadd_header["CRVAL1"]), str(coadd_header["CRVAL2"]))
 
 
 class Tile(dict):
@@ -167,6 +191,7 @@ class Tile(dict):
     @classmethod
     def from_tilename(
         cls, tilename, bands=["g", "r", "i", "z"], desrun="y6-image-sims", imsim_data=None,
+        n_se_test=None,
     ):
         """Create a Tile from a tilename and set of bands.
 
@@ -181,6 +206,8 @@ class Tile(dict):
         imsim_data : str, optional
             The local IMSIM_DATA directory with the data. Default of None
             reads this value from the environment.
+        n_se_test : int, optional
+            If not None, then cut down the number of SE images to this many for testing.
 
         Returns
         -------
@@ -220,7 +247,10 @@ class Tile(dict):
         # Get single-epoch image info for this tile
         for band in bands:
             # read band information for the tile
-            band_info = read_pizza_cutter_yaml(imsim_data, desrun, tilename, band)
+            band_info = read_pizza_cutter_yaml(
+                imsim_data, desrun, tilename, band,
+                n_se_test=n_se_test,
+            )
             pizza_cutter_yaml[band] = band_info
 
             # Get the image files and mag zeropoints

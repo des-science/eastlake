@@ -1,27 +1,60 @@
 from __future__ import print_function
 import os
 import subprocess
+import logging
+from subprocess import Popen, PIPE, CalledProcessError
+
 from .utils import get_logger, safe_mkdir
 
 from timeit import default_timer as timer
 from datetime import timedelta
 
 
-def run_and_check(command, command_name, logger=None):
+def run_and_check(command, command_name, logger=None, verbose=None):
     if logger is not None:
         logger.info("running cmd: %s" % (" ".join(command),))
     else:
         print("running cmd: %s" % (" ".join(command),))
 
+    if logger is not None and logger.isEnabledFor(logging.DEBUG):
+        rc_verbose = True
+    else:
+        rc_verbose = False
+
+    if verbose is None and logger is not None:
+        verbose = rc_verbose
+    elif verbose is None:
+        verbose = False
+
     try:
-        output = subprocess.check_output(command, stderr=subprocess.STDOUT)
+        with Popen(
+            command,
+            stdout=PIPE,
+            bufsize=1,
+            universal_newlines=True,
+            encoding="utf-8",
+            stderr=subprocess.STDOUT,
+        ) as p:
+            output = ""
+            for line in p.stdout:
+                if verbose:
+                    print(line, end='', flush=True)
+                output += line
+
+            output = output.encode("utf-8")
+
+        if p.returncode != 0:
+            e = CalledProcessError(p.returncode, p.args)
+            e.output = output
+            raise e
+
         return output
     except Exception as e:
 
         print("Failed calling %s using command %s, output follows:" % (
             command_name, command))
         if hasattr(e, "output"):
-            print(e.output)
+            print(e.output.decode("utf-8"))
         else:
             print(repr(e))
 
@@ -29,11 +62,11 @@ def run_and_check(command, command_name, logger=None):
             logger.error("Failed calling %s using command %s, output follows:" % (
                 command_name, command))
             if hasattr(e, "output"):
-                logger.error(e.output)
+                logger.error(e.output.decode("utf-8"))
             else:
                 logger.error(repr(e))
 
-        raise(e)
+        raise e
 
 
 def run_subprocess(command):
@@ -92,7 +125,7 @@ class Step(object):
         status, stash = self.execute(stash, new_params=new_params)
         step_end_time = timer()
         time_for_step = step_end_time-step_start_time
-        self.logger.error("Completed step %s in %s updated tile: %s" % (
+        self.logger.error("\nCompleted step %s in %s updated tile: %s" % (
             self.name, str(timedelta(seconds=time_for_step)),
             stash.get("tilenames", None)))
         return status, stash

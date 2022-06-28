@@ -1,12 +1,11 @@
 from __future__ import print_function, absolute_import
 import os
-import shutil
 
 import fitsio
 import numpy as np
 
 from ..step import Step
-from ..utils import safe_mkdir
+from ..utils import safe_copy, safe_rm
 
 
 class TrueDetectionRunner(Step):
@@ -119,19 +118,13 @@ class TrueDetectionRunner(Step):
             coadd_file = coadd_file[:-3]
 
         # delete them here to make sure things work ok
-        try:
-            os.remove(coadd_file)
-        except Exception:
-            pass
+        safe_rm(coadd_file)
+        safe_rm(dest_coadd_file)
 
-        try:
-            os.remove(dest_coadd_file)
-        except Exception:
-            pass
-
-        safe_mkdir(os.path.dirname(dest_coadd_file))
-
-        shutil.copy(orig_coadd_path, dest_coadd_file)
+        safe_copy(
+            orig_coadd_path,
+            dest_coadd_file,
+        )
 
         if orig_coadd_path.endswith('.fz'):
             os.system('funpack %s' % dest_coadd_file)

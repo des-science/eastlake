@@ -24,6 +24,7 @@ from ..step import Step
 from ..stash import Stash
 from ..des_files import MAGZP_REF
 from ..rejectlist import RejectList
+from .swarp import FITSEXTMAP
 
 # This is for MEDS boxsize calculation.
 FWHM_FAC = 2*np.sqrt(2*np.log(2))
@@ -88,11 +89,10 @@ class MEDSRunner(Step):
         super(MEDSRunner, self).__init__(
             config, base_dir, name=name,
             logger=logger, verbosity=verbosity, log_file=log_file)
-        # setup meds_dir environment variable
-        if not os.path.isabs(self.config["meds_dir"]):
-            self.config["meds_dir"] = os.path.join(
-                self.base_dir, self.config["meds_dir"])
-            os.environ["MEDS_DIR"] = self.config["meds_dir"]
+
+        self.config["meds_dir"] = self.base_dir
+        os.environ["MEDS_DIR"] = self.config["meds_dir"]
+
         # And set some defaults in the config
         if "allowed_box_sizes" not in self.config:
             self.config["allowed_box_sizes"] = [
@@ -109,8 +109,6 @@ class MEDSRunner(Step):
             self.config["sigma_fac"] = 5.0
         if "refband" not in self.config:
             self.config["refband"] = "r"
-        if "sub_bkg" not in self.config:
-            self.config["sub_bkg"] = False
         if "stage_output" not in self.config:
             self.config["stage_output"] = False
         if "use_rejectlist" not in self.config:
@@ -136,6 +134,7 @@ class MEDSRunner(Step):
             pr = None
 
         # And add meds_run and MEDS_DIR to stash for later
+        self.config["meds_run"] = stash["desrun"]
         stash["meds_run"] = self.config["meds_run"]
         stash["env"].append(("MEDS_DIR", os.environ["MEDS_DIR"]))
 
@@ -148,14 +147,14 @@ class MEDSRunner(Step):
             except AssertionError as e:
                 self.logger.error("""Found the psf type DES_Piff,
                 but use_rejectlist is set to False. This will not stand""")
-                raise(e)
+                raise e
         if self.config["use_rejectlist"]:
             try:
                 assert "rejectlist" in stash
             except AssertionError as e:
                 self.logger.error("""use_rejectlist is True, but no 'rejectlist'
                 entry found in stash""")
-                raise(e)
+                raise e
 
         # https://github.com/esheldon/meds/wiki/Creating-MEDS-Files-in-Python
         # Need to generate
@@ -255,13 +254,13 @@ class MEDSRunner(Step):
 
                 # coadd stuff
                 coadd_file, coadd_ext = stash.get_filepaths(
-                    "coadd_file", tilename, band=band, with_fits_ext=True,
+                    "coadd_file", tilename, band=band, with_fits_ext=True, funpack=True,
                 )
                 coadd_weight_file, coadd_weight_ext = stash.get_filepaths(
-                    "coadd_weight_file", tilename, band=band, with_fits_ext=True,
+                    "coadd_weight_file", tilename, band=band, with_fits_ext=True, funpack=True,
                 )
                 coadd_bmask_file, coadd_bmask_ext = stash.get_filepaths(
-                    "coadd_mask_file", tilename, band=band, with_fits_ext=True,
+                    "coadd_mask_file", tilename, band=band, with_fits_ext=True, funpack=True,
                 )
 
                 # headers and WCS
@@ -273,7 +272,8 @@ class MEDSRunner(Step):
                     coadd_header)
 
                 coadd_wcs, _ = galsim.wcs.readFromFitsHeader(
-                    galsim.FitsHeader(coadd_file, coadd_ext))
+                    galsim.FitsHeader(file_name=coadd_file, hdu=FITSEXTMAP[coadd_ext])
+                )
 
                 if (
                     stash.has_tile_info_quantity("coadd_bkg_file", tilename, band=band)
@@ -310,18 +310,14 @@ class MEDSRunner(Step):
                     )
                     mag_zps = stash.get_tile_info_quantity("mag_zps", tilename, band=band)
 
-                    if self.config.get("sub_bkg", True):
-                        bkg_files, bkg_ext = stash.get_filepaths(
-                            "bkg_files", tilename, band=band, with_fits_ext=True,
-                        )
-                        if not isinstance(bkg_ext, int):
-                            if bkg_files[0].endswith(".fits.fz"):
-                                bkg_ext = 1
-                            else:
-                                bkg_ext = 0
-                    else:
-                        bkg_files = [""]*len(img_files)
-                        bkg_ext = -1
+                    bkg_files, bkg_ext = stash.get_filepaths(
+                        "bkg_files", tilename, band=band, with_fits_ext=True,
+                    )
+                    if not isinstance(bkg_ext, int):
+                        if bkg_files[0].endswith(".fits.fz"):
+                            bkg_ext = 1
+                        else:
+                            bkg_ext = 0
 
                     img_files = [f for (i, f) in enumerate(img_files) if not is_rejectlisted[i]]
                     wgt_files = [f for (i, f) in enumerate(wgt_files) if not is_rejectlisted[i]]
@@ -355,15 +351,15 @@ class MEDSRunner(Step):
 
                 # fill coadd quantities
                 image_info["image_path"][0] = coadd_file
-                image_info["image_ext"][0] = coadd_ext
+                image_info["image_ext"][0] = FITSEXTMAP[coadd_ext]
                 image_info["weight_path"][0] = coadd_weight_file
-                image_info["weight_ext"][0] = coadd_weight_ext
+                image_info["weight_ext"][0] = FITSEXTMAP[coadd_weight_ext]
                 image_info["bmask_path"][0] = coadd_bmask_file
-                image_info["bmask_ext"][0] = coadd_bmask_ext
+                image_info["bmask_ext"][0] = FITSEXTMAP[coadd_bmask_ext]
                 image_info["bkg_path"][0] = ""  # No bkg file for coadd
                 image_info["bkg_ext"][0] = -1
                 image_info["seg_path"][0] = seg_file
-                image_info["seg_ext"][0] = seg_ext
+                image_info["seg_ext"][0] = FITSEXTMAP[seg_ext]
                 image_info["wcs"][0] = wcs_json[0]
                 image_info["magzp"][0] = MAGZP_REF
                 image_info["scale"][0] = 1.
@@ -371,11 +367,11 @@ class MEDSRunner(Step):
                 for i in range(n_images):
                     ind = i+1
                     image_info["image_path"][ind] = img_files[i]
-                    image_info["image_ext"][ind] = img_ext
+                    image_info["image_ext"][ind] = FITSEXTMAP[img_ext]
                     image_info["weight_path"][ind] = wgt_files[i]
-                    image_info["weight_ext"][ind] = wgt_ext
+                    image_info["weight_ext"][ind] = FITSEXTMAP[wgt_ext]
                     image_info["bmask_path"][ind] = msk_files[i]
-                    image_info["bmask_ext"][ind] = msk_ext
+                    image_info["bmask_ext"][ind] = FITSEXTMAP[msk_ext]
 
                     image_info["bkg_path"][ind] = bkg_files[i]
                     image_info["bkg_ext"][ind] = bkg_ext
@@ -428,7 +424,7 @@ class MEDSRunner(Step):
                 # as we're not running multiple sims on the same machine....
                 t0 = timer()
                 meds_file = os.path.join(
-                    os.environ.get("MEDS_DIR"), self.config["meds_run"], tilename,
+                    self.config["meds_dir"], self.config["meds_run"], tilename,
                     "%s_%s_meds-%s.fits.fz" % (tilename, band, self.config["meds_run"]))
                 meds_files.append(meds_file)
 
@@ -506,7 +502,7 @@ class MEDSRunner(Step):
                     psf_kwargs=PSF_KWARGS[band],
                 )
                 img_wcs, _ = galsim.wcs.readFromFitsHeader(
-                        galsim.FitsHeader(img_file, img_ext)
+                        galsim.FitsHeader(file_name=img_file, hdu=FITSEXTMAP[img_ext])
                     )
                 psf_data.append(PSFForMeds(psf, img_wcs, stash["draw_method"]))
 
@@ -545,7 +541,7 @@ class MEDSRunner(Step):
                     psf = galsim.des.DES_PSFEx(
                         psfex_file, image_file_name=img_file)
                     img_wcs, img_origin = galsim.wcs.readFromFitsHeader(
-                        galsim.FitsHeader(img_file, img_ext)
+                        galsim.FitsHeader(file_name=img_file, hdu=FITSEXTMAP[img_ext])
                     )
                     psf_data.append(PSFForMeds(psf, img_wcs, "no_pixel"))
                 else:
@@ -564,7 +560,7 @@ class MEDSRunner(Step):
                     self.logger.error(
                         "couldn't interpret psf %s "
                         "as float" % (size_key))
-                    raise(e)
+                    raise e
                 break
         psf = galsim.Gaussian(**{size_key: stash["psf_config"][size_key]})
 
@@ -579,7 +575,7 @@ class MEDSRunner(Step):
         if stash.has_tile_info_quantity("img_files", tilename, band=band):
             for img_file in img_files:
                 wcs, origin = galsim.wcs.readFromFitsHeader(
-                    galsim.FitsHeader(img_file, hdu=img_ext)
+                    galsim.FitsHeader(file_name=img_file, hdu=FITSEXTMAP[img_ext])
                 )
                 psf_data.append(
                     PSFForMeds(

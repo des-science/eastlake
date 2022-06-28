@@ -170,7 +170,7 @@ setup(
         'build_ext': build_ext,
     },
     package_data={
-        "eastlake": ["astromatic/*"],
+        "eastlake": ["astromatic/*", "data/*", "config/*"],
     },
     use_scm_version=True,
     setup_requires=['setuptools_scm', 'setuptools_scm_git_archive'],

@@ -61,6 +61,7 @@ def parse_args():
         '--no_overwrite_job_record', action='store_true', default=False)
     parser.add_argument('-v', '--verbosity', default=1)
     parser.add_argument('-l', '--logfile', default=None)
+    parser.add_argument('--seed', type=int, default=None)
     return parser.parse_args()
 
 
@@ -81,14 +82,14 @@ def main():
         except ImportError as e:
             print("found SLURM_STEP_NUM_TASKS=%d but mpi4py failed to import" % ntasks_srun)
             print("aborting.")
-            raise(e)
+            raise e
     if ntasks_mpirun > 1:
         try:
             from mpi4py import MPI  # noqa
         except ImportError as e:
             print("found OMPI_COMM_WORLD_SIZE=%d but mpi4py failed to import" % ntasks_mpirun)
             print("aborting.")
-            raise(e)
+            raise e
 
     # Set output directory
     base_dir = args.base_dir
@@ -140,6 +141,7 @@ def main():
         pipeline = EnsemblePipeline.from_config_file(
             config_file, base_dir, logger=logger, new_params=new_params,
             step_names=args.step_names, record_file=args.record_file,
+            seed=args.seed,
         )
 
     # go ahead and execute

@@ -7,6 +7,8 @@ import galsim.config.process
 import os
 import yaml
 import pickle
+import numpy as np
+
 # for metacal
 from collections import OrderedDict
 from .steps import (
@@ -14,11 +16,13 @@ from .steps import (
     SWarpRunner,
     SrcExtractorRunner,
     MEDSRunner,
-    SingleBandSwarpRunner,
     TrueDetectionRunner,
     DeleteImages,
     DeleteMeds,
     NewishMetcalRunner,
+    CoaddNwgintRunner,
+    PizzaCutterRunner,
+    MetadetectRunner,
 )
 from .utils import get_logger, safe_mkdir, pushd
 from .stash import Stash
@@ -32,16 +36,18 @@ STEP_CLASSES = OrderedDict([
     ('swarp', SWarpRunner),
     ('src_extractor', SrcExtractorRunner),
     ('meds', MEDSRunner),
-    ('single_band_swarp', SingleBandSwarpRunner),
     ('true_detection', TrueDetectionRunner),
     ('delete_images', DeleteImages),
     ('delete_meds', DeleteMeds),
     ('newish_metacal', NewishMetcalRunner),
+    ('coadd_nwgint', CoaddNwgintRunner),
+    ('pizza_cutter', PizzaCutterRunner),
+    ('metadetect', MetadetectRunner),
 ])
 
 STEP_IS_GALSIM = set(["galsim"])
 
-DEFAULT_STEPS = ["galsim", "swarp", "src_extractor", "meds"]
+DEFAULT_STEPS = ["galsim", "coadd_nwgint", "swarp", "src_extractor", "meds"]
 
 
 def register_pipeline_step(step_name, step_class, is_galsim=False):
@@ -68,8 +74,11 @@ def register_pipeline_step(step_name, step_class, is_galsim=False):
 
 
 class Pipeline(object):
-    def __init__(self, steps, base_dir, logger=None, verbosity=1, log_file=None, name="pipeline", config=None,
-                 record_file="job_record.pkl"):
+    def __init__(
+        self, steps, base_dir, seed=None,
+        logger=None, verbosity=1, log_file=None, name="pipeline", config=None,
+        record_file="job_record.pkl",
+    ):
         """Class for running an image simulation pipeline.
         @param steps    List of Step instances (see step.py)
         @base_dir       Path base output directory for this pipeline
@@ -116,6 +125,10 @@ class Pipeline(object):
         # stash is a dictionary that gets passed to and updated by pipeline steps.
         # It is also what is saved as the job_record, allowing restarting the pipeline
         self.init_stash()
+        if seed is None:
+            seed = np.random.randint(1, 2**31)
+        self.logger.error("step primary RNG seed = %d" % seed)
+        self.stash["step_primary_seed"] = seed
 
     def init_stash(self):
         self.stash = Stash(self.base_dir, self.step_names)
@@ -150,12 +163,13 @@ class Pipeline(object):
         # Reset environment variables that were set in previous pipeline
         for key, val in stash["env"]:
             os.environ[key] = val
+
         return pipe
 
     @classmethod
     def from_config_file(cls, config_file, base_dir, logger=None, verbosity=1,
                          log_file=None, name="pipeline", step_names=None,
-                         new_params=None, record_file=None):
+                         new_params=None, record_file=None, seed=None):
         """
         Initialize a pipeline from a config file.
         """
@@ -236,7 +250,7 @@ class Pipeline(object):
                         step_class = STEP_CLASSES[step_config["step_class"]]
                     except KeyError as e:
                         print("step_class must be in %s" % (str(STEP_CLASSES.keys())))
-                        raise(e)
+                        raise e
                 else:
                     step_class = STEP_CLASSES[step_name]
                 if "verbosity" in step_config:
@@ -255,7 +269,7 @@ class Pipeline(object):
             steps, base_dir,
             logger=logger, verbosity=verbosity,
             log_file=log_file, name=name, config=config,
-            record_file=record_file
+            record_file=record_file, seed=seed,
         )
 
     def execute(self, new_params_list=None, base_dir=None, no_overwrite_job_record=False,
@@ -284,18 +298,18 @@ class Pipeline(object):
                             "and you have skip_completed_steps=True." % step.name
                         )
                         continue
-                self.logger.error(THINGS_GOING_FINE+"Running step %s\n" %
-                                  step.name + THINGS_GOING_FINE)
+                self.logger.error("\n"+THINGS_GOING_FINE+"Running step %s\n" %
+                                  step.name + THINGS_GOING_FINE+"\n")
                 status, self.stash = step.execute_step(self.stash, new_params=new_params)
                 if status != 0:
                     self.logger.error(
-                        PANIC_STRING
+                        "\n"+PANIC_STRING
                         + "step %s return status %d: quitting pipeline here\n" % (step.name, status)
-                        + PANIC_STRING)
+                        + PANIC_STRING+"\n")
                     return status
                 else:
-                    self.logger.error(THINGS_GOING_FINE + "Completed step %s\n" %
-                                      step.name + THINGS_GOING_FINE)
+                    self.logger.error("\n"+THINGS_GOING_FINE + "Completed step %s\n" %
+                                      step.name + THINGS_GOING_FINE+"\n")
                 # record that we've completed this step
                 self.stash["completed_step_names"].append((step.name, status))
                 # save stash

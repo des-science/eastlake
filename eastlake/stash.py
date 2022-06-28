@@ -4,6 +4,7 @@ import pickle
 import os
 import yaml
 from .des_files import replace_imsim_data_in_pizza_cutter_yaml, get_pizza_cutter_yaml_path
+from .utils import unpack_fits_file_if_needed
 
 
 class Stash(dict):
@@ -89,8 +90,11 @@ class Stash(dict):
 
     def get_filepaths(
         self, file_key, tilename, band=None, ret_abs=True,
-        keyerror=True, with_fits_ext=False,
+        keyerror=True, with_fits_ext=False, funpack=False,
     ):
+        if funpack and not with_fits_ext:
+            raise RuntimeError("You must return the FITS extension in order to funpack!")
+
         if with_fits_ext:
             ext_key = file_key.rsplit("_", 1)[0] + "_ext"
 
@@ -107,7 +111,7 @@ class Stash(dict):
                 if not keyerror:
                     return None
                 else:
-                    raise(e)
+                    raise e
         else:
             try:
                 filepaths_in_stash = self["tile_info"][tilename][file_key]
@@ -119,7 +123,7 @@ class Stash(dict):
                 if not keyerror:
                     return None
                 else:
-                    raise(e)
+                    raise e
         islist = True
         if not isinstance(filepaths_in_stash, list):
             islist = False
@@ -136,7 +140,17 @@ class Stash(dict):
             filepaths_out = filepaths_out[0]
 
         if with_fits_ext:
-            return filepaths_out, file_ext
+            if funpack:
+                if not islist:
+                    return unpack_fits_file_if_needed(filepaths_out, file_ext)
+                else:
+                    new_filepaths_out = [
+                        unpack_fits_file_if_needed(fn, file_ext)
+                        for fn in filepaths_out
+                    ]
+                    return [nn[0] for nn in new_filepaths_out], new_filepaths_out[0][1]
+            else:
+                return filepaths_out, file_ext
         else:
             return filepaths_out
 

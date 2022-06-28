@@ -4,22 +4,25 @@ channels:
 dependencies:
   # run
   - astropy
-  - lsstdesc-coord
+  - cfitsio  # for fpack and builds
   - des-desmeds
+  - des-pixcorrect
+  - des-pizza-cutter-metadetect
   - esutil
   - fitsio
   - galsim
   - importlib_metadata
   - joblib
+  - lsstdesc-coord
   - meds
   - ngmix
   - numpy
   - piff
   - pixmappy
-  - setuptools
   - psfex
   - pyyaml
   - scipy
+  - setuptools
   # host setup.py
   - setuptools_scm
   - setuptools_scm_git_archive
@@ -27,7 +30,6 @@ dependencies:
   - autoconf
   - automake
   - blas-devel=*=*openblas
-  - cfitsio
   - compilers
   - fftw
   - libtool
