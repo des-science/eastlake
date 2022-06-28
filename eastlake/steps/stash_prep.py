@@ -7,7 +7,7 @@ from ..des_files import read_pizza_cutter_yaml
 
 class StashPrep(Step):
     """
-    Pipeline step which prepares the stash with imsidata, desrun and tilename
+    Pipeline step which prepares the stash with imsim_data, desrun, and tilename.
     """
 
     def __init__(

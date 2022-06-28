@@ -339,6 +339,9 @@ class Stash(dict):
             )
 
     def write_input_pizza_cutter_yaml(self, data, tilename, band):
+        self.set_input_pizza_cutter_yaml(data, tilename, band)
+
+        _data = self.get_input_pizza_cutter_yaml(tilename, band)
         pth = get_pizza_cutter_yaml_path(
             self["imsim_data"],
             self["desrun"],
@@ -347,9 +350,7 @@ class Stash(dict):
         )
         os.makedirs(os.path.dirname(pth), exist_ok=True)
         with open(pth, "w") as fp:
-            yaml.dump(data, fp)
-
-        self.set_input_pizza_cutter_yaml(data, tilename, band)
+            yaml.dump(_data, fp)
 
     def set_input_pizza_cutter_yaml(self, _data, tilename, band):
         data = copy.deepcopy(_data)
