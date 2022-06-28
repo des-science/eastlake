@@ -1,6 +1,8 @@
 from __future__ import print_function, absolute_import
 import os
 
+import galsim.config
+
 from ..step import Step
 from ..des_files import read_pizza_cutter_yaml
 
@@ -23,7 +25,9 @@ class StashPrep(Step):
         stash["tilenames"] = [self.config["tilename"]]
         stash["desrun"] = self.config["desrun"]
         try:
-            stash["imsim_data"] = self.config["imsim_data"]
+            stash["imsim_data"] = galsim.config.ParseValue(
+                self.config, "imsim_data", {}, str
+            )[0]
         except KeyError:
             stash["imsim_data"] = os.environ["IMSIM_DATA"]
         stash["bands"] = self.config.get("bands", ["g", "r", "i", "z"])
