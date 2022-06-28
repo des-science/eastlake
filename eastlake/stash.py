@@ -4,7 +4,7 @@ import pickle
 import os
 import yaml
 from .des_files import replace_imsim_data_in_pizza_cutter_yaml, get_pizza_cutter_yaml_path
-from .utils import unpack_fits_file_if_needed
+from .utils import unpack_fits_file_if_needed, pushd, safe_rm
 
 
 class Stash(dict):
@@ -207,6 +207,8 @@ class Stash(dict):
         data = copy.deepcopy(_data)
         replace_imsim_data_in_pizza_cutter_yaml(data, self["base_dir"])
 
+        self._make_lists_psfmaps_symlinks(self["base_dir"], tilename, band, data)
+
         if "_output_pizza_cutter_yaml" not in self:
             self["_output_pizza_cutter_yaml"] = {}
         if tilename not in self["_output_pizza_cutter_yaml"]:
@@ -336,10 +338,25 @@ class Stash(dict):
                 "Could not write pizza cutter yaml due to missing yaml or desrun!"
             )
 
+    def write_input_pizza_cutter_yaml(self, data, tilename, band):
+        pth = get_pizza_cutter_yaml_path(
+            self["imsim_data"],
+            self["desrun"],
+            tilename,
+            band,
+        )
+        os.makedirs(os.path.dirname(pth), exist_ok=True)
+        with open(pth, "w") as fp:
+            yaml.dump(data, fp)
+
+        self.set_input_pizza_cutter_yaml(data, tilename, band)
+
     def set_input_pizza_cutter_yaml(self, _data, tilename, band):
         data = copy.deepcopy(_data)
         if "imsim_data" in self and self["imsim_data"] is not None:
             replace_imsim_data_in_pizza_cutter_yaml(data, self["imsim_data"])
+
+        self._make_lists_psfmaps_symlinks(self["imsim_data"], tilename, band, data)
 
         if "_input_pizza_cutter_yaml" not in self:
             self["_input_pizza_cutter_yaml"] = {}
@@ -361,6 +378,80 @@ class Stash(dict):
             raise RuntimeError(
                 f"Could not find input pizza cutter yaml entry for tile|band={tilename}|{band}"
             )
+
+    def _make_lists_psfmaps_symlinks(
+        self, base_dir_or_imsim_data, tilename, band, pyml
+    ):
+        odir = os.path.join(base_dir_or_imsim_data, self["desrun"], tilename)
+
+        ##############################################
+        # make bkg and nullwt flist files
+        os.makedirs(os.path.join(odir, "lists"), exist_ok=True)
+        bkg_file = os.path.join(
+            odir, "lists", f"{tilename}_{band}_bkg-flist-{self['desrun']}.dat",
+        )
+        nw_file = os.path.join(
+            odir, "lists", f"{tilename}_{band}_nullwt-flist-{self['desrun']}.dat",
+        )
+        with open(bkg_file, "w") as fp_bkg:
+            with open(nw_file, "w") as fp_nw:
+                for i in range(len(pyml["src_info"])):
+                    fp_bkg.write(pyml["src_info"][i]["bkg_path"] + "\n")
+                    if "coadd_nwgint_path" in pyml["src_info"][i]:
+                        fp_nw.write(
+                            "%s %r\n" % (
+                                pyml["src_info"][i]["coadd_nwgint_path"],
+                                pyml["src_info"][i]["magzp"],
+                            )
+                        )
+
+        # make psf map files
+        pmap_file = os.path.join(odir, f"{tilename}_{band}_psfmap-{self['desrun']}.dat")
+        with open(pmap_file, "w") as fp:
+            fp.write(
+                "%d %d %s\n" % (
+                    -9999,
+                    -9999,
+                    pyml["psf_path"],
+                )
+            )
+            for i in range(len(pyml["src_info"])):
+                fn = pyml["src_info"][i]["psfex_path"]
+                en, _, cn = os.path.basename(fn).split("_")[:3]
+                en = en[1:]
+                cn = cn[1:]
+                fp.write("%s %s %s\n" % (en, cn, fn))
+
+        with open(os.path.join(odir, f"{tilename}_all_psfmap.dat"), "w") as fp_w:
+            for _bn in ["g", "r", "i", "z"]:
+                _bn_fn = os.path.join(odir, f"{tilename}_{_bn}_psfmap-{self['desrun']}.dat")
+                if os.path.exists(_bn_fn):
+                    with open(_bn_fn, "r") as fp_r:
+                        for line in fp_r.readlines():
+                            fp_w.write(line)
+
+        # symlinks
+        def _symlink_file_rel_to_cwd(fn):
+            ln = os.path.basename(fn)
+            fn_rel = os.path.relpath(fn)
+            safe_rm(ln)
+            os.symlink(fn_rel, ln)
+
+        # symlink nullwt files
+        nodir = os.path.join(odir, f"nullwt-{band}")
+        os.makedirs(nodir, exist_ok=True)
+        with pushd(nodir):
+            for i in range(len(pyml["src_info"])):
+                if "coadd_nwgint_path" in pyml["src_info"][i]:
+                    _symlink_file_rel_to_cwd(pyml["src_info"][i]["coadd_nwgint_path"])
+
+        # symlink psf files
+        podir = os.path.join(odir, "psfs")
+        os.makedirs(podir, exist_ok=True)
+        with pushd(podir):
+            _symlink_file_rel_to_cwd(pyml["psf_path"])
+            for i in range(len(pyml["src_info"])):
+                _symlink_file_rel_to_cwd(pyml["src_info"][i]["psfex_path"])
 
     def save(self, filename, overwrite=True):
         if not overwrite:

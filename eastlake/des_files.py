@@ -18,6 +18,7 @@ PIZZA_CUTTER_YAML_PATH_KEYS = [
     "piff_path",
     "psfex_path",
     "weight_path",
+    "coadd_nwgint_path",
 ]
 
 
