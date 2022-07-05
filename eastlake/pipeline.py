@@ -24,6 +24,7 @@ from .steps import (
     PizzaCutterRunner,
     MetadetectRunner,
     StashPrep,
+    BalrogRunner,
 )
 from .utils import get_logger, safe_mkdir, pushd
 from .stash import Stash
