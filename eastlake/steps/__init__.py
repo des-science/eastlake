@@ -10,3 +10,4 @@ from .coadd_nwgint import CoaddNwgintRunner  # noqa
 from .pizza_cutter import PizzaCutterRunner  # noqa
 from .mdet import MetadetectRunner  # noqa
 from .stash_prep import StashPrep  # noqa
+from .balrog import BalrogRunner  # noqa
