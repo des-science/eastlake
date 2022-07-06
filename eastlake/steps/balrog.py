@@ -74,13 +74,8 @@ class BalrogRunner(Step):
 
             cmd = [
                 "python", "balrog_injection.py",
-                self.config["config"],
-                "-g", os.path.join(
-                    stash["imsim_data"],
-                    stash["desrun"],
-                    tilename,
-                    "coadd_tile_geom.fits",
-                ),
+                self.config["config_file"],
+                "-g", self.config["coadd_tile_geom_file"],
                 "-l", tlist,
                 "-t", os.path.join(stash["imsim_data"], stash["desrun"]),
                 "-p", os.path.join(stash["imsim_data"], stash["desrun"], tilename, "psfs"),
