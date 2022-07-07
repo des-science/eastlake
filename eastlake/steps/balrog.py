@@ -37,12 +37,12 @@ from ..step import Step, run_and_check
 from ..utils import pushd
 
 LOGGING_MAP = {
-    logging.CRITICAL: '0',
-    logging.ERROR: '1',
-    logging.WARNING: '1',
-    logging.INFO: '2',
-    logging.DEBUG: '3',
-    logging.NOTSET: '1',
+    logging.CRITICAL: 0,
+    logging.ERROR: 1,
+    logging.WARNING: 1,
+    logging.INFO: 2,
+    logging.DEBUG: 3,
+    logging.NOTSET: 1,
 }
 
 
