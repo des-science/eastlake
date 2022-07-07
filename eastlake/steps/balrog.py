@@ -34,7 +34,16 @@ import multiprocessing
 import logging
 
 from ..step import Step, run_and_check
-from ..utils import LOGGING_LEVELS, pushd
+from ..utils import pushd
+
+LOGGING_MAP = {
+    logging.CRITICAL: '0',
+    logging.ERROR: '1',
+    logging.WARNING: '1',
+    logging.INFO: '2',
+    logging.DEBUG: '3',
+    logging.NOTSET: '1',
+}
 
 
 class BalrogRunner(Step):
@@ -62,7 +71,7 @@ class BalrogRunner(Step):
             llevel = self.logger.getEffectiveLevel()
         else:
             llevel = logging.WARNING
-        llevel = LOGGING_LEVELS[llevel]
+        llevel = LOGGING_MAP[llevel]
 
         for tilename in stash["tilenames"]:
             tlist = os.path.join(
