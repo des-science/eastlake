@@ -34,7 +34,7 @@ import multiprocessing
 import logging
 
 from ..step import Step, run_and_check
-from ..utils import LOGGING_LEVELS
+from ..utils import LOGGING_LEVELS, pushd
 
 
 class BalrogRunner(Step):
@@ -53,6 +53,10 @@ class BalrogRunner(Step):
                 "n_jobs",
                 multiprocessing.cpu_count(),
             )
+        )
+        self.config["balrog_dir"] = self.config.get(
+            "balrog_dir",
+            os.environ["BALROG_DIR"],
         )
 
     def execute(self, stash, new_params=None):
@@ -84,7 +88,8 @@ class BalrogRunner(Step):
                 "-v", "%d" % llevel,
             ]
 
-            run_and_check(cmd, "BalrogRunner", verbose=True)
+            with pushd(self.config["balrog_dir"]):
+                run_and_check(cmd, "BalrogRunner", verbose=True)
 
             for band in stash["bands"]:
                 with stash.update_output_pizza_cutter_yaml(tilename, band) as pyml:
