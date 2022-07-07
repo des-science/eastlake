@@ -54,10 +54,8 @@ class BalrogRunner(Step):
                 multiprocessing.cpu_count(),
             )
         )
-        self.config["balrog_dir"] = self.config.get(
-            "balrog_dir",
-            os.environ["BALROG_DIR"],
-        )
+        if "balrog_dir" not in self.config:
+            self.config["balrog_dir"] = os.environ["BALROG_DIR"]
 
     def execute(self, stash, new_params=None):
         if self.logger is not None:
