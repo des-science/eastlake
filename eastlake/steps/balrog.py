@@ -122,6 +122,6 @@ class BalrogRunner(Step):
                             bname + "_balrog_inj.fits",
                         )
 
-                    pyml["coadd_nwgint_path"] = ofile
+                        pyml["src_info"][i]["coadd_nwgint_path"] = ofile
 
         return 0, stash
