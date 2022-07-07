@@ -88,7 +88,7 @@ class BalrogRunner(Step):
                 "-v", "%d" % llevel,
             ]
 
-            with pushd(self.config["balrog_dir"]):
+            with pushd(os.path.join(self.config["balrog_dir"], "balrog")):
                 run_and_check(cmd, "BalrogRunner", verbose=True)
 
             for band in stash["bands"]:
