@@ -35,11 +35,11 @@ from ..des_files import (
     ),
     (
         "/data/des81.a/data/mtabbutt/Y6_integrations/sim_outputs/"
-        "des-pizza-slices-y6-v13/DES0350-6622/balrog_images/0/fname",
+        "des-pizza-slices-y6-v13/balrog_images/0/fname",
         "/blah/blah",
         None,
         "/blah/blah/"
-        "des-pizza-slices-y6-v13/DES0350-6622/balrog_images/0/fname",
+        "des-pizza-slices-y6-v13/balrog_images/0/fname",
     ),
 ])
 def test_replace_imsim_data(pth, imsim_data, old_imsim_data, val):
