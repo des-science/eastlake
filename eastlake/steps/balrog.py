@@ -113,7 +113,6 @@ class BalrogRunner(Step):
                         ofile = os.path.join(
                             self.base_dir,
                             stash["desrun"],
-                            tilename,
                             "balrog_images",
                             "0",
                             stash["desrun"],
