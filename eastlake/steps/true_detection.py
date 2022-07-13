@@ -97,7 +97,7 @@ class TrueDetectionRunner(Step):
 
         # now we add the new srcext catalog to the stash and
         # write it to disk
-        srcext_cat_name = coadd_file.replace(".fits", "_sexcat.fits")
+        srcext_cat_name = coadd_file.replace(".fits", "_cat.fits")
         with stash.update_output_pizza_cutter_yaml(tilename, band) as pyml:
             pyml["cat_path"] = srcext_cat_name
         fitsio.write(srcext_cat_name, srcext_cat, clobber=True)
