@@ -34,7 +34,7 @@ import multiprocessing
 import logging
 
 from ..step import Step, run_and_check
-from ..utils import pushd
+from ..utils import pushd, copy_ifnotexists
 
 LOGGING_MAP = {
     logging.CRITICAL: 0,
@@ -122,5 +122,27 @@ class BalrogRunner(Step):
                         )
 
                         pyml["src_info"][i]["coadd_nwgint_path"] = ofile
+
+                # copy input PSF and WCS info
+                in_pyml = stash.get_input_pizza_cutter_yaml(tilename, band)
+                pyml = stash.get_output_pizza_cutter_yaml(tilename, band)
+                for i in range(len(pyml["src_info"])):
+                    # we don't overwrite these since we could have estimated them
+                    copy_ifnotexists(
+                        in_pyml["src_info"][i]["head_path"],
+                        pyml["src_info"][i]["head_path"],
+                    )
+                    copy_ifnotexists(
+                        in_pyml["src_info"][i]["piff_path"],
+                        pyml["src_info"][i]["piff_path"],
+                    )
+                    copy_ifnotexists(
+                        in_pyml["src_info"][i]["psf_path"],
+                        pyml["src_info"][i]["psf_path"],
+                    )
+
+        # update the stash with PSF info for downstream w/ MEDS
+        stash["psf_config"] = {"type": "DES_PSFEx"}
+        stash["draw_method"] = "no_pixel"
 
         return 0, stash
