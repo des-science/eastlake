@@ -114,7 +114,7 @@ class MEDSRunner(Step):
         if "use_rejectlist" not in self.config:
             # We can rejectlist some of the images
             self.config["use_rejectlist"] = True
-        self.config["use_nwgint"] = self.get("use_nwgint", False)
+        self.config["use_nwgint"] = self.config.get("use_nwgint", False)
 
     def clear_stash(self, stash):
         # If we continued the pipeline from a previous job record file,
