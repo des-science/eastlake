@@ -126,6 +126,10 @@ class BalrogRunner(Step):
                 # copy input PSF and WCS info
                 in_pyml = stash.get_input_pizza_cutter_yaml(tilename, band)
                 pyml = stash.get_output_pizza_cutter_yaml(tilename, band)
+                copy_ifnotexists(
+                    in_pyml["psf_path"],
+                    pyml["psf_path"],
+                )
                 for i in range(len(pyml["src_info"])):
                     # we don't overwrite these since we could have estimated them
                     copy_ifnotexists(
