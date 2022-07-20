@@ -532,7 +532,7 @@ class MEDSRunner(Step):
 
         # first look for coadd psfex file.
         pyml = stash.get_output_pizza_cutter_yaml(tilename, band)
-        coadd_psfex_path = pyml["psfex_path"]
+        coadd_psfex_path = pyml["psf_path"]
         coadd_file = pyml["image_path"]
         self.logger.error("coadd psfex file: %s" % (coadd_psfex_path))
 
