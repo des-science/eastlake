@@ -144,6 +144,10 @@ class BalrogRunner(Step):
                         in_pyml["src_info"][i]["psf_path"],
                         pyml["src_info"][i]["psf_path"],
                     )
+                    copy_ifnotexists(
+                        in_pyml["src_info"][i]["bkg_path"],
+                        pyml["src_info"][i]["bkg_path"],
+                    )
 
         # update the stash with PSF info for downstream w/ MEDS
         stash["psf_config"] = {"type": "DES_PSFEx"}
