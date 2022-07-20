@@ -254,6 +254,15 @@ class Stash(dict):
             band=band,
         )
 
+        if "coadd_nwgint_path" in data["src_info"][0]:
+            if data["src_info"][0]["coadd_nwgint_path"].endswith(".fz"):
+                nwgint_ext_offset = 1
+            else:
+                nwgint_ext_offset = 0
+            _set_paths("coadd_nwgint_img_files", "coadd_nwgint_path", 0 + nwgint_ext_offset)
+            _set_paths("coadd_nwgint_wgt_files", "coadd_nwgint_path", 2 + nwgint_ext_offset)
+            _set_paths("coadd_nwgint_msk_files", "coadd_nwgint_path", 3 + nwgint_ext_offset)
+
         #######################
         # coadd images
         self.set_filepaths(

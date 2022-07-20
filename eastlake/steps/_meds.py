@@ -114,6 +114,7 @@ class MEDSRunner(Step):
         if "use_rejectlist" not in self.config:
             # We can rejectlist some of the images
             self.config["use_rejectlist"] = True
+        self.config["use_nwgint"] = self.get("use_nwgint", False)
 
     def clear_stash(self, stash):
         # If we continued the pipeline from a previous job record file,
@@ -289,10 +290,20 @@ class MEDSRunner(Step):
                 wcs_json.append(json.dumps(coadd_header))
 
                 # single-epoch stuff
-                if stash.has_tile_info_quantity("img_files", tilename, band=band):
+                if (
+                    stash.has_tile_info_quantity("img_files", tilename, band=band)
+                    or
+                    stash.has_tile_info_quantity("coadd_nwgint_img_files", tilename, band=band)
+                ):
+                    if self.config["use_nwgint"]:
+                        pre = "coadd_nwgint_"
+                    else:
+                        pre = ""
                     img_files, img_ext = stash.get_filepaths(
-                        "img_files", tilename, band=band, with_fits_ext=True,
+                        pre+"img_files", tilename, band=band, with_fits_ext=True,
                     )
+                    if not isinstance(img_ext, int):
+                        img_ext = FITSEXTMAP[img_ext]
 
                     # Are we rejectlisting?
                     if self.config["use_rejectlist"]:
@@ -303,11 +314,17 @@ class MEDSRunner(Step):
                         is_rejectlisted = [False] * len(img_files)
 
                     wgt_files, wgt_ext = stash.get_filepaths(
-                        "wgt_files", tilename, band=band, with_fits_ext=True,
+                        pre+"wgt_files", tilename, band=band, with_fits_ext=True,
                     )
+                    if not isinstance(wgt_ext, int):
+                        wgt_ext = FITSEXTMAP[wgt_ext]
+
                     msk_files, msk_ext = stash.get_filepaths(
-                        "msk_files", tilename, band=band, with_fits_ext=True,
+                        pre+"msk_files", tilename, band=band, with_fits_ext=True,
                     )
+                    if not isinstance(msk_ext, int):
+                        msk_ext = FITSEXTMAP[msk_ext]
+
                     mag_zps = stash.get_tile_info_quantity("mag_zps", tilename, band=band)
 
                     bkg_files, bkg_ext = stash.get_filepaths(
@@ -367,11 +384,11 @@ class MEDSRunner(Step):
                 for i in range(n_images):
                     ind = i+1
                     image_info["image_path"][ind] = img_files[i]
-                    image_info["image_ext"][ind] = FITSEXTMAP[img_ext]
+                    image_info["image_ext"][ind] = img_ext
                     image_info["weight_path"][ind] = wgt_files[i]
-                    image_info["weight_ext"][ind] = FITSEXTMAP[wgt_ext]
+                    image_info["weight_ext"][ind] = wgt_ext
                     image_info["bmask_path"][ind] = msk_files[i]
-                    image_info["bmask_ext"][ind] = FITSEXTMAP[msk_ext]
+                    image_info["bmask_ext"][ind] = msk_ext
 
                     image_info["bkg_path"][ind] = bkg_files[i]
                     image_info["bkg_ext"][ind] = bkg_ext
