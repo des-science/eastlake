@@ -30,6 +30,12 @@ from .swarp import FITSEXTMAP
 FWHM_FAC = 2*np.sqrt(2*np.log(2))
 
 
+def _remap_fitsext(ext):
+    if not isinstance(ext, int):
+        ext = FITSEXTMAP[ext]
+    return ext
+
+
 # Choose the boxsize - this is the same method as used in desmeds
 # Pasted in these functions from desmeds.
 def _get_box_sizes(cat, config):
@@ -211,6 +217,8 @@ class MEDSRunner(Step):
                     seg_file = ''
                     seg_ext = -1
 
+            seg_ext = _remap_fitsext(seg_ext)
+
             stash.set_filepaths("srcex_cat", srcex_cat, tilename)
 
             try:
@@ -257,12 +265,15 @@ class MEDSRunner(Step):
                 coadd_file, coadd_ext = stash.get_filepaths(
                     "coadd_file", tilename, band=band, with_fits_ext=True, funpack=True,
                 )
+                coadd_ext = _remap_fitsext(coadd_ext)
                 coadd_weight_file, coadd_weight_ext = stash.get_filepaths(
                     "coadd_weight_file", tilename, band=band, with_fits_ext=True, funpack=True,
                 )
+                coadd_weight_ext = _remap_fitsext(coadd_weight_ext)
                 coadd_bmask_file, coadd_bmask_ext = stash.get_filepaths(
                     "coadd_mask_file", tilename, band=band, with_fits_ext=True, funpack=True,
                 )
+                coadd_bmask_ext = _remap_fitsext(coadd_bmask_ext)
 
                 # headers and WCS
                 coadd_header = fitsio.read_header(
@@ -273,7 +284,7 @@ class MEDSRunner(Step):
                     coadd_header)
 
                 coadd_wcs, _ = galsim.wcs.readFromFitsHeader(
-                    galsim.FitsHeader(file_name=coadd_file, hdu=FITSEXTMAP[coadd_ext])
+                    galsim.FitsHeader(file_name=coadd_file, hdu=coadd_ext)
                 )
 
                 if (
@@ -302,8 +313,7 @@ class MEDSRunner(Step):
                     img_files, img_ext = stash.get_filepaths(
                         pre+"img_files", tilename, band=band, with_fits_ext=True,
                     )
-                    if not isinstance(img_ext, int):
-                        img_ext = FITSEXTMAP[img_ext]
+                    img_ext = _remap_fitsext(img_ext)
 
                     # Are we rejectlisting?
                     if self.config["use_rejectlist"]:
@@ -316,14 +326,12 @@ class MEDSRunner(Step):
                     wgt_files, wgt_ext = stash.get_filepaths(
                         pre+"wgt_files", tilename, band=band, with_fits_ext=True,
                     )
-                    if not isinstance(wgt_ext, int):
-                        wgt_ext = FITSEXTMAP[wgt_ext]
+                    wgt_ext = _remap_fitsext(wgt_ext)
 
                     msk_files, msk_ext = stash.get_filepaths(
                         pre+"msk_files", tilename, band=band, with_fits_ext=True,
                     )
-                    if not isinstance(msk_ext, int):
-                        msk_ext = FITSEXTMAP[msk_ext]
+                    msk_ext = _remap_fitsext(msk_ext)
 
                     mag_zps = stash.get_tile_info_quantity("mag_zps", tilename, band=band)
 
@@ -368,15 +376,15 @@ class MEDSRunner(Step):
 
                 # fill coadd quantities
                 image_info["image_path"][0] = coadd_file
-                image_info["image_ext"][0] = FITSEXTMAP[coadd_ext]
+                image_info["image_ext"][0] = coadd_ext
                 image_info["weight_path"][0] = coadd_weight_file
-                image_info["weight_ext"][0] = FITSEXTMAP[coadd_weight_ext]
+                image_info["weight_ext"][0] = coadd_weight_ext
                 image_info["bmask_path"][0] = coadd_bmask_file
-                image_info["bmask_ext"][0] = FITSEXTMAP[coadd_bmask_ext]
+                image_info["bmask_ext"][0] = coadd_bmask_ext
                 image_info["bkg_path"][0] = ""  # No bkg file for coadd
                 image_info["bkg_ext"][0] = -1
                 image_info["seg_path"][0] = seg_file
-                image_info["seg_ext"][0] = FITSEXTMAP[seg_ext]
+                image_info["seg_ext"][0] = seg_ext
                 image_info["wcs"][0] = wcs_json[0]
                 image_info["magzp"][0] = MAGZP_REF
                 image_info["scale"][0] = 1.
