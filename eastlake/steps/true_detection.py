@@ -112,7 +112,7 @@ class TrueDetectionRunner(Step):
 
         # make a copy, decompress it if needed,
         if coadd_file[-3:] != '.fz':
-            dest_coadd_file = coadd_file + '.fz'
+            dest_coadd_file = coadd_file
         else:
             dest_coadd_file = coadd_file
             coadd_file = coadd_file[:-3]
