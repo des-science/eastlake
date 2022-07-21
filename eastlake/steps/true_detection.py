@@ -128,7 +128,7 @@ class TrueDetectionRunner(Step):
 
         if orig_coadd_path.endswith('.fz'):
             os.system('funpack %s' % dest_coadd_file)
-        safe_rm(dest_coadd_file)
+            safe_rm(dest_coadd_file)
 
         # write all zeros in the image
         with fitsio.FITS(coadd_file, mode='rw') as fp:
