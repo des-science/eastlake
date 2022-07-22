@@ -17,7 +17,7 @@ import psfex
 import desmeds
 from desmeds.files import StagedOutFile
 
-from ..utils import safe_mkdir
+from ..utils import safe_mkdir, copy_ifnotexists
 from ..des_piff import DES_Piff, PSF_KWARGS
 from .meds_psf_interface import PSFForMeds
 from ..step import Step
@@ -456,6 +456,13 @@ class MEDSRunner(Step):
                 d = os.path.dirname(os.path.normpath(meds_file))
                 safe_mkdir(d)
 
+                in_pyml = stash.get_input_pizza_cutter_yaml(tilename, band)
+                pyml = stash.get_output_pizza_cutter_yaml(tilename, band)
+                copy_ifnotexists(
+                    in_pyml["seg_path"],
+                    pyml["seg_path"],
+                )
+                
                 # If requested, we stage the file at $TMPDIR and then
                 # copy over when finished writing. This is a good idea
                 # on many systems, but maybe not all.
