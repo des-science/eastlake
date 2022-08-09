@@ -143,5 +143,7 @@ class TrueDetectionRunner(Step):
             pyml["bmask_ext"] = 1
             pyml["weight_path"] = coadd_file
             pyml["weight_ext"] = 2
+            pyml["seg_path"] = ""
+            pyml["seg_ext"] = -1
 
         return coadd_file
