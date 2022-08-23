@@ -350,6 +350,7 @@ class SWarpRunner(Step):
                 "--tileid", "-9999",
                 "--interp_image", "MSK",
                 "--ydilate", "3",
+                "--clobber",
             ]
             self.logger.error(
                 "running coadd_assemble for tile %s, band %s:\n\t%s" % (
@@ -554,6 +555,7 @@ class SWarpRunner(Step):
                 "--tileid", "-9999",
                 "--interp_image", "MSK",
                 "--ydilate", "3",
+                "--clobber",
             ]
             self.logger.error(
                 "running DET coadd_assemble for tile %s: %s" % (

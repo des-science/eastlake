@@ -48,10 +48,24 @@ def replace_imsim_data(
     """
     if old_imsim_data is None:
         # try to infer
-        # paths look like this
+        # paths look like this for DESDM
         # /Users/beckermr/MEDS_DIR/test-y6-sims/DES0131-3206/sources-r/OPS/
+        # and like this for balrog
+        # /data/des81.a/data/mtabbutt/Y6_integrations/sim_outputs/
+        #  des-pizza-slices-y6-v13/
+        #  balrog_images/0/des-pizza-slices-y6-v13/DES0350-6622/
+        #  g/D00809310_g_c13_r4061p01_balrog_inj.fits
+
+        balrog_parts = pth.split("/balrog_images/")
         parts = pth.split("/sources-")
+
         if (
+            "/balrog_images/" in pth
+            and len(balrog_parts) == 2
+            and balrog_parts[1].split("/")[0].isdigit()
+        ):
+            old_imsim_data = os.path.dirname(balrog_parts[0])
+        elif (
             len(parts) == 2
             and parts[1][1:6] in ["/OPS/", "/ACT/"]
             and os.path.basename(parts[0]).startswith("DES")

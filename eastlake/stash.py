@@ -220,8 +220,11 @@ class Stash(dict):
 
         #######################
         # SE images
-        def _set_paths(dest_key, src_key, src_ext_key):
-            exts = list(set([src[src_ext_key] for src in data["src_info"]]))
+        def _set_paths(dest_key, src_key, src_ext_key, ext_not_a_key=False):
+            if ext_not_a_key:
+                exts = [src_ext_key]
+            else:
+                exts = list(set([src[src_ext_key] for src in data["src_info"]]))
             assert len(exts) == 1
             self.set_filepaths(
                 dest_key,
@@ -253,6 +256,30 @@ class Stash(dict):
             tilename,
             band=band,
         )
+
+        if "coadd_nwgint_path" in data["src_info"][0]:
+            if data["src_info"][0]["coadd_nwgint_path"].endswith(".fz"):
+                nwgint_ext_offset = 1
+            else:
+                nwgint_ext_offset = 0
+            _set_paths(
+                "coadd_nwgint_img_files",
+                "coadd_nwgint_path",
+                0 + nwgint_ext_offset,
+                ext_not_a_key=True,
+            )
+            _set_paths(
+                "coadd_nwgint_wgt_files",
+                "coadd_nwgint_path",
+                2 + nwgint_ext_offset,
+                ext_not_a_key=True,
+            )
+            _set_paths(
+                "coadd_nwgint_msk_files",
+                "coadd_nwgint_path",
+                3 + nwgint_ext_offset,
+                ext_not_a_key=True,
+            )
 
         #######################
         # coadd images

@@ -112,7 +112,7 @@ class TrueDetectionRunner(Step):
 
         # make a copy, decompress it if needed,
         if coadd_file[-3:] != '.fz':
-            dest_coadd_file = coadd_file + '.fz'
+            dest_coadd_file = coadd_file
         else:
             dest_coadd_file = coadd_file
             coadd_file = coadd_file[:-3]
@@ -128,6 +128,7 @@ class TrueDetectionRunner(Step):
 
         if orig_coadd_path.endswith('.fz'):
             os.system('funpack %s' % dest_coadd_file)
+            safe_rm(dest_coadd_file)
 
         # write all zeros in the image
         with fitsio.FITS(coadd_file, mode='rw') as fp:
@@ -142,5 +143,7 @@ class TrueDetectionRunner(Step):
             pyml["bmask_ext"] = 1
             pyml["weight_path"] = coadd_file
             pyml["weight_ext"] = 2
+            pyml["seg_path"] = ""
+            pyml["seg_ext"] = -1
 
         return coadd_file

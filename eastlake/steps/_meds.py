@@ -30,6 +30,12 @@ from .swarp import FITSEXTMAP
 FWHM_FAC = 2*np.sqrt(2*np.log(2))
 
 
+def _remap_fitsext(ext):
+    if not isinstance(ext, int):
+        ext = FITSEXTMAP[ext]
+    return ext
+
+
 # Choose the boxsize - this is the same method as used in desmeds
 # Pasted in these functions from desmeds.
 def _get_box_sizes(cat, config):
@@ -114,6 +120,7 @@ class MEDSRunner(Step):
         if "use_rejectlist" not in self.config:
             # We can rejectlist some of the images
             self.config["use_rejectlist"] = True
+        self.config["use_nwgint"] = self.config.get("use_nwgint", False)
 
     def clear_stash(self, stash):
         # If we continued the pipeline from a previous job record file,
@@ -210,6 +217,8 @@ class MEDSRunner(Step):
                     seg_file = ''
                     seg_ext = -1
 
+            seg_ext = _remap_fitsext(seg_ext)
+
             stash.set_filepaths("srcex_cat", srcex_cat, tilename)
 
             try:
@@ -256,12 +265,15 @@ class MEDSRunner(Step):
                 coadd_file, coadd_ext = stash.get_filepaths(
                     "coadd_file", tilename, band=band, with_fits_ext=True, funpack=True,
                 )
+                coadd_ext = _remap_fitsext(coadd_ext)
                 coadd_weight_file, coadd_weight_ext = stash.get_filepaths(
                     "coadd_weight_file", tilename, band=band, with_fits_ext=True, funpack=True,
                 )
+                coadd_weight_ext = _remap_fitsext(coadd_weight_ext)
                 coadd_bmask_file, coadd_bmask_ext = stash.get_filepaths(
                     "coadd_mask_file", tilename, band=band, with_fits_ext=True, funpack=True,
                 )
+                coadd_bmask_ext = _remap_fitsext(coadd_bmask_ext)
 
                 # headers and WCS
                 coadd_header = fitsio.read_header(
@@ -272,7 +284,7 @@ class MEDSRunner(Step):
                     coadd_header)
 
                 coadd_wcs, _ = galsim.wcs.readFromFitsHeader(
-                    galsim.FitsHeader(file_name=coadd_file, hdu=FITSEXTMAP[coadd_ext])
+                    galsim.FitsHeader(file_name=coadd_file, hdu=coadd_ext)
                 )
 
                 if (
@@ -289,10 +301,19 @@ class MEDSRunner(Step):
                 wcs_json.append(json.dumps(coadd_header))
 
                 # single-epoch stuff
-                if stash.has_tile_info_quantity("img_files", tilename, band=band):
+                if (
+                    stash.has_tile_info_quantity("img_files", tilename, band=band)
+                    or
+                    stash.has_tile_info_quantity("coadd_nwgint_img_files", tilename, band=band)
+                ):
+                    if self.config["use_nwgint"]:
+                        pre = "coadd_nwgint_"
+                    else:
+                        pre = ""
                     img_files, img_ext = stash.get_filepaths(
-                        "img_files", tilename, band=band, with_fits_ext=True,
+                        pre+"img_files", tilename, band=band, with_fits_ext=True,
                     )
+                    img_ext = _remap_fitsext(img_ext)
 
                     # Are we rejectlisting?
                     if self.config["use_rejectlist"]:
@@ -303,11 +324,15 @@ class MEDSRunner(Step):
                         is_rejectlisted = [False] * len(img_files)
 
                     wgt_files, wgt_ext = stash.get_filepaths(
-                        "wgt_files", tilename, band=band, with_fits_ext=True,
+                        pre+"wgt_files", tilename, band=band, with_fits_ext=True,
                     )
+                    wgt_ext = _remap_fitsext(wgt_ext)
+
                     msk_files, msk_ext = stash.get_filepaths(
-                        "msk_files", tilename, band=band, with_fits_ext=True,
+                        pre+"msk_files", tilename, band=band, with_fits_ext=True,
                     )
+                    msk_ext = _remap_fitsext(msk_ext)
+
                     mag_zps = stash.get_tile_info_quantity("mag_zps", tilename, band=band)
 
                     bkg_files, bkg_ext = stash.get_filepaths(
@@ -351,15 +376,15 @@ class MEDSRunner(Step):
 
                 # fill coadd quantities
                 image_info["image_path"][0] = coadd_file
-                image_info["image_ext"][0] = FITSEXTMAP[coadd_ext]
+                image_info["image_ext"][0] = coadd_ext
                 image_info["weight_path"][0] = coadd_weight_file
-                image_info["weight_ext"][0] = FITSEXTMAP[coadd_weight_ext]
+                image_info["weight_ext"][0] = coadd_weight_ext
                 image_info["bmask_path"][0] = coadd_bmask_file
-                image_info["bmask_ext"][0] = FITSEXTMAP[coadd_bmask_ext]
+                image_info["bmask_ext"][0] = coadd_bmask_ext
                 image_info["bkg_path"][0] = ""  # No bkg file for coadd
                 image_info["bkg_ext"][0] = -1
                 image_info["seg_path"][0] = seg_file
-                image_info["seg_ext"][0] = FITSEXTMAP[seg_ext]
+                image_info["seg_ext"][0] = seg_ext
                 image_info["wcs"][0] = wcs_json[0]
                 image_info["magzp"][0] = MAGZP_REF
                 image_info["scale"][0] = 1.
@@ -367,11 +392,11 @@ class MEDSRunner(Step):
                 for i in range(n_images):
                     ind = i+1
                     image_info["image_path"][ind] = img_files[i]
-                    image_info["image_ext"][ind] = FITSEXTMAP[img_ext]
+                    image_info["image_ext"][ind] = img_ext
                     image_info["weight_path"][ind] = wgt_files[i]
-                    image_info["weight_ext"][ind] = FITSEXTMAP[wgt_ext]
+                    image_info["weight_ext"][ind] = wgt_ext
                     image_info["bmask_path"][ind] = msk_files[i]
-                    image_info["bmask_ext"][ind] = FITSEXTMAP[msk_ext]
+                    image_info["bmask_ext"][ind] = msk_ext
 
                     image_info["bkg_path"][ind] = bkg_files[i]
                     image_info["bkg_ext"][ind] = bkg_ext
@@ -502,7 +527,7 @@ class MEDSRunner(Step):
                     psf_kwargs=PSF_KWARGS[band],
                 )
                 img_wcs, _ = galsim.wcs.readFromFitsHeader(
-                        galsim.FitsHeader(file_name=img_file, hdu=FITSEXTMAP[img_ext])
+                        galsim.FitsHeader(file_name=img_file, hdu=img_ext)
                     )
                 psf_data.append(PSFForMeds(psf, img_wcs, stash["draw_method"]))
 
@@ -515,7 +540,7 @@ class MEDSRunner(Step):
 
         # first look for coadd psfex file.
         pyml = stash.get_output_pizza_cutter_yaml(tilename, band)
-        coadd_psfex_path = pyml["psfex_path"]
+        coadd_psfex_path = pyml["psf_path"]
         coadd_file = pyml["image_path"]
         self.logger.error("coadd psfex file: %s" % (coadd_psfex_path))
 
@@ -541,7 +566,7 @@ class MEDSRunner(Step):
                     psf = galsim.des.DES_PSFEx(
                         psfex_file, image_file_name=img_file)
                     img_wcs, img_origin = galsim.wcs.readFromFitsHeader(
-                        galsim.FitsHeader(file_name=img_file, hdu=FITSEXTMAP[img_ext])
+                        galsim.FitsHeader(file_name=img_file, hdu=img_ext)
                     )
                     psf_data.append(PSFForMeds(psf, img_wcs, "no_pixel"))
                 else:
@@ -575,7 +600,7 @@ class MEDSRunner(Step):
         if stash.has_tile_info_quantity("img_files", tilename, band=band):
             for img_file in img_files:
                 wcs, origin = galsim.wcs.readFromFitsHeader(
-                    galsim.FitsHeader(file_name=img_file, hdu=FITSEXTMAP[img_ext])
+                    galsim.FitsHeader(file_name=img_file, hdu=img_ext)
                 )
                 psf_data.append(
                     PSFForMeds(

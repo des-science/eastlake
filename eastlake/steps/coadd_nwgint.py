@@ -92,12 +92,12 @@ class CoaddNwgintRunner(Step):
                 ofile = ofile[:-5]
             ofile = ofile + "_nullwt.fits"
 
+            pyml["src_info"][i]["coadd_nwgint_path"] = ofile
+
             if check_exists and os.path.exists(ofile):
                 if self.logger is not None:
                     self.logger.info("skipping existing coadd null weight filename: %s", ofile)
                 continue
-
-            pyml["src_info"][i]["coadd_nwgint_path"] = ofile
 
             if self.logger is not None:
                 self.logger.info("making coadd null weight filename: %s", ofile)

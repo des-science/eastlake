@@ -24,6 +24,7 @@ from .steps import (
     PizzaCutterRunner,
     MetadetectRunner,
     StashPrep,
+    BalrogRunner,
 )
 from .utils import get_logger, safe_mkdir, pushd
 from .stash import Stash
@@ -45,6 +46,7 @@ STEP_CLASSES = OrderedDict([
     ('pizza_cutter', PizzaCutterRunner),
     ('metadetect', MetadetectRunner),
     ('stash_prep', StashPrep),
+    ('balrog', BalrogRunner),
 ])
 
 STEP_IS_GALSIM = set(["galsim"])

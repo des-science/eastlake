@@ -33,6 +33,14 @@ from ..des_files import (
         None,
         "/blah/blah/run/DESr1431/sources-r/ACT/fname",
     ),
+    (
+        "/data/des81.a/data/mtabbutt/Y6_integrations/sim_outputs/"
+        "des-pizza-slices-y6-v13/balrog_images/0/fname",
+        "/blah/blah",
+        None,
+        "/blah/blah/"
+        "des-pizza-slices-y6-v13/balrog_images/0/fname",
+    ),
 ])
 def test_replace_imsim_data(pth, imsim_data, old_imsim_data, val):
     assert val == replace_imsim_data(pth, imsim_data, old_imsim_data=old_imsim_data)
