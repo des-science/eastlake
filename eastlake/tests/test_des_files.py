@@ -41,6 +41,24 @@ from ..des_files import (
         "/blah/blah/"
         "des-pizza-slices-y6-v13/balrog_images/0/fname",
     ),
+    (
+        None,
+        "/blah/blah",
+        None,
+        None,
+    ),
+    (
+        "",
+        "/blah/blah",
+        None,
+        "",
+    ),
+    (
+        "  ",
+        "/blah/blah",
+        None,
+        "  ",
+    ),
 ])
 def test_replace_imsim_data(pth, imsim_data, old_imsim_data, val):
     assert val == replace_imsim_data(pth, imsim_data, old_imsim_data=old_imsim_data)

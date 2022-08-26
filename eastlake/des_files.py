@@ -46,6 +46,9 @@ def replace_imsim_data(
         The path, possible with IMSIM_DATA in the path replaced with the desired
         one.
     """
+    if pth is None or len(pth.strip()) == 0:
+        return pth
+
     if old_imsim_data is None:
         # try to infer
         # paths look like this for DESDM
