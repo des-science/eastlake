@@ -200,6 +200,8 @@ class MEDSRunner(Step):
                     seg_file, seg_ext = other_stash.get_filepaths(
                         "seg_file", tilename, band=refband, with_fits_ext=True,
                     )
+                    if len(os.path.split(seg_file)[1]) == 0:
+                        raise KeyError("no seg file")
                 except KeyError:
                     seg_file = ''
                     seg_ext = -1
@@ -213,6 +215,8 @@ class MEDSRunner(Step):
                     seg_file, seg_ext = stash.get_filepaths(
                         "seg_file", tilename, band=refband, with_fits_ext=True,
                     )
+                    if len(os.path.split(seg_file)[1]) == 0:
+                        raise KeyError("no seg file")
                 except KeyError:
                     seg_file = ''
                     seg_ext = -1
