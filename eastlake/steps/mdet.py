@@ -43,6 +43,7 @@ class MetadetectRunner(Step):
             )
         )
         self.config["bands"] = self.config.get("bands", None)
+        self.config["shear_bands"] = self.config.get("shear_bands", None)
 
     def execute(self, stash, new_params=None):
         rng = np.random.RandomState(seed=stash["step_primary_seed"])
@@ -103,6 +104,8 @@ class MetadetectRunner(Step):
             ]
             if tmpdir is not None:
                 cmd += ["--tmpdir=%s" % tmpdir]
+            if self.config["shear_bands"] is not None:
+                cmd += ["--shear-bands=%s" % self.config["shear_bands"]]
             cmd += mfiles
 
             run_and_check(cmd, "MetadetectRunner", verbose=True)
