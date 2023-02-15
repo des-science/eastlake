@@ -1,5 +1,3 @@
-model: pgauss
-
 metacal:
   psf: fitgauss
   types: [noshear, 1p, 1m, 2p, 2m]
@@ -8,8 +6,19 @@ metacal:
 # use defaults in sxdes package
 sx: null
 
-weight:
-  fwhm: 2.0  # arcsec
+fitters:
+  - model: pgauss
+    weight:
+      fwhm: 2.0
+    symmetrize: False
+  - model: gauss
+    weight:
+      fwhm: 2.0
+    symmetrize: False
+    coadd: True
+
+shear_band_combs: [[1, 2, 3]]
+det_band_combs: [[1, 2, 3]]
 
 # any regions where the bmask is set with one of these flags will be masked
 # out of detection
@@ -27,6 +36,7 @@ meds:
   min_box_size: 48
   rad_fac: 2
   rad_min: 4
+  weight_type: uberseg
 
 pizza-cutter-preprocessing:
   gaia_star_masks:
