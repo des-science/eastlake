@@ -256,6 +256,12 @@ class Stash(dict):
             tilename,
             band=band,
         )
+        self.set_filepaths(
+            "head_files",
+            [src["head_path"] for src in data["src_info"]],
+            tilename,
+            band=band,
+        )
 
         if "coadd_nwgint_path" in data["src_info"][0]:
             if data["src_info"][0]["coadd_nwgint_path"].endswith(".fz"):

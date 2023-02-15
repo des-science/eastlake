@@ -84,4 +84,13 @@ class DeleteImages(Step):
                         for f in img_files:
                             if os.path.isfile(f):
                                 os.remove(f)
+
+                    img_files = stash.get_filepaths(
+                        "coadd_nwgint_img_files", tilename, band=band,
+                        keyerror=False)
+                    if (img_files is not None):
+                        for f in img_files:
+                            if os.path.isfile(f):
+                                os.remove(f)
+
         return 0, stash

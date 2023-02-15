@@ -32,7 +32,7 @@ class PizzaCutterRunner(Step):
                 os.path.expandvars(
                     self.config.get(
                         "config_file",
-                        _get_default_config("des-pizza-slices-y6-v14.yaml"),
+                        _get_default_config("des-pizza-slices-y6-v15.yaml"),
                     )
                 )
             )
