@@ -185,11 +185,11 @@ class PizzaCutterRunner(Step):
             )
             for i in range(len(info["src_info"])):
                 info["src_info"][i]["image_path"] = info["src_info"][i]["coadd_nwgint_path"]
-                info["src_info"][i]["image_path"] = img_ext
+                info["src_info"][i]["image_ext"] = img_ext
                 info["src_info"][i]["weight_path"] = info["src_info"][i]["coadd_nwgint_path"]
-                info["src_info"][i]["weight_path"] = wgt_ext
+                info["src_info"][i]["weight_ext"] = wgt_ext
                 info["src_info"][i]["bmask_path"] = info["src_info"][i]["coadd_nwgint_path"]
-                info["src_info"][i]["bmask_path"] = msk_ext
+                info["src_info"][i]["bmask_ext"] = msk_ext
 
             with open(info_file_pth, "w") as fp:
                 yaml.dump(info, fp)
