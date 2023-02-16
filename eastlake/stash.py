@@ -277,7 +277,7 @@ class Stash(dict):
             _set_paths(
                 "coadd_nwgint_wgt_files",
                 "coadd_nwgint_path",
-                2 + nwgint_ext_offset,
+                1 + nwgint_ext_offset,
                 ext_not_a_key=True,
             )
             _set_paths(
