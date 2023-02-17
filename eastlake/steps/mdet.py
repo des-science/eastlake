@@ -127,18 +127,18 @@ class MetadetectRunner(Step):
                 det_bands = [list(range(len(bands)))]
                 shear_bands = [list(range(len(bands)))]
 
-        pzyml_pth = os.path.join(odir, "metadetect-config.yaml")
+        mdet_pth = os.path.join(odir, "metadetect-config.yaml")
         safe_copy(
-            self.pizza_cutter_config_file,
-            pzyml_pth,
+            self.metadetect_config_file,
+            mdet_pth,
         )
-        with open(pzyml_pth, "r") as fp:
-            pzyml = yaml.safe_load(fp.read())
+        with open(mdet_pth, "r") as fp:
+            mdet_cfg = yaml.safe_load(fp.read())
 
-        pzyml["shear_band_combs"] = shear_bands
-        pzyml["det_band_combs"] = det_bands
+        mdet_cfg["shear_band_combs"] = shear_bands
+        mdet_cfg["det_band_combs"] = det_bands
 
-        with open(pzyml_pth, "w") as fp:
-            yaml.dump(pzyml, fp)
+        with open(mdet_pth, "w") as fp:
+            yaml.dump(mdet_cfg, fp)
 
-        return bands, pzyml_pth
+        return bands, mdet_pth
