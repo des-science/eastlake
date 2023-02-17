@@ -141,12 +141,7 @@ class CoaddNwgintRunner(Step):
             jobs.append(joblib.delayed(run_and_check)(cmd, "CoaddNwgint", verbose=verbose))
 
         if len(jobs) > 0:
-            if "n_jobs" in self.config.keys():
-                n_jobs = self.config["n_jobs"]
-            else:
-                n_jobs = -1
-
-
+            n_jobs = self.config.get("n_jobs", -1)
             if self.logger is not None:
                 self.logger.warning(
                     "making null weight images for tile %s band %s",
