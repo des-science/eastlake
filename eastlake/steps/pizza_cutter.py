@@ -160,7 +160,11 @@ class PizzaCutterRunner(Step):
 
         # make info file
         info_file_pth = os.path.join(
-            odir, "%s_%s_pizza_cutter_info_used.yaml")
+            odir,
+            "%s_%s_pizza_cutter_info_used.yaml" % (
+                tilename, band
+            )
+        )
         safe_copy(
             get_pizza_cutter_yaml_path(
                 self.base_dir,
