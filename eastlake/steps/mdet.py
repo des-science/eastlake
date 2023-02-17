@@ -32,7 +32,7 @@ class MetadetectRunner(Step):
                 os.path.expandvars(
                     self.config.get(
                         "config_file",
-                        _get_default_config("metadetect-v5.yaml"),
+                        _get_default_config("metadetect-v9.yaml"),
                     )
                 )
             )
