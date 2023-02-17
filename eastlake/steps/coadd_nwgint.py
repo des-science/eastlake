@@ -141,6 +141,7 @@ class CoaddNwgintRunner(Step):
             jobs.append(joblib.delayed(run_and_check)(cmd, "CoaddNwgint", verbose=verbose))
 
         if len(jobs) > 0:
+            n_jobs = self.config.get("n_jobs", -1)
             if self.logger is not None:
                 self.logger.warning(
                     "making null weight images for tile %s band %s",
@@ -153,5 +154,5 @@ class CoaddNwgintRunner(Step):
                     )
                 )
 
-            with joblib.Parallel(n_jobs=-1, backend="multiprocessing", verbose=100) as par:
+            with joblib.Parallel(n_jobs=n_jobs, backend="multiprocessing", verbose=100) as par:
                 par(jobs)
