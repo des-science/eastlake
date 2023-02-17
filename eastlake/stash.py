@@ -264,26 +264,22 @@ class Stash(dict):
         )
 
         if "coadd_nwgint_path" in data["src_info"][0]:
-            if data["src_info"][0]["coadd_nwgint_path"].endswith(".fz"):
-                nwgint_ext_offset = 1
-            else:
-                nwgint_ext_offset = 0
             _set_paths(
                 "coadd_nwgint_img_files",
                 "coadd_nwgint_path",
-                0 + nwgint_ext_offset,
+                "sci",
                 ext_not_a_key=True,
             )
             _set_paths(
                 "coadd_nwgint_wgt_files",
                 "coadd_nwgint_path",
-                1 + nwgint_ext_offset,
+                "wgt",
                 ext_not_a_key=True,
             )
             _set_paths(
                 "coadd_nwgint_msk_files",
                 "coadd_nwgint_path",
-                3 + nwgint_ext_offset,
+                "msk",
                 ext_not_a_key=True,
             )
 
