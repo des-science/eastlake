@@ -1,12 +1,12 @@
 des_data:
   campaign: Y6A2_COADD
   source_type: finalcut
-  piff_campaign: Y6A2_PIFF_V2
+  piff_campaign: Y6A2_PIFF_V3
 
 # optional but these are good defaults
 fpack_pars:
   # if you do not set FZTILE, the code sets it to the size of a slice for you
-  FZQVALUE: 4
+  FZQVALUE: 16
   FZALGOR: "RICE_1"
   # preserve zeros, don't dither them
   FZQMETHD: "SUBTRACTIVE_DITHER_2"
@@ -58,7 +58,7 @@ single_epoch:
     max_abs_T_diff: 0.15
 
   # which SE WCS to use - one of piff, pixmappy or image
-  wcs_type: pixmappy
+  wcs_type: head  # changed to head for the sims
   wcs_color: 1.1
 
   ignored_ccds:

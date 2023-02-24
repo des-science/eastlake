@@ -5,10 +5,11 @@ import multiprocessing
 import logging
 import glob
 
+import yaml
 import numpy as np
 
 from ..step import Step, run_and_check
-from ..utils import safe_mkdir
+from ..utils import safe_mkdir, safe_copy
 
 
 def _get_default_config(nm):
@@ -31,7 +32,7 @@ class MetadetectRunner(Step):
                 os.path.expandvars(
                     self.config.get(
                         "config_file",
-                        _get_default_config("metadetect-v5.yaml"),
+                        _get_default_config("metadetect-v9.yaml"),
                     )
                 )
             )
@@ -43,7 +44,6 @@ class MetadetectRunner(Step):
             )
         )
         self.config["bands"] = self.config.get("bands", None)
-        self.config["shear_bands"] = self.config.get("shear_bands", None)
 
     def execute(self, stash, new_params=None):
         rng = np.random.RandomState(seed=stash["step_primary_seed"])
@@ -70,10 +70,7 @@ class MetadetectRunner(Step):
                 _mf = os.path.basename(mf)
                 in_bands.append(_mf.split("_")[1])
 
-            if self.config["bands"] is None:
-                mdet_bands = in_bands
-            else:
-                mdet_bands = self.config["bands"]
+            mdet_bands, mdet_conf = self._prep_config(in_bands, odir)
 
             mfiles = []
             for band in mdet_bands:
@@ -94,7 +91,7 @@ class MetadetectRunner(Step):
             bn = "".join(mdet_bands)
             cmd = [
                 "run-metadetect-on-slices",
-                "--config=%s" % self.metadetect_config_file,
+                "--config=%s" % mdet_conf,
                 "--seed=%d" % seed,
                 "--n-jobs=%d" % self.config["n_jobs"],
                 "--log-level=%s" % llevel,
@@ -104,8 +101,6 @@ class MetadetectRunner(Step):
             ]
             if tmpdir is not None:
                 cmd += ["--tmpdir=%s" % tmpdir]
-            if self.config["shear_bands"] is not None:
-                cmd += ["--shear-bands=%s" % self.config["shear_bands"]]
             cmd += mfiles
 
             run_and_check(cmd, "MetadetectRunner", verbose=True)
@@ -117,3 +112,33 @@ class MetadetectRunner(Step):
             stash.set_filepaths("metadetect_mask_files", maskfiles, tilename)
 
         return 0, stash
+
+    def _prep_config(self, in_bands, odir):
+        if self.config["bands"] is not None:
+            bands = self.config["bands"]
+            det_bands = [list(range(len(bands)))]
+            shear_bands = [list(range(len(bands)))]
+        else:
+            bands = in_bands
+            if set(in_bands) == set(["g", "r", "i", "z"]):
+                det_bands = [[1, 2, 3]]
+                shear_bands = [[1, 2, 3]]
+            else:
+                det_bands = [list(range(len(bands)))]
+                shear_bands = [list(range(len(bands)))]
+
+        mdet_pth = os.path.join(odir, "metadetect-config.yaml")
+        safe_copy(
+            self.metadetect_config_file,
+            mdet_pth,
+        )
+        with open(mdet_pth, "r") as fp:
+            mdet_cfg = yaml.safe_load(fp.read())
+
+        mdet_cfg["shear_band_combs"] = shear_bands
+        mdet_cfg["det_band_combs"] = det_bands
+
+        with open(mdet_pth, "w") as fp:
+            yaml.dump(mdet_cfg, fp)
+
+        return bands, mdet_pth

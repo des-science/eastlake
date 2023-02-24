@@ -248,6 +248,8 @@ class Tile(dict):
         mag_zp_list = []
         psfex_file_list = []
         piff_file_list = []
+        head_file_list = []
+        ccdnum_list = []
         output_filenames = []
         pizza_cutter_yaml = {}
 
@@ -341,6 +343,16 @@ class Tile(dict):
                 for src in band_info["src_info"]
             ]
 
+            head_file_list += [
+                src["head_path"]
+                for src in band_info["src_info"]
+            ]
+
+            ccdnum_list += [
+                src["ccdnum"]
+                for src in band_info["src_info"]
+            ]
+
             # fill out indexing info for bands, tile_nums and tilenames
             band_list += band * len(image_files)
 
@@ -418,6 +430,8 @@ class Tile(dict):
         tile_data["mag_zp_list"] = mag_zp_list
         tile_data["psfex_files"] = psfex_file_list
         tile_data['piff_files'] = piff_file_list
+        tile_data['head_files'] = head_file_list
+        tile_data['ccdnum_list'] = ccdnum_list
         tile_data["coadd_ra_ranges_deg"] = coadd_ra_ranges_deg
         tile_data["coadd_dec_ranges_deg"] = coadd_dec_ranges_deg
         tile_data["tile_ra_ranges_deg"] = tile_ra_ranges_deg

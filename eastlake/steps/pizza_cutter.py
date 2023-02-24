@@ -32,7 +32,7 @@ class PizzaCutterRunner(Step):
                 os.path.expandvars(
                     self.config.get(
                         "config_file",
-                        _get_default_config("des-pizza-slices-y6-v14.yaml"),
+                        _get_default_config("des-pizza-slices-y6-v15.yaml"),
                     )
                 )
             )
@@ -44,20 +44,13 @@ class PizzaCutterRunner(Step):
             )
         )
         self.config["n_chunks"] = 2*self.config["n_jobs"]
+        self.config["use_nwgint"] = self.config.get("use_nwgint", False)
 
     def execute(self, stash, new_params=None):
         rng = np.random.RandomState(seed=stash["step_primary_seed"])
         for tilename in stash["tilenames"]:
             pz_meds = []
             for band in stash["bands"]:
-
-                info_file = get_pizza_cutter_yaml_path(
-                    self.base_dir,
-                    stash["desrun"],
-                    tilename,
-                    band,
-                )
-
                 tmpdir = os.environ.get("TMPDIR", None)
                 odir = os.path.join(
                     self.base_dir, stash["desrun"], tilename
@@ -94,7 +87,7 @@ class PizzaCutterRunner(Step):
                         pyml["src_info"][i]["psf_path"],
                     )
 
-                pzyml_pth = self._prep_input_config_and_info_file(
+                pzyml_pth, info_file = self._prep_input_config_and_info_file(
                     tilename, band, stash, odir, stash["bands"],
                 )
 
@@ -165,4 +158,44 @@ class PizzaCutterRunner(Step):
         with open(pzyml_pth, "w") as fp:
             yaml.dump(pzyml, fp)
 
-        return pzyml_pth
+        # make info file
+        info_file_pth = os.path.join(
+            odir,
+            "%s_%s_pizza_cutter_info_used.yaml" % (
+                tilename, band
+            )
+        )
+        safe_copy(
+            get_pizza_cutter_yaml_path(
+                self.base_dir,
+                stash["desrun"],
+                tilename,
+                band,
+            ),
+            info_file_pth,
+        )
+        if self.config["use_nwgint"]:
+            with open(info_file_pth, "r") as fp:
+                info = yaml.safe_load(fp.read())
+
+            _, img_ext = stash.get_filepaths(
+                "coadd_nwgint_img_files", tilename, band=band, with_fits_ext=True
+            )
+            _, wgt_ext = stash.get_filepaths(
+                "coadd_nwgint_wgt_files", tilename, band=band, with_fits_ext=True
+            )
+            _, msk_ext = stash.get_filepaths(
+                "coadd_nwgint_msk_files", tilename, band=band, with_fits_ext=True
+            )
+            for i in range(len(info["src_info"])):
+                info["src_info"][i]["image_path"] = info["src_info"][i]["coadd_nwgint_path"]
+                info["src_info"][i]["image_ext"] = img_ext
+                info["src_info"][i]["weight_path"] = info["src_info"][i]["coadd_nwgint_path"]
+                info["src_info"][i]["weight_ext"] = wgt_ext
+                info["src_info"][i]["bmask_path"] = info["src_info"][i]["coadd_nwgint_path"]
+                info["src_info"][i]["bmask_ext"] = msk_ext
+
+            with open(info_file_pth, "w") as fp:
+                yaml.dump(info, fp)
+
+        return pzyml_pth, info_file_pth

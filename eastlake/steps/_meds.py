@@ -318,6 +318,9 @@ class MEDSRunner(Step):
                         pre+"img_files", tilename, band=band, with_fits_ext=True,
                     )
                     img_ext = _remap_fitsext(img_ext)
+                    head_files = stash.get_filepaths(
+                        "head_files", tilename, band=band,
+                    )
 
                     # Are we rejectlisting?
                     if self.config["use_rejectlist"]:
@@ -349,6 +352,7 @@ class MEDSRunner(Step):
                             bkg_ext = 0
 
                     img_files = [f for (i, f) in enumerate(img_files) if not is_rejectlisted[i]]
+                    head_files = [f for (i, f) in enumerate(head_files) if not is_rejectlisted[i]]
                     wgt_files = [f for (i, f) in enumerate(wgt_files) if not is_rejectlisted[i]]
                     msk_files = [f for (i, f) in enumerate(msk_files) if not is_rejectlisted[i]]
                     bkg_files = [f for (i, f) in enumerate(bkg_files) if not is_rejectlisted[i]]
@@ -361,8 +365,12 @@ class MEDSRunner(Step):
                             max(len(img_files[i]), len(bkg_files[i])),
                         )
 
-                    for img_file in img_files:
-                        h = fitsio.read_header(img_file, img_ext)
+                    for img_file, head_file in zip(img_files, head_files):
+                        im_h = fitsio.read_header(img_file, img_ext)
+                        h = fitsio.read_scamp_head(head_file)
+                        for naxis_key in ["naxis1", "naxis2", "znaxis1", "znaxis2"]:
+                            if naxis_key in im_h:
+                                h[naxis_key] = im_h[naxis_key]
                         h.delete(None)
                         wcs_json.append(
                             json.dumps(desmeds.util.fitsio_header_to_dict(h)))
@@ -426,7 +434,7 @@ class MEDSRunner(Step):
                 t0 = timer()
                 psf_data = self._make_psf_data(
                     stash, coadd_wcs, tilename, band,
-                    is_rejectlisted, img_files, img_ext
+                    is_rejectlisted, img_files, img_ext, head_files,
                 )
                 t1 = timer()
                 self.logger.error(
@@ -480,24 +488,29 @@ class MEDSRunner(Step):
             pr.print_stats(sort='time')
         return 0, stash
 
-    def _make_psf_data(self, stash, coadd_wcs, tilename, band, is_rejectlisted, img_files, img_ext):
+    def _make_psf_data(self, stash, coadd_wcs, tilename, band, is_rejectlisted, img_files, img_ext, head_files):
         if stash["psf_config"]["type"] == "DES_Piff":
             self.logger.error("Adding Piff info to meds file")
-            return self._make_psf_data_piff(stash, coadd_wcs, tilename, band, is_rejectlisted, img_files, img_ext)
+            return self._make_psf_data_piff(
+                stash, coadd_wcs, tilename, band, is_rejectlisted, img_files, img_ext, head_files)
         elif stash["psf_config"]["type"] in [
                 "DES_PSFEx", "DES_PSFEx_perturbed"
         ]:
             self.logger.error("Adding psfex info to meds file")
-            return self._make_psf_data_psfex(stash, coadd_wcs, tilename, band, is_rejectlisted, img_files, img_ext)
+            return self._make_psf_data_psfex(
+                stash, coadd_wcs, tilename, band, is_rejectlisted, img_files, img_ext, head_files)
         elif stash["psf_config"]["type"] == "Gaussian":
             self.logger.error("Adding Gauss PSF info to meds file")
-            return self._make_psf_data_gauss(stash, coadd_wcs, tilename, band, is_rejectlisted, img_files, img_ext)
+            return self._make_psf_data_gauss(
+                stash, coadd_wcs, tilename, band, is_rejectlisted, img_files, img_ext, head_files)
         else:
             raise RuntimeError(
                 "PSF config type '%s' not recognized!" % stash["psf_config"]["type"]
             )
 
-    def _make_psf_data_piff(self, stash, coadd_wcs, tilename, band, is_rejectlisted, img_files, img_ext):
+    def _make_psf_data_piff(
+        self, stash, coadd_wcs, tilename, band, is_rejectlisted, img_files, img_ext, head_files,
+    ):
         smooth = stash["psf_config"].get("smooth", False)
         if smooth:
             assert stash["draw_method"] == "auto"
@@ -519,25 +532,31 @@ class MEDSRunner(Step):
                 "auto")
         )
 
-        if stash.has_tile_info_quantity("img_files", tilename, band=band):
+        if (
+            stash.has_tile_info_quantity("img_files", tilename, band=band)
+            or stash.has_tile_info_quantity("coadd_nwgint_img_files", tilename, band=band)
+        ):
             piff_files = stash.get_filepaths("piff_files", tilename, band=band)
             piff_files = [f for (i, f) in enumerate(piff_files) if not is_rejectlisted[i]]
 
             self.logger.error("se piff files: %s" % piff_files)
-            for piff_file, img_file in zip(piff_files, img_files):
+            for piff_file, img_file, head_file in zip(piff_files, img_files, head_files):
                 psf = DES_Piff(
                     piff_file,
                     smooth=smooth,
                     psf_kwargs=PSF_KWARGS[band],
                 )
-                img_wcs, _ = galsim.wcs.readFromFitsHeader(
-                        galsim.FitsHeader(file_name=img_file, hdu=img_ext)
-                    )
+                img_wcs, _ = galsim.wcs.FitsWCS(
+                    file_name=head_file,
+                    text_file=True,
+                )
                 psf_data.append(PSFForMeds(psf, img_wcs, stash["draw_method"]))
 
         return psf_data
 
-    def _make_psf_data_psfex(self, stash, coadd_wcs, tilename, band, is_rejectlisted, img_files, img_ext):
+    def _make_psf_data_psfex(
+        self, stash, coadd_wcs, tilename, band, is_rejectlisted, img_files, img_ext, head_files,
+    ):
         self.config["psf_type"] = "psfex"
 
         psf_data = []
@@ -557,20 +576,24 @@ class MEDSRunner(Step):
         else:
             psf_data.append(psfex.PSFEx(coadd_psfex_path))
 
-        if stash.has_tile_info_quantity("img_files", tilename, band=band):
+        if (
+            stash.has_tile_info_quantity("img_files", tilename, band=band)
+            or stash.has_tile_info_quantity("coadd_nwgint_img_files", tilename, band=band)
+        ):
             psfex_files = stash.get_filepaths("psfex_files", tilename, band=band)
             psfex_files = [f for (i, f) in enumerate(psfex_files) if not is_rejectlisted[i]]
 
             self.logger.error("se psfex files: %s" % psfex_files)
-            for psfex_file, img_file in zip(psfex_files, img_files):
+            for psfex_file, img_file, head_file in zip(psfex_files, img_files, head_files):
                 if self.config.get("use_galsim_psfex", True):
                     self.logger.error(
                         "using galsim to reconstruct psfex "
                         "for meds file")
                     psf = galsim.des.DES_PSFEx(
                         psfex_file, image_file_name=img_file)
-                    img_wcs, img_origin = galsim.wcs.readFromFitsHeader(
-                        galsim.FitsHeader(file_name=img_file, hdu=img_ext)
+                    img_wcs, _ = galsim.wcs.FitsWCS(
+                        file_name=head_file,
+                        text_file=True,
                     )
                     psf_data.append(PSFForMeds(psf, img_wcs, "no_pixel"))
                 else:
@@ -578,7 +601,9 @@ class MEDSRunner(Step):
 
         return psf_data
 
-    def _make_psf_data_gauss(self, stash, coadd_wcs, tilename, band, is_rejectlisted, img_files, img_ext):
+    def _make_psf_data_gauss(
+        self, stash, coadd_wcs, tilename, band, is_rejectlisted, img_files, img_ext, head_files
+    ):
         self.config["psf_type"] = "psfex"  # always use this for saving PSFs
         size_key = None
         for size_key in ["half_light_radius", "sigma", "fwhm"]:
@@ -601,10 +626,14 @@ class MEDSRunner(Step):
                 coadd_wcs,
                 stash.get("draw_method", "auto")))
 
-        if stash.has_tile_info_quantity("img_files", tilename, band=band):
-            for img_file in img_files:
-                wcs, origin = galsim.wcs.readFromFitsHeader(
-                    galsim.FitsHeader(file_name=img_file, hdu=img_ext)
+        if (
+            stash.has_tile_info_quantity("img_files", tilename, band=band)
+            or stash.has_tile_info_quantity("coadd_nwgint_img_files", tilename, band=band)
+        ):
+            for head_file in head_files:
+                wcs, _ = galsim.wcs.FitsWCS(
+                    file_name=head_file,
+                    text_file=True,
                 )
                 psf_data.append(
                     PSFForMeds(
