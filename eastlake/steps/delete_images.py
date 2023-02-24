@@ -21,10 +21,12 @@ class DeleteImages(Step):
             self.config["delete_coadd"] = False
         if "delete_se" not in self.config:
             self.config["delete_se"] = False
+        if "delete_se_nwgint" not in self.config:
+            self.config["delete_se_nwgint"] = False
         if "save_tilenames" not in self.config:
             self.config["save_tilenames"] = []
         if "delete_seg" not in self.config:
-            self.config["delete_seg"] = True
+            self.config["delete_seg"] = False
 
     def execute(self, stash, new_params=None):
 
@@ -75,7 +77,6 @@ class DeleteImages(Step):
             # Secondly se stuff
             if self.config["delete_se"]:
                 self.logger.error("deleting se images for tile %s" % tilename)
-
                 for band in stash["bands"]:
                     img_files = stash.get_filepaths(
                         "img_files", tilename, band=band,
@@ -85,6 +86,9 @@ class DeleteImages(Step):
                             if os.path.isfile(f):
                                 os.remove(f)
 
+            if self.config["delete_se_nwgint"]:
+                self.logger.error("deleting se nwgint images for tile %s" % tilename)
+                for band in stash["bands"]:
                     img_files = stash.get_filepaths(
                         "coadd_nwgint_img_files", tilename, band=band,
                         keyerror=False)
