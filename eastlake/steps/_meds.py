@@ -546,7 +546,7 @@ class MEDSRunner(Step):
                     smooth=smooth,
                     psf_kwargs=PSF_KWARGS[band],
                 )
-                img_wcs, _ = galsim.wcs.FitsWCS(
+                img_wcs, _ = galsim.FitsWCS(
                     file_name=head_file,
                     text_file=True,
                 )
@@ -591,7 +591,7 @@ class MEDSRunner(Step):
                         "for meds file")
                     psf = galsim.des.DES_PSFEx(
                         psfex_file, image_file_name=img_file)
-                    img_wcs, _ = galsim.wcs.FitsWCS(
+                    img_wcs, _ = galsim.FitsWCS(
                         file_name=head_file,
                         text_file=True,
                     )
@@ -631,7 +631,7 @@ class MEDSRunner(Step):
             or stash.has_tile_info_quantity("coadd_nwgint_img_files", tilename, band=band)
         ):
             for head_file in head_files:
-                wcs, _ = galsim.wcs.FitsWCS(
+                wcs, _ = galsim.FitsWCS(
                     file_name=head_file,
                     text_file=True,
                 )
