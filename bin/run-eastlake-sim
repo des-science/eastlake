@@ -62,7 +62,14 @@ def parse_args():
     parser.add_argument('-v', '--verbosity', default=1)
     parser.add_argument('-l', '--logfile', default=None)
     parser.add_argument('--seed', type=int, default=None)
-    parser.add_argument('--resume', action='store_true', default=False)
+    parser.add_argument(
+        '--resume', action='store_true', default=False,
+        help=(
+            "If passed, implies --skip_completed_steps and "
+            "the restart file must be in the default location "
+            "(i.e., 'BASE_DIR/job_record.pkl')."
+        ),
+    )
     return parser.parse_args()
 
 
@@ -107,6 +114,8 @@ def main():
                     args.resume_from
                 )
             )
+    if args.resume:
+        args.skip_completed_steps = True
 
     # Setup the logger
     # If we're resuming a pipeline (ie. if args.job_record_file is not None),
