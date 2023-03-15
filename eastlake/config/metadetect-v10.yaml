@@ -15,7 +15,7 @@ fitters:
     weight:
       fwhm: 2.0
     symmetrize: False
-    coadd: True
+    coadd: False
 
 shear_band_combs: [[1, 2, 3]]
 det_band_combs: [[1, 2, 3]]
