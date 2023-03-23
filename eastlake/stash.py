@@ -386,7 +386,10 @@ class Stash(dict):
         if "imsim_data" in self and self["imsim_data"] is not None:
             replace_imsim_data_in_pizza_cutter_yaml(data, self["imsim_data"])
 
-        self._make_lists_psfmaps_symlinks(self["imsim_data"], tilename, band, data)
+        self._make_lists_psfmaps_symlinks(
+            self["imsim_data"], tilename, band, data,
+            skip_existing=True,
+        )
 
         if "_input_pizza_cutter_yaml" not in self:
             self["_input_pizza_cutter_yaml"] = {}
@@ -410,7 +413,7 @@ class Stash(dict):
             )
 
     def _make_lists_psfmaps_symlinks(
-        self, base_dir_or_imsim_data, tilename, band, pyml
+        self, base_dir_or_imsim_data, tilename, band, pyml, skip_existing=False,
     ):
         odir = os.path.join(base_dir_or_imsim_data, self["desrun"], tilename)
 
@@ -420,13 +423,17 @@ class Stash(dict):
         bkg_file = os.path.join(
             odir, "lists", f"{tilename}_{band}_bkg-flist-{self['desrun']}.dat",
         )
+        if not (skip_existing and os.path.exists(bkg_file)):
+            with open(bkg_file, "w") as fp_bkg:
+                for i in range(len(pyml["src_info"])):
+                    fp_bkg.write(pyml["src_info"][i]["bkg_path"] + "\n")
+
         nw_file = os.path.join(
             odir, "lists", f"{tilename}_{band}_nullwt-flist-{self['desrun']}.dat",
         )
-        with open(bkg_file, "w") as fp_bkg:
+        if not (skip_existing and os.path.exists(nw_file)):
             with open(nw_file, "w") as fp_nw:
                 for i in range(len(pyml["src_info"])):
-                    fp_bkg.write(pyml["src_info"][i]["bkg_path"] + "\n")
                     if "coadd_nwgint_path" in pyml["src_info"][i]:
                         fp_nw.write(
                             "%s %r\n" % (
@@ -437,35 +444,39 @@ class Stash(dict):
 
         # make psf map files
         pmap_file = os.path.join(odir, f"{tilename}_{band}_psfmap-{self['desrun']}.dat")
-        with open(pmap_file, "w") as fp:
-            fp.write(
-                "%d %d %s\n" % (
-                    -9999,
-                    -9999,
-                    pyml["psf_path"],
+        if not (skip_existing and os.path.exists(pmap_file)):
+            with open(pmap_file, "w") as fp:
+                fp.write(
+                    "%d %d %s\n" % (
+                        -9999,
+                        -9999,
+                        pyml["psf_path"],
+                    )
                 )
-            )
-            for i in range(len(pyml["src_info"])):
-                fn = pyml["src_info"][i]["psfex_path"]
-                en, _, cn = os.path.basename(fn).split("_")[:3]
-                en = en[1:]
-                cn = cn[1:]
-                fp.write("%s %s %s\n" % (en, cn, fn))
+                for i in range(len(pyml["src_info"])):
+                    fn = pyml["src_info"][i]["psfex_path"]
+                    en, _, cn = os.path.basename(fn).split("_")[:3]
+                    en = en[1:]
+                    cn = cn[1:]
+                    fp.write("%s %s %s\n" % (en, cn, fn))
 
-        with open(os.path.join(odir, f"{tilename}_all_psfmap.dat"), "w") as fp_w:
-            for _bn in ["g", "r", "i", "z"]:
-                _bn_fn = os.path.join(odir, f"{tilename}_{_bn}_psfmap-{self['desrun']}.dat")
-                if os.path.exists(_bn_fn):
-                    with open(_bn_fn, "r") as fp_r:
-                        for line in fp_r.readlines():
-                            fp_w.write(line)
+        pmap_file = os.path.join(odir, f"{tilename}_all_psfmap.dat")
+        if not (skip_existing and os.path.exists(pmap_file)):
+            with open(pmap_file, "w") as fp_w:
+                for _bn in ["g", "r", "i", "z"]:
+                    _bn_fn = os.path.join(odir, f"{tilename}_{_bn}_psfmap-{self['desrun']}.dat")
+                    if os.path.exists(_bn_fn):
+                        with open(_bn_fn, "r") as fp_r:
+                            for line in fp_r.readlines():
+                                fp_w.write(line)
 
         # symlinks
         def _symlink_file_rel_to_cwd(fn):
             ln = os.path.basename(fn)
-            fn_rel = os.path.relpath(fn)
-            safe_rm(ln)
-            os.symlink(fn_rel, ln)
+            if not (skip_existing and os.path.exists(ln)):
+                fn_rel = os.path.relpath(fn)
+                safe_rm(ln)
+                os.symlink(fn_rel, ln)
 
         # symlink nullwt files
         nodir = os.path.join(odir, f"nullwt-{band}")
