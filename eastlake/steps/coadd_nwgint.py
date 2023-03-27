@@ -71,8 +71,13 @@ class CoaddNwgintRunner(Step):
                 in_pyml = stash.get_input_pizza_cutter_yaml(tilename, band)
 
                 if self.config["run_on_inputs"]:
-                    self._run(tilename, band, in_pyml, in_pyml, check_exists=True)
-                    stash.write_input_pizza_cutter_yaml(in_pyml, tilename, band)
+                    n_done = self._run(tilename, band, in_pyml, in_pyml, check_exists=True)
+                    # if we made any files, force data and symlinks to be updated via setting
+                    # skip_existing to False
+                    stash.write_input_pizza_cutter_yaml(
+                        in_pyml, tilename, band,
+                        skip_existing=False if n_done > 0 else True,
+                    )
                 else:
                     with stash.update_output_pizza_cutter_yaml(tilename, band) as pyml:
                         self._run(tilename, band, in_pyml, pyml)
@@ -80,6 +85,7 @@ class CoaddNwgintRunner(Step):
         return 0, stash
 
     def _run(self, tilename, band, in_pyml, pyml, check_exists=False):
+
         jobs = []
         for i in range(len(pyml["src_info"])):
             src_info = pyml["src_info"][i]
@@ -141,6 +147,7 @@ class CoaddNwgintRunner(Step):
             jobs.append(joblib.delayed(run_and_check)(cmd, "CoaddNwgint", verbose=verbose))
 
         if len(jobs) > 0:
+            n_done = len(jobs)
             n_jobs = self.config.get("n_jobs", -1)
             if self.logger is not None:
                 self.logger.warning(
@@ -156,3 +163,7 @@ class CoaddNwgintRunner(Step):
 
             with joblib.Parallel(n_jobs=n_jobs, backend="multiprocessing", verbose=100) as par:
                 par(jobs)
+        else:
+            n_done = 0
+
+        return n_done

@@ -367,8 +367,8 @@ class Stash(dict):
                 "Could not write pizza cutter yaml due to missing yaml or desrun!"
             )
 
-    def write_input_pizza_cutter_yaml(self, data, tilename, band):
-        self.set_input_pizza_cutter_yaml(data, tilename, band)
+    def write_input_pizza_cutter_yaml(self, data, tilename, band, skip_existing=True):
+        self.set_input_pizza_cutter_yaml(data, tilename, band, skip_existing=skip_existing)
 
         _data = self.get_input_pizza_cutter_yaml(tilename, band)
         pth = get_pizza_cutter_yaml_path(
@@ -381,14 +381,14 @@ class Stash(dict):
         with open(pth, "w") as fp:
             yaml.dump(_data, fp)
 
-    def set_input_pizza_cutter_yaml(self, _data, tilename, band):
+    def set_input_pizza_cutter_yaml(self, _data, tilename, band, skip_existing=True):
         data = copy.deepcopy(_data)
         if "imsim_data" in self and self["imsim_data"] is not None:
             replace_imsim_data_in_pizza_cutter_yaml(data, self["imsim_data"])
 
         self._make_lists_psfmaps_symlinks(
             self["imsim_data"], tilename, band, data,
-            skip_existing=True,
+            skip_existing=skip_existing,
         )
 
         if "_input_pizza_cutter_yaml" not in self:
@@ -431,7 +431,13 @@ class Stash(dict):
         nw_file = os.path.join(
             odir, "lists", f"{tilename}_{band}_nullwt-flist-{self['desrun']}.dat",
         )
-        if not (skip_existing and os.path.exists(nw_file)):
+        if (
+            (not (skip_existing and os.path.exists(nw_file)))
+            and any(
+                "coadd_nwgint_path" in pyml["src_info"][i]
+                for i in range(len(pyml["src_info"]))
+            )
+        ):
             with open(nw_file, "w") as fp_nw:
                 for i in range(len(pyml["src_info"])):
                     if "coadd_nwgint_path" in pyml["src_info"][i]:
@@ -479,12 +485,16 @@ class Stash(dict):
                 os.symlink(fn_rel, ln)
 
         # symlink nullwt files
-        nodir = os.path.join(odir, f"nullwt-{band}")
-        os.makedirs(nodir, exist_ok=True)
-        with pushd(nodir):
-            for i in range(len(pyml["src_info"])):
-                if "coadd_nwgint_path" in pyml["src_info"][i]:
-                    _symlink_file_rel_to_cwd(pyml["src_info"][i]["coadd_nwgint_path"])
+        if any(
+            "coadd_nwgint_path" in pyml["src_info"][i]
+            for i in range(len(pyml["src_info"]))
+        ):
+            nodir = os.path.join(odir, f"nullwt-{band}")
+            os.makedirs(nodir, exist_ok=True)
+            with pushd(nodir):
+                for i in range(len(pyml["src_info"])):
+                    if "coadd_nwgint_path" in pyml["src_info"][i]:
+                        _symlink_file_rel_to_cwd(pyml["src_info"][i]["coadd_nwgint_path"])
 
         # symlink psf files
         podir = os.path.join(odir, "psfs")
