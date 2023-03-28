@@ -86,9 +86,10 @@ class DES_Piff(object):
         if "GI_COLOR" in self.getPiff().interp_property_names:
             psf_kwargs.pop("IZ_COLOR", None)
             if (
-                "GI_COLOR" not in psf_kwargs or
-                psf_kwargs["GI_COLOR"] is None or
-                psf_kwargs["GI_COLOR"] == "None"
+                "GI_COLOR" in psf_kwargs and (
+                    psf_kwargs["GI_COLOR"] is None or
+                    psf_kwargs["GI_COLOR"] == "None"
+                )
             ):
                 psf_kwargs["GI_COLOR"] = 1.1
 
@@ -96,9 +97,10 @@ class DES_Piff(object):
             psf_kwargs.pop("GI_COLOR", None)
 
             if (
-                "IZ_COLOR" not in psf_kwargs or
-                psf_kwargs["IZ_COLOR"] is None or
-                psf_kwargs["IZ_COLOR"] == "None"
+                "IZ_COLOR" in psf_kwargs and (
+                    psf_kwargs["IZ_COLOR"] is None or
+                    psf_kwargs["IZ_COLOR"] == "None"
+                )
             ):
                 psf_kwargs["IZ_COLOR"] = 0.34
 

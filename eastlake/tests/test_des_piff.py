@@ -6,7 +6,7 @@ import yaml
 
 import pytest
 
-from ..des_piff import PSF_KWARGS
+from ..des_piff import PSF_KWARGS, DES_Piff
 from ..des_smoothpiff import DES_SmoothPiff
 
 
@@ -20,6 +20,35 @@ def _get_piff_file():
             "DESDATA",
             yaml.safe_load(fp)["piff_path"]
         )
+
+
+@pytest.mark.skipif(
+    os.environ.get('TEST_DESDATA', None) is None,
+    reason=(
+        'DES_Piff can only be tested if '
+        'test data is at TEST_DESDATA'))
+def test_des_piff_smoke():
+    piff_fname = _get_piff_file()
+    piff = DES_Piff(piff_fname)
+    psf_im = piff.getPSF(
+        galsim.PositionD(20, 10),
+        **PSF_KWARGS["g"],
+    ).drawImage(nx=53, ny=53, scale=0.263).array
+
+    if False:
+        import matplotlib.pyplot as plt
+        plt.figure()
+        plt.imshow(psf_im)
+        import pdb
+        pdb.set_trace()
+
+    assert np.all(np.isfinite(psf_im))
+    assert np.allclose(np.sum(psf_im), 1)
+
+    y, x = np.unravel_index(np.argmax(psf_im), psf_im.shape)
+    cen = (psf_im.shape[0]-1)/2
+    assert y == cen
+    assert x == cen
 
 
 @pytest.mark.skipif(
