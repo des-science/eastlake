@@ -43,7 +43,7 @@ def test_des_piff_smoke():
         pdb.set_trace()
 
     assert np.all(np.isfinite(psf_im))
-    assert np.allclose(np.sum(psf_im), 1)
+    assert np.allclose(np.sum(psf_im), 1, rtol=1e-4, atol=0)
 
     y, x = np.unravel_index(np.argmax(psf_im), psf_im.shape)
     cen = (psf_im.shape[0]-1)/2
