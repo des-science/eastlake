@@ -6,7 +6,8 @@ import yaml
 
 import pytest
 
-from ..des_piff import DES_Piff, PSF_KWARGS
+from ..des_piff import PSF_KWARGS
+from ..des_smoothpiff import DES_SmoothPiff
 
 
 def _get_piff_file():
@@ -26,9 +27,9 @@ def _get_piff_file():
     reason=(
         'DES_Piff can only be tested if '
         'test data is at TEST_DESDATA'))
-def test_des_piff_smoke():
+def test_des_smoothpiff_smoke():
     piff_fname = _get_piff_file()
-    piff = DES_Piff(piff_fname, psf_kwargs=PSF_KWARGS["g"])
+    piff = DES_SmoothPiff(piff_fname, psf_kwargs=PSF_KWARGS["g"])
     psf_im = piff.getPSF(galsim.PositionD(20, 10)).drawImage(nx=53, ny=53, scale=0.263).array
 
     if False:
@@ -52,20 +53,20 @@ def test_des_piff_smoke():
     reason=(
         'DES_Piff can only be tested if '
         'test data is at TEST_DESDATA'))
-def test_des_piff_smooth():
+def test_des_smoothpiff_smooth():
     piff_fname = _get_piff_file()
-    piff = DES_Piff(piff_fname, psf_kwargs=PSF_KWARGS["g"])
+    piff = DES_SmoothPiff(piff_fname, psf_kwargs=PSF_KWARGS["g"])
     psf_im = piff.getPSF(
         galsim.PositionD(20, 10),
     ).drawImage(nx=53, ny=53, scale=0.263).array
 
-    piff = DES_Piff(piff_fname, psf_kwargs=PSF_KWARGS["g"])
+    piff = DES_SmoothPiff(piff_fname, psf_kwargs=PSF_KWARGS["g"])
     psf_im1 = piff.getPSF(
         galsim.PositionD(20, 10),
         smooth=True,
     ).drawImage(nx=53, ny=53, scale=0.263).array
 
-    piff = DES_Piff(piff_fname, psf_kwargs=PSF_KWARGS["g"], smooth=True)
+    piff = DES_SmoothPiff(piff_fname, psf_kwargs=PSF_KWARGS["g"], smooth=True)
     psf_im2 = piff.getPSF(
         galsim.PositionD(20, 10),
     ).drawImage(nx=53, ny=53, scale=0.263).array
