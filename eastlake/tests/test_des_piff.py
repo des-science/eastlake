@@ -27,6 +27,119 @@ def _get_piff_file():
     reason=(
         'DES_Piff can only be tested if '
         'test data is at TEST_DESDATA'))
+@pytest.mark.parametrize("x_offset", [-0.3, 0.0, 0.3])
+@pytest.mark.parametrize("y_offset", [-0.3, 0.0, 0.3])
+def test_des_piff_centering(x_offset, y_offset):
+    piff_fname = _get_piff_file()
+    piff = DES_Piff(piff_fname)
+    atol = 0.01
+
+    # test the image it makes
+    psf_im = piff.getPSFImage(
+        galsim.PositionD(20 + x_offset, 10 + y_offset),
+        **PSF_KWARGS["g"],
+    )
+
+    cen = (53-1)/2 + 1
+    admom = psf_im.FindAdaptiveMom()
+
+    assert np.allclose(
+        admom.moments_centroid.x,
+        cen + x_offset,
+        rtol=0,
+        atol=atol,
+    )
+
+    assert np.allclose(
+        admom.moments_centroid.y,
+        cen + y_offset,
+        rtol=0,
+        atol=atol,
+    )
+
+    # test how well it recenters
+    psf_im = piff.getPSF(
+        galsim.PositionD(20 + x_offset, 10 + y_offset),
+        **PSF_KWARGS["g"],
+    ).drawImage(nx=53, ny=53, scale=0.263, offset=(x_offset, y_offset))
+    cen = (53-1)/2 + 1
+    admom = psf_im.FindAdaptiveMom()
+
+    assert np.allclose(
+        admom.moments_centroid.x,
+        cen + x_offset,
+        rtol=0,
+        atol=atol,
+    )
+
+    assert np.allclose(
+        admom.moments_centroid.y,
+        cen + y_offset,
+        rtol=0,
+        atol=atol,
+    )
+
+
+@pytest.mark.skipif(
+    os.environ.get('TEST_DESDATA', None) is None,
+    reason=(
+        'DES_Piff can only be tested if '
+        'test data is at TEST_DESDATA'))
+def test_des_piff_color():
+    piff_fname = _get_piff_file()
+    piff = DES_Piff(piff_fname)
+    psf_im1 = piff.getPSF(
+        galsim.PositionD(20, 10),
+        GI_COLOR=1.3,
+        IZ_COLOR=0.4,
+    ).drawImage(nx=53, ny=53, scale=0.263).array
+
+    psf_im2 = piff.getPSF(
+        galsim.PositionD(20, 10),
+        GI_COLOR=0.7,
+        IZ_COLOR=0.1,
+    ).drawImage(nx=53, ny=53, scale=0.263).array
+
+    assert not np.allclose(psf_im1, psf_im2)
+
+    psf_im2 = piff.getPSF(
+        galsim.PositionD(20, 10),
+        GI_COLOR=1.3,
+        IZ_COLOR=0.4,
+    ).drawImage(nx=53, ny=53, scale=0.263).array
+
+    assert np.array_equal(psf_im1, psf_im2)
+
+
+@pytest.mark.skipif(
+    os.environ.get('TEST_DESDATA', None) is None,
+    reason=(
+        'DES_Piff can only be tested if '
+        'test data is at TEST_DESDATA'))
+def test_des_piff_raises():
+    piff_fname = _get_piff_file()
+    piff = DES_Piff(piff_fname)
+    with pytest.raises(Exception) as e:
+        piff.getPSF(
+            galsim.PositionD(20, 10),
+        ).drawImage(nx=53, ny=53, scale=0.263).array
+
+    assert "_COLOR" in str(e.value)
+
+    with pytest.raises(Exception) as e:
+        piff.getPSF(
+            galsim.PositionD(20, 10),
+            IZ_COLOR=0.4,
+        ).drawImage(nx=53, ny=53, scale=0.263).array
+
+    assert "_COLOR" in str(e.value)
+
+
+@pytest.mark.skipif(
+    os.environ.get('TEST_DESDATA', None) is None,
+    reason=(
+        'DES_Piff can only be tested if '
+        'test data is at TEST_DESDATA'))
 def test_des_piff_smoke():
     piff_fname = _get_piff_file()
     piff = DES_Piff(piff_fname)
@@ -54,7 +167,7 @@ def test_des_piff_smoke():
 @pytest.mark.skipif(
     os.environ.get('TEST_DESDATA', None) is None,
     reason=(
-        'DES_Piff can only be tested if '
+        'DES_SmoothPiff can only be tested if '
         'test data is at TEST_DESDATA'))
 def test_des_smoothpiff_smoke():
     piff_fname = _get_piff_file()
@@ -80,7 +193,7 @@ def test_des_smoothpiff_smoke():
 @pytest.mark.skipif(
     os.environ.get('TEST_DESDATA', None) is None,
     reason=(
-        'DES_Piff can only be tested if '
+        'DES_SmoothPiff can only be tested if '
         'test data is at TEST_DESDATA'))
 def test_des_smoothpiff_smooth():
     piff_fname = _get_piff_file()

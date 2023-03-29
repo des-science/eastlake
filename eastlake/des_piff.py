@@ -46,7 +46,6 @@ class DES_Piff(object):
 
     def _draw(
         self, image_pos, wcs=None, n_pix=None,
-        depixelize=False,
         gsparams=None, **psf_kwargs
     ):
         """Get an image of the PSF at the given location.
@@ -60,8 +59,6 @@ class DES_Piff(object):
         n_pix : int, optional
             The image size to use when drawing without smoothing. Defaults to
             53 pixels if not given
-        depixelize : bool, optional
-            If True, the interpolated image will be depixelized. Default is False.
         gsparams : galsim.GSParams, optional
             Optional galsim configuration data to pass along.
         psf_kwargs : extra keyword arguments
@@ -69,8 +66,12 @@ class DES_Piff(object):
 
         Returns
         -------
-        psf : galsim.InterpolatedImage
-            The PSF at the image position.
+        psf_img : galsim.ImageD
+            The Galsim image of the PSF.
+        pixel_wcs : galsim.BaseWCS
+            The WCS of the image
+        offset : tuple of floats
+            The offset from the true center of the PSF centroid.
         """
         if n_pix is None:
             n_pix = 53
@@ -109,7 +110,7 @@ class DES_Piff(object):
             image_pos.y - int(image_pos.y + 0.5),
         )
 
-        psf = self.getPiff().draw(
+        psf_img = self.getPiff().draw(
             image_pos.x,
             image_pos.y,
             image=image,
@@ -119,18 +120,7 @@ class DES_Piff(object):
             **psf_kwargs,
         )
 
-        psf = galsim.InterpolatedImage(
-            galsim.ImageD(psf.array),  # make sure galsim is not keeping state
-            wcs=pixel_wcs,
-            gsparams=gsparams,
-            x_interpolant='lanczos15',
-            depixelize=depixelize,
-            offset=offset,
-        ).withFlux(
-            1.0
-        )
-
-        return psf
+        return psf_img, pixel_wcs, offset
 
     def getPiff(self):
         return self._piff
@@ -138,6 +128,7 @@ class DES_Piff(object):
     def getPSF(
         self, image_pos, wcs=None,
         n_pix=None, depixelize=False,
+        gsparams=None,
         **kwargs
     ):
         """Get an image of the PSF at the given location.
@@ -152,6 +143,8 @@ class DES_Piff(object):
             The image size to use when drawing without smoothing.
         depixelize : bool, optional
             If True, the interpolated image will be depixelized. Default is False.
+        gsparams : galsim.GSParams, optional
+            Optional galsim configuration data to pass along.
         **kwargs : extra keyword arguments
             These are all passed on to the Piff model when drawing.
 
@@ -160,7 +153,61 @@ class DES_Piff(object):
         psf : galsim.GSObject
             The PSF at the image position.
         """
-        return self._draw(image_pos, wcs=wcs, n_pix=n_pix, depixelize=depixelize, **kwargs)
+
+        psf_img, pixel_wcs, offset = self._draw(
+            image_pos,
+            wcs=wcs,
+            n_pix=n_pix,
+            gsparams=gsparams,
+            **kwargs
+        )
+
+        psf = galsim.InterpolatedImage(
+            galsim.ImageD(psf_img.array),  # make sure galsim is not keeping state
+            wcs=pixel_wcs,
+            gsparams=gsparams,
+            x_interpolant='lanczos15',
+            depixelize=depixelize,
+            offset=offset,
+        ).withFlux(
+            1.0
+        )
+        return psf
+
+    def getPSFImage(
+        self, image_pos, wcs=None,
+        n_pix=None,
+        gsparams=None,
+        **kwargs
+    ):
+        """Get an image of the PSF at the given location.
+
+        Parameters
+        ----------
+        image_pos : galsim.Position
+            The image position for the PSF.
+        wcs : galsim.BaseWCS or subclass, optional
+            The WCS to use to draw the PSF. If not given, the WCS in the Piff model is used.
+        n_pix : int, optional
+            The image size to use when drawing without smoothing.
+        gsparams : galsim.GSParams, optional
+            Optional galsim configuration data to pass along.
+        **kwargs : extra keyword arguments
+            These are all passed on to the Piff model when drawing.
+
+        Returns
+        -------
+        psf : galsim.Image
+            The PSF image at the image position.
+        """
+        psf_img, pixel_wcs, offset = self._draw(
+            image_pos,
+            wcs=wcs,
+            n_pix=n_pix,
+            gsparams=gsparams,
+            **kwargs
+        )
+        return psf_img
 
 
 class PiffLoader(galsim.config.InputLoader):
