@@ -267,8 +267,8 @@ def BuildDES_Piff(config, base, ignore, gsparams, logger):
         image_pos,
         wcs=wcs,
         n_pix=params.get("n_pix", None),
-        gi_color=params.get("gi_color", None),
-        iz_color=params.get("iz_color", None),
+        GI_COLOR=params.get("gi_color", None),
+        IZ_COLOR=params.get("iz_color", None),
         depixelize=params.get("depixelize", False),
         gsparams=gsparams,
     )
