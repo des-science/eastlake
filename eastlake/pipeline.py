@@ -191,6 +191,16 @@ class Pipeline(object):
 
         config = config[0]
 
+        # make sure base_dir is an absolute path
+        if base_dir is not None:
+            base_dir = os.path.abspath(base_dir)
+            safe_mkdir(base_dir)
+        else:
+            base_dir = "."
+
+        with open(os.path.join(base_dir, "orig-config.yaml"), 'w') as f:
+            yaml.dump(config, f)
+
         galsim.config.process.ImportModules(config)
 
         # Process templates.
@@ -231,13 +241,6 @@ class Pipeline(object):
             step_names = config["pipeline"]["steps"]
 
         steps = []
-        # make sure base_dir is an absolute path
-        if base_dir is not None:
-            base_dir = os.path.abspath(base_dir)
-            safe_mkdir(base_dir)
-        else:
-            base_dir = "."
-
         for step_name in step_names:
             if step_name == "galsim":
                 steps.append(GalSimRunner(config, base_dir, logger=logger))
