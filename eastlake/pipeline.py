@@ -247,7 +247,7 @@ class Pipeline(object):
                 steps.append(GalSimRunner(config, base_dir, logger=logger))
             else:
                 try:
-                    step_config = config.pop(step_name)
+                    step_config = config[step_name]
                 except KeyError:
                     logger.error(
                         "no entry for step %s found in config file, continuing with empty step_config" % step_name)
