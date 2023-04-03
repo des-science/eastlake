@@ -116,6 +116,7 @@ class Pipeline(object):
 
         if config is not None:
             galsim.config.process.ImportModules(config)
+            self.logger.debug("init post-import top-level keys: %r", sorted(list(config.keys())))
             with open(os.path.join(self.base_dir, "config.yaml"), 'w') as f:
                 yaml.dump(config, f)
 
@@ -192,8 +193,10 @@ class Pipeline(object):
             raise RuntimeError("Multiple documents in config file not supported, sorry.")
 
         config = config[0]
+        logger.debug("config top-level keys: %r", sorted(list(config.keys())))
 
         galsim.config.process.ImportModules(config)
+        logger.debug("post-import config top-level keys: %r", sorted(list(config.keys())))
 
         # Process templates.
         # allow for template config in the same directory as the config file
@@ -221,10 +224,12 @@ class Pipeline(object):
                     config["template"] = template_file_to_use
 
         galsim.config.ProcessAllTemplates(config)
+        logger.debug("post-template config top-level keys: %r", sorted(list(config.keys())))
 
         # update with new_params
         if new_params is not None:
             galsim.config.UpdateConfig(config, new_params)
+            logger.debug("post-params config top-level keys: %r", sorted(list(config.keys())))
 
         if "pipeline" not in config:
             config["pipeline"] = {"ntiles": 1}
