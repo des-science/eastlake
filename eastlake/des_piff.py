@@ -227,8 +227,6 @@ galsim.config.RegisterInputType('des_piff', PiffLoader(DES_Piff))
 
 # and a builder
 def BuildDES_Piff(config, base, ignore, gsparams, logger):
-    des_piff = galsim.config.GetInputObj('des_piff', config, base, 'DES_Piff')
-
     opt = {
         'flux': float,
         'image_pos': galsim.PositionD,
@@ -236,10 +234,16 @@ def BuildDES_Piff(config, base, ignore, gsparams, logger):
         'gi_color': float,
         'iz_color': float,
         'depixelize': bool,
+        'file_name': str,
     }
     params, safe = galsim.config.GetAllParams(
         config, base, opt=opt, ignore=ignore
     )
+
+    if params.get("file_name", None) is None:
+        des_piff = galsim.config.GetInputObj('des_piff', config, base, 'DES_Piff')
+    else:
+        des_piff = DES_Piff(params.get("file_name", None))
 
     if 'image_pos' in params:
         image_pos = params['image_pos']
