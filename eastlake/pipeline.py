@@ -116,9 +116,6 @@ class Pipeline(object):
 
         if config is not None:
             galsim.config.process.ImportModules(config)
-            self.logger.debug("init post-import top-level keys: %r", sorted(list(config.keys())))
-            with open(os.path.join(self.base_dir, "config.yaml"), 'w') as f:
-                yaml.dump(config, f)
 
         self.record_file = record_file
         if record_file is None:
@@ -193,10 +190,8 @@ class Pipeline(object):
             raise RuntimeError("Multiple documents in config file not supported, sorry.")
 
         config = config[0]
-        logger.debug("config top-level keys: %r", sorted(list(config.keys())))
 
         galsim.config.process.ImportModules(config)
-        logger.debug("post-import config top-level keys: %r", sorted(list(config.keys())))
 
         # Process templates.
         # allow for template config in the same directory as the config file
@@ -224,12 +219,10 @@ class Pipeline(object):
                     config["template"] = template_file_to_use
 
         galsim.config.ProcessAllTemplates(config)
-        logger.debug("post-template config top-level keys: %r", sorted(list(config.keys())))
 
         # update with new_params
         if new_params is not None:
             galsim.config.UpdateConfig(config, new_params)
-            logger.debug("post-params config top-level keys: %r", sorted(list(config.keys())))
 
         if "pipeline" not in config:
             config["pipeline"] = {"ntiles": 1}
@@ -241,6 +234,9 @@ class Pipeline(object):
         # make sure base_dir is an absolute path
         if base_dir is not None:
             base_dir = os.path.abspath(base_dir)
+            safe_mkdir(base_dir)
+        else:
+            base_dir = "."
 
         for step_name in step_names:
             if step_name == "galsim":
@@ -273,6 +269,9 @@ class Pipeline(object):
                 else:
                     steps.append(step_class(step_config, base_dir, logger=logger,
                                  verbosity=step_verbosity, name=step_name))
+
+        with open(os.path.join(base_dir, "config.yaml"), 'w') as f:
+            yaml.dump(config, f)
 
         return cls(
             steps, base_dir,
