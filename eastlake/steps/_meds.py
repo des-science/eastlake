@@ -17,7 +17,7 @@ import psfex
 import desmeds
 from desmeds.files import StagedOutFile
 
-from ..utils import safe_mkdir, pushd
+from ..utils import safe_mkdir, pushd, copy_ifnotexists
 from ..des_piff import DES_Piff, PSF_KWARGS
 from .meds_psf_interface import PSFForMeds
 from ..step import Step, run_and_check
@@ -251,6 +251,8 @@ class MEDSRunner(Step):
             # image data
             for band in stash["bands"]:
                 t0 = timer()
+
+                self._copy_inputs(stash, tilename, band)
 
                 # coadd stuff
                 coadd_file, coadd_ext = stash.get_filepaths(
@@ -489,6 +491,25 @@ class MEDSRunner(Step):
         if pr is not None:
             pr.print_stats(sort='time')
         return 0, stash
+
+    def _copy_inputs(self, stash, tilename, band):
+        # copy input files
+        in_pyml = stash.get_input_pizza_cutter_yaml(tilename, band)
+        pyml = stash.get_output_pizza_cutter_yaml(tilename, band)
+        for i in range(len(pyml["src_info"])):
+            # we don't overwrite these since we could have estimated them
+            copy_ifnotexists(
+                in_pyml["src_info"][i]["head_path"],
+                pyml["src_info"][i]["head_path"],
+            )
+            copy_ifnotexists(
+                in_pyml["src_info"][i]["piff_path"],
+                pyml["src_info"][i]["piff_path"],
+            )
+            copy_ifnotexists(
+                in_pyml["src_info"][i]["psf_path"],
+                pyml["src_info"][i]["psf_path"],
+            )
 
     def _make_psf_data(self, stash, coadd_wcs, tilename, band, is_rejectlisted, img_files, img_ext, head_files):
         if stash["psf_config"]["type"] == "DES_Piff":
