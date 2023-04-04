@@ -23,7 +23,6 @@ from .meds_psf_interface import PSFForMeds
 from ..step import Step, run_and_check
 from ..stash import Stash
 from ..des_files import MAGZP_REF
-from ..rejectlist import RejectList
 from .swarp import FITSEXTMAP
 
 # This is for MEDS boxsize calculation.
@@ -117,9 +116,6 @@ class MEDSRunner(Step):
             self.config["refband"] = "r"
         if "stage_output" not in self.config:
             self.config["stage_output"] = False
-        if "use_rejectlist" not in self.config:
-            # We can rejectlist some of the images
-            self.config["use_rejectlist"] = True
         self.config["use_nwgint"] = self.config.get("use_nwgint", False)
 
         if "fpack_pars" not in self.config:
@@ -153,24 +149,6 @@ class MEDSRunner(Step):
         self.config["meds_run"] = stash["desrun"]
         stash["meds_run"] = self.config["meds_run"]
         stash["env"].append(("MEDS_DIR", os.environ["MEDS_DIR"]))
-
-        # If we used DES_Piff psfs, we should have also done some rejectlisting.
-        # Make sure then that there is a rejectlist in stash["rejectlist"],
-        # and that self.config["use_rejectlist"] is True
-        if stash["psf_config"]["type"] == "DES_Piff":
-            try:
-                assert self.config["use_rejectlist"] is True
-            except AssertionError as e:
-                self.logger.error("""Found the psf type DES_Piff,
-                but use_rejectlist is set to False. This will not stand""")
-                raise e
-        if self.config["use_rejectlist"]:
-            try:
-                assert "rejectlist" in stash
-            except AssertionError as e:
-                self.logger.error("""use_rejectlist is True, but no 'rejectlist'
-                entry found in stash""")
-                raise e
 
         # https://github.com/esheldon/meds/wiki/Creating-MEDS-Files-in-Python
         # Need to generate
@@ -332,12 +310,7 @@ class MEDSRunner(Step):
                     )
 
                     # Are we rejectlisting?
-                    if self.config["use_rejectlist"]:
-                        rejectlist = RejectList(stash["rejectlist"])
-                        # keep only non-rejectlisted files
-                        is_rejectlisted = [rejectlist.img_file_is_rejectlisted(f) for f in img_files]
-                    else:
-                        is_rejectlisted = [False] * len(img_files)
+                    is_rejectlisted = [False] * len(img_files)
 
                     wgt_files, wgt_ext = stash.get_filepaths(
                         pre+"wgt_files", tilename, band=band, with_fits_ext=True,
