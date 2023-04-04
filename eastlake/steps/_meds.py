@@ -17,10 +17,10 @@ import psfex
 import desmeds
 from desmeds.files import StagedOutFile
 
-from ..utils import safe_mkdir
+from ..utils import safe_mkdir, pushd
 from ..des_piff import DES_Piff, PSF_KWARGS
 from .meds_psf_interface import PSFForMeds
-from ..step import Step
+from ..step import Step, run_and_check
 from ..stash import Stash
 from ..des_files import MAGZP_REF
 from ..rejectlist import RejectList
@@ -121,6 +121,15 @@ class MEDSRunner(Step):
             # We can rejectlist some of the images
             self.config["use_rejectlist"] = True
         self.config["use_nwgint"] = self.config.get("use_nwgint", False)
+
+        if "fpack_pars" not in self.config:
+            self.config["fpack_pars"] = {
+                "FZQVALUE": 4,
+                "FZTILE": "(10240,1)",
+                "FZALGOR": "RICE_1",
+                # preserve zeros, don't dither them
+                "FZQMETHD": "SUBTRACTIVE_DITHER_2",
+            }
 
     def clear_stash(self, stash):
         # If we continued the pipeline from a previous job record file,
@@ -471,12 +480,32 @@ class MEDSRunner(Step):
                 # If requested, we stage the file at $TMPDIR and then
                 # copy over when finished writing. This is a good idea
                 # on many systems, but maybe not all.
-                if self.config["stage_output"]:
-                    tmpdir = os.environ.get("TMPDIR", None)
-                    with StagedOutFile(meds_file, tmpdir=tmpdir) as sf:
-                        maker.write(sf.path)
+                if "fpack_pars" in self.config:
+                    if self.config["stage_output"]:
+                        tmpdir = os.environ.get("TMPDIR", None)
+                        with StagedOutFile(meds_file, tmpdir=tmpdir) as sf:
+                            maker.write(sf.path[:-len(".fz")])
+                            with pushd(os.path.dirname(sf.path)):
+                                run_and_check(
+                                    ["fpack", os.path.basename(sf.path[:-len(".fz")])],
+                                    "fpack meds",
+                                    logger=self.logger,
+                                )
+                    else:
+                        maker.write(meds_file[:-len(".fz")])
+                        with pushd(os.path.dirname(meds_file)):
+                            run_and_check(
+                                ["fpack", os.path.basename(meds_file[:-len(".fz")])],
+                                "fpack meds",
+                                logger=self.logger,
+                            )
                 else:
-                    maker.write(meds_file)
+                    if self.config["stage_output"]:
+                        tmpdir = os.environ.get("TMPDIR", None)
+                        with StagedOutFile(meds_file, tmpdir=tmpdir) as sf:
+                            maker.write(sf.path)
+                    else:
+                        maker.write(meds_file)
                 t1 = timer()
                 self.logger.error(
                     "Time to write meds file for tile %s, band %s: %s" % (
