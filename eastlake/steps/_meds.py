@@ -17,13 +17,12 @@ import psfex
 import desmeds
 from desmeds.files import StagedOutFile
 
-from ..utils import safe_mkdir
+from ..utils import safe_mkdir, pushd, copy_ifnotexists
 from ..des_piff import DES_Piff, PSF_KWARGS
 from .meds_psf_interface import PSFForMeds
-from ..step import Step
+from ..step import Step, run_and_check
 from ..stash import Stash
 from ..des_files import MAGZP_REF
-from ..rejectlist import RejectList
 from .swarp import FITSEXTMAP
 
 # This is for MEDS boxsize calculation.
@@ -117,10 +116,16 @@ class MEDSRunner(Step):
             self.config["refband"] = "r"
         if "stage_output" not in self.config:
             self.config["stage_output"] = False
-        if "use_rejectlist" not in self.config:
-            # We can rejectlist some of the images
-            self.config["use_rejectlist"] = True
         self.config["use_nwgint"] = self.config.get("use_nwgint", False)
+
+        if "fpack_pars" not in self.config:
+            self.config["fpack_pars"] = {
+                "FZQVALUE": 4,
+                "FZTILE": "(10240,1)",
+                "FZALGOR": "RICE_1",
+                # preserve zeros, don't dither them
+                "FZQMETHD": "SUBTRACTIVE_DITHER_2",
+            }
 
     def clear_stash(self, stash):
         # If we continued the pipeline from a previous job record file,
@@ -144,24 +149,6 @@ class MEDSRunner(Step):
         self.config["meds_run"] = stash["desrun"]
         stash["meds_run"] = self.config["meds_run"]
         stash["env"].append(("MEDS_DIR", os.environ["MEDS_DIR"]))
-
-        # If we used DES_Piff psfs, we should have also done some rejectlisting.
-        # Make sure then that there is a rejectlist in stash["rejectlist"],
-        # and that self.config["use_rejectlist"] is True
-        if stash["psf_config"]["type"] == "DES_Piff":
-            try:
-                assert self.config["use_rejectlist"] is True
-            except AssertionError as e:
-                self.logger.error("""Found the psf type DES_Piff,
-                but use_rejectlist is set to False. This will not stand""")
-                raise e
-        if self.config["use_rejectlist"]:
-            try:
-                assert "rejectlist" in stash
-            except AssertionError as e:
-                self.logger.error("""use_rejectlist is True, but no 'rejectlist'
-                entry found in stash""")
-                raise e
 
         # https://github.com/esheldon/meds/wiki/Creating-MEDS-Files-in-Python
         # Need to generate
@@ -265,6 +252,8 @@ class MEDSRunner(Step):
             for band in stash["bands"]:
                 t0 = timer()
 
+                self._copy_inputs(stash, tilename, band)
+
                 # coadd stuff
                 coadd_file, coadd_ext = stash.get_filepaths(
                     "coadd_file", tilename, band=band, with_fits_ext=True, funpack=True,
@@ -323,12 +312,7 @@ class MEDSRunner(Step):
                     )
 
                     # Are we rejectlisting?
-                    if self.config["use_rejectlist"]:
-                        rejectlist = RejectList(stash["rejectlist"])
-                        # keep only non-rejectlisted files
-                        is_rejectlisted = [rejectlist.img_file_is_rejectlisted(f) for f in img_files]
-                    else:
-                        is_rejectlisted = [False] * len(img_files)
+                    is_rejectlisted = [False] * len(img_files)
 
                     wgt_files, wgt_ext = stash.get_filepaths(
                         pre+"wgt_files", tilename, band=band, with_fits_ext=True,
@@ -471,12 +455,32 @@ class MEDSRunner(Step):
                 # If requested, we stage the file at $TMPDIR and then
                 # copy over when finished writing. This is a good idea
                 # on many systems, but maybe not all.
-                if self.config["stage_output"]:
-                    tmpdir = os.environ.get("TMPDIR", None)
-                    with StagedOutFile(meds_file, tmpdir=tmpdir) as sf:
-                        maker.write(sf.path)
+                if "fpack_pars" in self.config:
+                    if self.config["stage_output"]:
+                        tmpdir = os.environ.get("TMPDIR", None)
+                        with StagedOutFile(meds_file, tmpdir=tmpdir) as sf:
+                            maker.write(sf.path[:-len(".fz")])
+                            with pushd(os.path.dirname(sf.path)):
+                                run_and_check(
+                                    ["fpack", os.path.basename(sf.path[:-len(".fz")])],
+                                    "fpack meds",
+                                    logger=self.logger,
+                                )
+                    else:
+                        maker.write(meds_file[:-len(".fz")])
+                        with pushd(os.path.dirname(meds_file)):
+                            run_and_check(
+                                ["fpack", os.path.basename(meds_file[:-len(".fz")])],
+                                "fpack meds",
+                                logger=self.logger,
+                            )
                 else:
-                    maker.write(meds_file)
+                    if self.config["stage_output"]:
+                        tmpdir = os.environ.get("TMPDIR", None)
+                        with StagedOutFile(meds_file, tmpdir=tmpdir) as sf:
+                            maker.write(sf.path)
+                    else:
+                        maker.write(meds_file)
                 t1 = timer()
                 self.logger.error(
                     "Time to write meds file for tile %s, band %s: %s" % (
@@ -487,6 +491,25 @@ class MEDSRunner(Step):
         if pr is not None:
             pr.print_stats(sort='time')
         return 0, stash
+
+    def _copy_inputs(self, stash, tilename, band):
+        # copy input files
+        in_pyml = stash.get_input_pizza_cutter_yaml(tilename, band)
+        pyml = stash.get_output_pizza_cutter_yaml(tilename, band)
+        for i in range(len(pyml["src_info"])):
+            # we don't overwrite these since we could have estimated them
+            copy_ifnotexists(
+                in_pyml["src_info"][i]["head_path"],
+                pyml["src_info"][i]["head_path"],
+            )
+            copy_ifnotexists(
+                in_pyml["src_info"][i]["piff_path"],
+                pyml["src_info"][i]["piff_path"],
+            )
+            copy_ifnotexists(
+                in_pyml["src_info"][i]["psf_path"],
+                pyml["src_info"][i]["psf_path"],
+            )
 
     def _make_psf_data(self, stash, coadd_wcs, tilename, band, is_rejectlisted, img_files, img_ext, head_files):
         if stash["psf_config"]["type"] == "DES_Piff":
