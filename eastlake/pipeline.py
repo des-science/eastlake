@@ -116,8 +116,6 @@ class Pipeline(object):
 
         if config is not None:
             galsim.config.process.ImportModules(config)
-            with open(os.path.join(self.base_dir, "config.yaml"), 'w') as f:
-                yaml.dump(config, f)
 
         self.record_file = record_file
         if record_file is None:
@@ -193,6 +191,16 @@ class Pipeline(object):
 
         config = config[0]
 
+        # make sure base_dir is an absolute path
+        if base_dir is not None:
+            base_dir = os.path.abspath(base_dir)
+            safe_mkdir(base_dir)
+        else:
+            base_dir = "."
+
+        with open(os.path.join(base_dir, "orig-config.yaml"), 'w') as f:
+            yaml.dump(config, f)
+
         galsim.config.process.ImportModules(config)
 
         # Process templates.
@@ -233,16 +241,12 @@ class Pipeline(object):
             step_names = config["pipeline"]["steps"]
 
         steps = []
-        # make sure base_dir is an absolute path
-        if base_dir is not None:
-            base_dir = os.path.abspath(base_dir)
-
         for step_name in step_names:
             if step_name == "galsim":
                 steps.append(GalSimRunner(config, base_dir, logger=logger))
             else:
                 try:
-                    step_config = config.pop(step_name)
+                    step_config = config[step_name]
                 except KeyError:
                     logger.error(
                         "no entry for step %s found in config file, continuing with empty step_config" % step_name)
@@ -268,6 +272,9 @@ class Pipeline(object):
                 else:
                     steps.append(step_class(step_config, base_dir, logger=logger,
                                  verbosity=step_verbosity, name=step_name))
+
+        with open(os.path.join(base_dir, "config.yaml"), 'w') as f:
+            yaml.dump(config, f)
 
         return cls(
             steps, base_dir,
