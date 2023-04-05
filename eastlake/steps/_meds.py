@@ -17,7 +17,7 @@ import psfex
 import desmeds
 from desmeds.files import StagedOutFile
 
-from ..utils import safe_mkdir, pushd, copy_ifnotexists
+from ..utils import safe_mkdir, pushd, copy_ifnotexists, safe_rm
 from ..des_piff import DES_Piff, PSF_KWARGS
 from .meds_psf_interface import PSFForMeds
 from ..step import Step, run_and_check
@@ -474,6 +474,7 @@ class MEDSRunner(Step):
                                 "fpack meds",
                                 logger=self.logger,
                             )
+                    safe_rm(meds_file[:-len(".fz")])
                 else:
                     if self.config["stage_output"]:
                         tmpdir = os.environ.get("TMPDIR", None)
