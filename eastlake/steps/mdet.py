@@ -116,16 +116,16 @@ class MetadetectRunner(Step):
     def _prep_config(self, in_bands, odir):
         if self.config["bands"] is not None:
             bands = self.config["bands"]
-            det_bands = [list(range(len(bands)))]
-            shear_bands = [list(range(len(bands)))]
         else:
             bands = in_bands
-            if set(in_bands) == set(["g", "r", "i", "z"]):
-                det_bands = [[1, 2, 3]]
-                shear_bands = [[1, 2, 3]]
-            else:
-                det_bands = [list(range(len(bands)))]
-                shear_bands = [list(range(len(bands)))]
+
+        if set(bands) == set(["g", "r", "i", "z"]):
+            bands = ["g", "r", "i", "z"]
+            det_bands = [[1, 2, 3]]
+            shear_bands = [[1, 2, 3]]
+        else:
+            det_bands = [list(range(len(bands)))]
+            shear_bands = [list(range(len(bands)))]
 
         mdet_pth = os.path.join(odir, "metadetect-config.yaml")
         safe_copy(
