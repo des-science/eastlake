@@ -70,7 +70,10 @@ def replace_imsim_data(
             old_imsim_data = os.path.dirname(balrog_parts[0])
         elif (
             len(parts) == 2
-            and parts[1][1:6] in ["/OPS/", "/ACT/", "/OPS_Taiga/", "/ACT_Taiga/"]
+            and (
+                parts[1][1:6] in ["/OPS/", "/ACT/"]
+                or parts[1][1:12] in ["/OPS_Taiga/", "/ACT_Taiga/"]
+            )
             and os.path.basename(parts[0]).startswith("DES")
         ):
             old_imsim_data = os.path.dirname(os.path.dirname(parts[0]))
