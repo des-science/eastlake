@@ -28,6 +28,18 @@ from ..des_files import (
         "/blah/blah/run/DESr1431/sources-r/OPS/fname",
     ),
     (
+        "/blah/run/DESr1431/sources-r/OPS_Taiga/fname",
+        "/blah/blah",
+        None,
+        "/blah/blah/run/DESr1431/sources-r/OPS_Taiga/fname",
+    ),
+    (
+        "/blah/run/DESr1431/sources-r/OPS_Taiga/fname",
+        "/blah/blah",
+        "/blah",
+        "/blah/blah/run/DESr1431/sources-r/OPS_Taiga/fname",
+    ),
+    (
         "/blah/run/DESr1431/sources-r/ACT/fname",
         "/blah/blah",
         None,
