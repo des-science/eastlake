@@ -32,4 +32,9 @@ class DeleteMeds(Step):
                 self.logger.error("removing meds file %s" % m)
                 os.remove(m)
 
+            meds_files = stash.get_filepaths("pizza_cutter_meds_files", tilename)
+            for m in meds_files:
+                self.logger.error("removing pizza-cutter meds file %s" % m)
+                os.remove(m)
+
         return 0, stash

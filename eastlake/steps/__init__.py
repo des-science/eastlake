@@ -11,3 +11,4 @@ from .pizza_cutter import PizzaCutterRunner  # noqa
 from .mdet import MetadetectRunner  # noqa
 from .stash_prep import StashPrep  # noqa
 from .balrog import BalrogRunner  # noqa
+from .delete_sources import DeleteSources  # noqa
