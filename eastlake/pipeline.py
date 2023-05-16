@@ -18,6 +18,7 @@ from .steps import (
     MEDSRunner,
     TrueDetectionRunner,
     DeleteImages,
+    DeleteSources,
     DeleteMeds,
     NewishMetcalRunner,
     CoaddNwgintRunner,
@@ -47,6 +48,7 @@ STEP_CLASSES = OrderedDict([
     ('metadetect', MetadetectRunner),
     ('stash_prep', StashPrep),
     ('balrog', BalrogRunner),
+    ('delete_sources', DeleteSources),
 ])
 
 STEP_IS_GALSIM = set(["galsim"])
