@@ -93,8 +93,8 @@ class DeleteSources(Step):
                     if isinstance(v, str) and os.path.isfile(v):
                         os.remove(v)
 
-                    if k == "srcinfo":
-                        for srci in pyml["srcinfo"]:
+                    if k == "src_info":
+                        for srci in pyml["src_info"]:
                             for _v in srci.items():
                                 if isinstance(_v, str) and os.path.isfile(_v):
                                     os.remove(_v)
