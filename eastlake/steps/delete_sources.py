@@ -50,14 +50,13 @@ class DeleteSources(Step):
                         os.remove(coadd_file)
 
                 # Also check for seg file
-                if self.config["delete_seg"]:
-                    seg_file = stash.get_filepaths(
-                        "seg_file", tilename, band=band,
-                        keyerror=False,
-                    )
-                    if (seg_file is not None):
-                        if os.path.isfile(seg_file):
-                            self.logger.error("removing file %s" % seg_file)
+                seg_file = stash.get_filepaths(
+                    "seg_file", tilename, band=band,
+                    keyerror=False,
+                )
+                if (seg_file is not None):
+                    if os.path.isfile(seg_file):
+                        self.logger.error("removing file %s" % seg_file)
 
                 # Also check for bkg and bkg-rms files
                 bkg_file = coadd_file.replace(".fits", "bkg.fits")
