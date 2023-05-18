@@ -90,13 +90,27 @@ class DeleteSources(Step):
             for band in stash["bands"]:
                 pyml = stash.get_output_pizza_cutter_yaml(tilename, band)
                 for k, v in pyml.items():
-                    if isinstance(v, str) and os.path.isfile(v):
-                        os.remove(v)
+                    if isinstance(v, str):
+                        totry = [
+                            v,
+                            v.replace(".fits", ".fits.fz"),
+                            v.replace(".fits.fz", ".fits"),
+                        ]
+                        for t in totry:
+                            if os.path.isfile(t):
+                                os.remove(t)
 
                     if k == "src_info":
                         for srci in pyml["src_info"]:
-                            for _v in srci.items():
-                                if isinstance(_v, str) and os.path.isfile(_v):
-                                    os.remove(_v)
+                            for _v in srci.values():
+                                if isinstance(_v, str):
+                                    totry = [
+                                        _v,
+                                        _v.replace(".fits", ".fits.fz"),
+                                        _v.replace(".fits.fz", ".fits"),
+                                    ]
+                                    for t in totry:
+                                        if os.path.isfile(t):
+                                            os.remove(t)
 
         return 0, stash
