@@ -57,6 +57,7 @@ class DeleteSources(Step):
                 if (seg_file is not None):
                     if os.path.isfile(seg_file):
                         self.logger.error("removing file %s" % seg_file)
+                        os.remove(seg_file)
 
                 # Also check for bkg and bkg-rms files
                 bkg_file = coadd_file.replace(".fits", "bkg.fits")
