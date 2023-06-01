@@ -481,7 +481,7 @@ class Stash(dict):
                     for i in range(len(pyml["src_info"]))
                 )
             ):
-                os.makedirs(os.path.basename(fname), exist_ok=True)
+                os.makedirs(os.path.dirname(fname), exist_ok=True)
                 with open(fname, "w") as fp:
                     if flist_name in ["finalcut_flist", "nwgint_flist"]:
                         for i in range(len(pyml["src_info"])):
