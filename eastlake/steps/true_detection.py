@@ -6,6 +6,7 @@ import numpy as np
 
 from ..step import Step
 from ..utils import safe_copy, safe_rm
+from ..des_piff import PSF_KWARGS
 
 
 class TrueDetectionRunner(Step):
@@ -102,6 +103,30 @@ class TrueDetectionRunner(Step):
             pyml["cat_path"] = srcext_cat_name
         fitsio.write(srcext_cat_name, srcext_cat, clobber=True)
 
+        # make the coadd object map file
+        dtype = [
+            ('id', 'i8'),
+            ('object_number', 'i8'),
+            ('gi_color', 'f8'),
+            ('iz_color', 'f8'),
+        ]
+        obj_cat = np.zeros(len(tdet), dtype=dtype)
+        obj_cat_name = coadd_file.replace(".fits", "_objmap.fits")
+        obj_cat["id"] = srcext_cat['number']
+        obj_cat["object_number"] = srcext_cat['number']
+        if "mag_g" in tdet.dtype.names and "mag_i" in tdet.dtype.names:
+            obj_cat["gi_color"] = tdet["mag_g"] - tdet["mag_i"]
+        else:
+            obj_cat["gi_color"] = PSF_KWARGS["r"]["GI_COLOR"]
+
+        if "mag_i" in tdet.dtype.names and "mag_z" in tdet.dtype.names:
+            obj_cat["iz_color"] = tdet["mag_i"] - tdet["mag_z"]
+        else:
+            obj_cat["iz_color"] = PSF_KWARGS["z"]["IZ_COLOR"]
+
+        fitsio.write(obj_cat_name, obj_cat, clobber=True)
+        stash.set_filepaths("coadd_object_map", obj_cat, tilename, band=band)
+
     def _copy_and_munge_coadd_data(self, stash, tilename, band):
         # we need to set the coadd path and img ext for downstrem code
         orig_coadd_path = stash.get_input_pizza_cutter_yaml(tilename, band)["image_path"]
@@ -145,5 +170,16 @@ class TrueDetectionRunner(Step):
             pyml["weight_ext"] = 2
             pyml["seg_path"] = ""
             pyml["seg_ext"] = -1
+
+        # copy the PSF model even though it is not the actual PSF
+        orig_psf_path = stash.get_input_pizza_cutter_yaml(tilename, band)["psf_path"]
+        psf_path_from_imsim_data = os.path.relpath(
+            orig_psf_path, stash["imsim_data"])
+        psf_file = os.path.join(
+            stash["base_dir"], psf_path_from_imsim_data)
+        safe_copy(
+            orig_psf_path,
+            psf_file,
+        )
 
         return coadd_file

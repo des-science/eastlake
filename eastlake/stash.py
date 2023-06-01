@@ -415,38 +415,92 @@ class Stash(dict):
     def _make_lists_psfmaps_symlinks(
         self, base_dir_or_imsim_data, tilename, band, pyml, skip_existing=False,
     ):
+        # retry here for race conditions
+        import random
+        import time
+
+        ntry = 10
+        for i in range(ntry):
+            stime = 1.25**i * random.uniform(0.9, 1.0)
+            try:
+                self._make_lists_psfmaps_symlinks_impl(
+                    base_dir_or_imsim_data, tilename, band, pyml, skip_existing=skip_existing,
+                )
+            except Exception as e:
+                if i == ntry-1:
+                    raise e
+                else:
+                    time.sleep(stime)
+
+    def _make_lists_psfmaps_symlinks_impl(
+        self, base_dir_or_imsim_data, tilename, band, pyml, skip_existing=False,
+    ):
         odir = os.path.join(base_dir_or_imsim_data, self["desrun"], tilename)
 
         ##############################################
-        # make bkg and nullwt flist files
-        os.makedirs(os.path.join(odir, "lists"), exist_ok=True)
-        bkg_file = os.path.join(
-            odir, "lists", f"{tilename}_{band}_bkg-flist-{self['desrun']}.dat",
+        # make lists and file conf stuff
+        meds_path = os.path.join(
+            odir,
+            "%s_%s_meds-%s.fits.fz" % (tilename, band, self["desrun"]),
         )
-        if not (skip_existing and os.path.exists(bkg_file)):
-            with open(bkg_file, "w") as fp_bkg:
-                for i in range(len(pyml["src_info"])):
-                    fp_bkg.write(pyml["src_info"][i]["bkg_path"] + "\n")
+        fileconf_data = {
+            "band": band,
+            "tilename": tilename,
+            "coadd_image_url": pyml["image_path"],
+            "coadd_cat_url": pyml["cat_path"],
+            "coadd_seg_url": pyml["seg_path"],
+            "coadd_psf_url": pyml["psf_path"],
+            "coadd_magzp": 30,
+            "coadd_object_map": self.get_filepaths(
+                "coadd_object_map", tilename, band=band, keyerror=False
+            ),
+            "meds_url": meds_path,
+            "coaddinfo": get_pizza_cutter_yaml_path(
+                self["base_dir"],
+                self["desrun"],
+                tilename,
+                band,
+            ),
+        }
 
-        nw_file = os.path.join(
-            odir, "lists", f"{tilename}_{band}_nullwt-flist-{self['desrun']}.dat",
-        )
-        if (
-            (not (skip_existing and os.path.exists(nw_file)))
-            and any(
-                "coadd_nwgint_path" in pyml["src_info"][i]
-                for i in range(len(pyml["src_info"]))
+        for flist_name, key in [
+            ("bkg_flist", "bkg_path"),
+            ("piff_flist", "piff_path"),
+            ("psf_flist", "psf_path"),
+            ("seg_flist", "seg_path"),
+            ("nullwt_flist", "coadd_nwgint_path"),
+            ("finalcut_flist", "image_path"),
+        ]:
+            fname = os.path.join(
+                odir, "lists", f"{tilename}_{band}_{flist_name.replace('_', '-')}-{self['desrun']}.dat",
             )
-        ):
-            with open(nw_file, "w") as fp_nw:
-                for i in range(len(pyml["src_info"])):
-                    if "coadd_nwgint_path" in pyml["src_info"][i]:
-                        fp_nw.write(
-                            "%s %r\n" % (
-                                pyml["src_info"][i]["coadd_nwgint_path"],
-                                pyml["src_info"][i]["magzp"],
-                            )
-                        )
+            if (
+                (not (skip_existing and os.path.exists(fname)))
+                and any(
+                    key in pyml["src_info"][i]
+                    for i in range(len(pyml["src_info"]))
+                )
+            ):
+                with open(fname, "w") as fp:
+                    if key in ["finalcut_flist", "nwgint_flist"]:
+                        for i in range(len(pyml["src_info"])):
+                            fp.write(
+                                    "%s %r\n" % (
+                                        pyml["src_info"][i][key],
+                                        pyml["src_info"][i]["magzp"],
+                                    )
+                                )
+                    else:
+                        for i in range(len(pyml["src_info"])):
+                            fp.write("%s\n" % (pyml["src_info"][i][key],))
+
+                fileconf_data[flist_name] = fname
+
+        fname = os.path.join(
+            odir, "lists", f"{tilename}_{band}_fileconf-{self['desrun']}.dat",
+        )
+        with open(fname, "w") as fp:
+            yaml.dump(fileconf_data, fp)
 
         # make psf map files
         pmap_file = os.path.join(odir, f"{tilename}_{band}_psfmap-{self['desrun']}.dat")

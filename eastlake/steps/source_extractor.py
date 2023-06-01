@@ -9,6 +9,7 @@ import numpy as np
 from ..step import Step, run_and_check
 from ..stash import Stash
 from ..utils import get_relpath, pushd
+from ..des_piff import PSF_KWARGS
 from .swarp import FITSEXTMAP
 
 
@@ -186,5 +187,41 @@ class SrcExtractorRunner(Step):
                 stash.set_filepaths("bkg_file", bkg_name, tilename, band=band)
                 stash.set_filepaths(
                     "bkg_rms_file", bkg_rms_name, tilename, band=band)
+
+            # make coadd object map
+            last_coadd_cat = fitsio.read(catalog_name, lower=True)
+            dtype = [
+                ('id', 'i8'),
+                ('object_number', 'i8'),
+                ('gi_color', 'f8'),
+                ('iz_color', 'f8'),
+            ]
+            obj_cat = np.zeros(len(last_coadd_cat), dtype=dtype)
+            obj_cat["id"] = last_coadd_cat['number']
+            obj_cat["object_number"] = last_coadd_cat['number']
+            mags = {}
+            for band in stash["bands"]:
+                pyml = stash.get_output_pizza_cutter_yaml(tilename, band)
+                coadd_cat = fitsio.read(pyml["cat_path"], lower=True)
+                mags[band] = coadd_cat["mag_auto"]
+                assert len(coadd_cat) == len(obj_cat)
+
+            if "g" in mags and "i" in mags:
+                obj_cat["gi_color"] = mags["g"] - mags["i"]
+            else:
+                obj_cat["gi_color"] = PSF_KWARGS["r"]["GI_COLOR"]
+
+            if "i" in mags and "z" in mags:
+                obj_cat["iz_color"] = mags["i"] - mags["z"]
+            else:
+                obj_cat["iz_color"] = PSF_KWARGS["z"]["IZ_COLOR"]
+
+            for band in stash["bands"]:
+                coadd_file, _ = stash.get_filepaths(
+                    "coadd_file", tilename, band=band, with_fits_ext=True, funpack=True,
+                )
+                obj_cat_name = coadd_file.replace(".fits", "_objmap.fits")
+                fitsio.write(obj_cat_name, obj_cat, clobber=True)
+                stash.set_filepaths("coadd_object_map", obj_cat, tilename, band=band)
 
         return 0, stash
