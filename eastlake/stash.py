@@ -483,7 +483,7 @@ class Stash(dict):
             ):
                 os.makedirs(os.path.basename(fname), exist_ok=True)
                 with open(fname, "w") as fp:
-                    if key in ["finalcut_flist", "nwgint_flist"]:
+                    if flist_name in ["finalcut_flist", "nwgint_flist"]:
                         for i in range(len(pyml["src_info"])):
                             fp.write(
                                     "%s %r\n" % (
