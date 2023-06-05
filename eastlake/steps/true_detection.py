@@ -131,7 +131,7 @@ class TrueDetectionRunner(Step):
             obj_cat["iz_color"] = PSF_KWARGS["z"]["IZ_COLOR"]
 
         fitsio.write(obj_cat_name, obj_cat, clobber=True)
-        stash.set_filepaths("coadd_object_map", obj_cat, tilename, band=band)
+        stash.set_filepaths("coadd_object_map", obj_cat_name, tilename, band=band)
 
     def _copy_and_munge_coadd_data(self, stash, tilename, band):
         # we need to set the coadd path and img ext for downstrem code
