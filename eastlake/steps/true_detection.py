@@ -116,11 +116,17 @@ class TrueDetectionRunner(Step):
         obj_cat["object_number"] = srcext_cat['number']
         if "mag_g" in tdet.dtype.names and "mag_i" in tdet.dtype.names:
             obj_cat["gi_color"] = tdet["mag_g"] - tdet["mag_i"]
+            bad = ~np.isfinite(obj_cat["gi_color"])
+            if np.any(bad):
+                obj_cat[bad] = PSF_KWARGS["r"]["GI_COLOR"]
         else:
             obj_cat["gi_color"] = PSF_KWARGS["r"]["GI_COLOR"]
 
         if "mag_i" in tdet.dtype.names and "mag_z" in tdet.dtype.names:
             obj_cat["iz_color"] = tdet["mag_i"] - tdet["mag_z"]
+            bad = ~np.isfinite(obj_cat["iz_color"])
+            if np.any(bad):
+                obj_cat[bad] = PSF_KWARGS["r"]["iz_COLOR"]
         else:
             obj_cat["iz_color"] = PSF_KWARGS["z"]["IZ_COLOR"]
 
