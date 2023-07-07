@@ -498,10 +498,11 @@ class Stash(dict):
                 fileconf_data[flist_name] = fname
 
         fname = os.path.join(
-            odir, "lists", f"{tilename}_{band}_fileconf-{self['desrun']}.dat",
+            odir, "lists", f"{tilename}_{band}_fileconf-{self['desrun']}.yaml",
         )
         with open(fname, "w") as fp:
             yaml.dump(fileconf_data, fp)
+        self.set_filepaths("desdm-fileconf", fname, tilename, band=band)
 
         # make psf map files
         pmap_file = os.path.join(odir, f"{tilename}_{band}_psfmap-{self['desrun']}.dat")

@@ -26,6 +26,7 @@ from .steps import (
     MetadetectRunner,
     StashPrep,
     BalrogRunner,
+    DESDMMEDSRunner,
 )
 from .utils import get_logger, safe_mkdir, pushd
 from .stash import Stash
@@ -49,6 +50,7 @@ STEP_CLASSES = OrderedDict([
     ('stash_prep', StashPrep),
     ('balrog', BalrogRunner),
     ('delete_sources', DeleteSources),
+    ('desdm_meds', DESDMMEDSRunner),
 ])
 
 STEP_IS_GALSIM = set(["galsim"])
