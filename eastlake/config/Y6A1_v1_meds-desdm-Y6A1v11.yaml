@@ -1,0 +1,81 @@
+# Originally https://github.com/beckermr/des-y6-analysis/blob/main/2022_09_20_color_dep_meds/Y6A1_test_piff.yaml
+# Color ranges (gi_color_range and iz_color_range have been updated)
+medsconf: "Y6A1_v1_meds-desdm-Y6A1v11.yaml"
+campaign: "Y6A2_COADD"
+piff_campaign: "Y6A2_PIFF_V3"
+
+joblib:
+  max_workers: 8
+  backend: loky
+
+psf:
+  se:
+    type: piff
+    stamp_size: 25
+    use_color: True
+    gi_color_range: [0.0, 3.5]
+    iz_color_range: [0.0, 0.65]
+
+  coadd:
+    type: psfex
+    use_color: False
+
+# extensions for single-epoch images
+# the ngwint files
+se_image_ext:  "sci"
+se_weight_ext: "wgt"
+se_bmask_ext:  "msk"
+
+se_astrom:
+  type: 'piff'
+  use_color: True
+
+# separate bkg files
+se_bkg_ext:    "sci"
+
+# separate seg files
+se_seg_ext:    "sci"
+
+# coadd images
+coadd_image_ext:  "sci"
+coadd_weight_ext: "wgt"
+coadd_bmask_ext:  "msk"
+
+# separate segmap file
+coadd_seg_ext:    "sci"
+
+# coadds are already background subtracted
+coadd_bkg_ext: "none"
+
+# DESDM prefers to have the compression keywords instead
+# of fpack command line arguments
+
+fpack_pars:
+  FZQVALUE: 4
+  FZTILE: "(10240,1)"
+  FZALGOR: "RICE_1"
+  FZQMETHD: "SUBTRACTIVE_DITHER_2"
+
+source_type: "finalcut"
+
+use_astro_refine: False
+coadd_astrom:
+  use_color: False
+
+# allowed_box_sizes: [32, 48, 64, 96, 128, 192, 256]
+allowed_box_sizes: [40, 56, 72, 104, 136, 200, 264]
+min_box_size: 40
+max_box_size: 264
+
+# special bmask flags that we zero out in the weight map. This should be
+# restricted to BADAMP (8) currently, which is designed to deal with the fact
+# that the good half of ccd 31 was used for coadds but not the bad half.  The
+# bad part will be included in the MEDS files and potentially misused.  Of
+# course users should check the bitmask but in the previous MEDS files ccd 31
+# was not included so codes may not be checking for BADAMP
+
+
+unusable_bmask: 8
+
+comment: |
+  Updated for piff color dep
