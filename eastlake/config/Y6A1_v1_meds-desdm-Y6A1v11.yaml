@@ -28,7 +28,7 @@ se_weight_ext: "wgt"
 se_bmask_ext:  "msk"
 
 se_astrom:
-  use_color: True
+  use_color: False
 
 # separate bkg files
 se_bkg_ext:    "sci"
