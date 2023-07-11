@@ -1,6 +1,7 @@
 # Originally https://github.com/beckermr/des-y6-analysis/blob/main/2022_09_20_color_dep_meds/Y6A1_test_piff.yaml
 # Color ranges (gi_color_range and iz_color_range have been updated)
-medsconf: "Y6A1_v1_meds-desdm-Y6A1v11.yaml"
+# MRB - changed to use astrorefine WCS for use in sims
+medsconf: "Y6A1_v1_meds-desdm-Y6A1v11"
 campaign: "Y6A2_COADD"
 piff_campaign: "Y6A2_PIFF_V3"
 
@@ -27,7 +28,6 @@ se_weight_ext: "wgt"
 se_bmask_ext:  "msk"
 
 se_astrom:
-  type: 'piff'
   use_color: True
 
 # separate bkg files
@@ -58,7 +58,7 @@ fpack_pars:
 
 source_type: "finalcut"
 
-use_astro_refine: False
+use_astro_refine: True
 coadd_astrom:
   use_color: False
 

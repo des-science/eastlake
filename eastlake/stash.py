@@ -463,42 +463,56 @@ class Stash(dict):
             ),
         }
 
-        for flist_name, key in [
-            ("bkg_flist", "bkg_path"),
-            ("piff_flist", "piff_path"),
-            ("psf_flist", "psf_path"),
-            ("seg_flist", "seg_path"),
-            ("nullwt_flist", "coadd_nwgint_path"),
-            ("finalcut_flist", "image_path"),
-        ]:
-            fname = os.path.join(
-                odir, "lists", f"{tilename}_{band}_{flist_name.replace('_', '-')}-{self['desrun']}.dat",
-            )
-            if (
-                (not (skip_existing and os.path.exists(fname)))
-                and any(
-                    key in pyml["src_info"][i]
-                    for i in range(len(pyml["src_info"]))
+        # there are two versions of the lists files, one in a single list dir and one per band
+        for ldir in ["lists", f"lists-{band}"]:
+            for flist_name, key in [
+                ("bkg_flist", "bkg_path"),
+                ("piff_flist", "piff_path"),
+                ("psf_flist", "psf_path"),
+                ("seg_flist", "seg_path"),
+                ("nullwt_flist", "coadd_nwgint_path"),
+                ("finalcut_flist", "image_path"),
+            ]:
+                fname = os.path.join(
+                    odir,
+                    ldir,
+                    f"{tilename}_{band}_{flist_name.replace('_', '-')}-{self['desrun']}.dat",
                 )
-            ):
-                os.makedirs(os.path.dirname(fname), exist_ok=True)
-                with open(fname, "w") as fp:
-                    if flist_name in ["finalcut_flist", "nwgint_flist"]:
-                        for i in range(len(pyml["src_info"])):
-                            fp.write(
-                                    "%s %r\n" % (
-                                        pyml["src_info"][i][key],
-                                        pyml["src_info"][i]["magzp"],
-                                    )
-                                )
-                    else:
-                        for i in range(len(pyml["src_info"])):
-                            fp.write("%s\n" % (pyml["src_info"][i][key],))
+                if (
+                    (not (skip_existing and os.path.exists(fname)))
+                    and any(
+                        key in pyml["src_info"][i]
+                        for i in range(len(pyml["src_info"]))
+                    )
+                ):
+                    os.makedirs(os.path.dirname(fname), exist_ok=True)
+                    with open(fname, "w") as fp:
+                        if flist_name in ["finalcut_flist", "nwgint_flist"]:
+                            for i in range(len(pyml["src_info"])):
+                                if ldir == "lists":
+                                    fp.write(
+                                            "%s %r\n" % (
+                                                pyml["src_info"][i][key],
+                                                pyml["src_info"][i]["magzp"],
+                                            )
+                                        )
+                                else:
+                                    fp.write(
+                                            "%s %s %r\n" % (
+                                                pyml["src_info"][i][key],
+                                                pyml["src_info"][i]["head_path"],
+                                                pyml["src_info"][i]["magzp"],
+                                            )
+                                        )
+                        else:
+                            for i in range(len(pyml["src_info"])):
+                                fp.write("%s\n" % (pyml["src_info"][i][key],))
 
-                fileconf_data[flist_name] = fname
+                if ldir != "lists":
+                    fileconf_data[flist_name] = fname
 
         fname = os.path.join(
-            odir, "lists", f"{tilename}_{band}_fileconf-{self['desrun']}.yaml",
+            odir, f"lists-{band}", f"{tilename}_{band}_fileconf-{self['desrun']}.yaml",
         )
         with open(fname, "w") as fp:
             yaml.dump(fileconf_data, fp)

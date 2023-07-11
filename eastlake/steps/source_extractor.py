@@ -222,6 +222,9 @@ class SrcExtractorRunner(Step):
                 )
                 obj_cat_name = coadd_file.replace(".fits", "_objmap.fits")
                 fitsio.write(obj_cat_name, obj_cat, clobber=True)
-                stash.set_filepaths("coadd_object_map", obj_cat, tilename, band=band)
+                with stash.update_output_pizza_cutter_yaml(tilename, band):
+                    stash.set_filepaths(
+                        "coadd_object_map", obj_cat, tilename, band=band,
+                    )
 
         return 0, stash

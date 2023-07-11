@@ -7,6 +7,7 @@ import numpy as np
 from ..step import Step
 from ..utils import safe_copy, safe_rm
 from ..des_piff import PSF_KWARGS
+from ..des_files import MAGZP_REF
 
 
 class TrueDetectionRunner(Step):
@@ -69,12 +70,22 @@ class TrueDetectionRunner(Step):
             ('ymax_image', 'i4'),
             ('x_image', 'f4'),
             ('y_image', 'f4'),
+            ('x2_image', 'f4'),
+            ('y2_image', 'f4'),
+            ('errx2_image', 'f4'),
+            ('erry2_image', 'f4'),
             ('alpha_j2000', 'f8'),
             ('delta_j2000', 'f8'),
             ('a_world', 'f4'),
             ('b_world', 'f4'),
             ('flags', 'i2'),
-            ('flux_radius', 'f4')]
+            ('flux_radius', 'f4'),
+            ('isoarea_image', 'f4'),
+            ('flux_auto', 'f4'),
+            ("mag_auto", 'f4'),
+            ('fluxerr_auto', 'f4'),
+            ('magerr_auto', 'f4'),
+        ]
         srcext_cat = np.zeros(len(tdet), dtype=dtype)
         srcext_cat['number'] = np.arange(len(tdet)) + 1
         srcext_cat['x_image'] = tdet['x']
@@ -85,6 +96,11 @@ class TrueDetectionRunner(Step):
         srcext_cat['b_world'] = 0
         srcext_cat['flags'] = 0
         srcext_cat['flux_radius'] = 0
+        if f"mag_{band}" in tdet.dtype.names:
+            srcext_cat["mag_auto"] = tdet[f"mag_{band}"]
+            srcext_cat["flux_auto"] = 10**(
+                0.4*(MAGZP_REF - tdet[f"mag_{band}"])
+            )
 
         half = int(self.box_size / 2)
         xint = (tdet['x'] + 0.5).astype(np.int32)
@@ -131,11 +147,16 @@ class TrueDetectionRunner(Step):
             obj_cat["iz_color"] = PSF_KWARGS["z"]["IZ_COLOR"]
 
         fitsio.write(obj_cat_name, obj_cat, clobber=True)
-        stash.set_filepaths("coadd_object_map", obj_cat_name, tilename, band=band)
+        with stash.update_output_pizza_cutter_yaml(tilename, band):
+            stash.set_filepaths(
+                "coadd_object_map", obj_cat_name, tilename, band=band,
+            )
 
     def _copy_and_munge_coadd_data(self, stash, tilename, band):
         # we need to set the coadd path and img ext for downstrem code
-        orig_coadd_path = stash.get_input_pizza_cutter_yaml(tilename, band)["image_path"]
+        orig_coadd_path = stash.get_input_pizza_cutter_yaml(
+            tilename, band
+        )["image_path"]
         coadd_path_from_imsim_data = os.path.relpath(
             orig_coadd_path, stash["imsim_data"])
         coadd_file = os.path.join(
@@ -178,7 +199,9 @@ class TrueDetectionRunner(Step):
             pyml["seg_ext"] = -1
 
         # copy the PSF model even though it is not the actual PSF
-        orig_psf_path = stash.get_input_pizza_cutter_yaml(tilename, band)["psf_path"]
+        orig_psf_path = stash.get_input_pizza_cutter_yaml(
+            tilename, band
+        )["psf_path"]
         psf_path_from_imsim_data = os.path.relpath(
             orig_psf_path, stash["imsim_data"])
         psf_file = os.path.join(
