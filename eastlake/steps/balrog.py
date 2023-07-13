@@ -150,7 +150,7 @@ class BalrogRunner(Step):
                     )
 
         # update the stash with PSF info for downstream w/ MEDS
-        stash["psf_config"] = {"type": "DES_PSFEx"}
+        stash["psf_config"] = {"type": "DES_Piff"}
         stash["draw_method"] = "no_pixel"
 
         return 0, stash

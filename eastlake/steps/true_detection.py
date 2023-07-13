@@ -6,6 +6,8 @@ import numpy as np
 
 from ..step import Step
 from ..utils import safe_copy, safe_rm
+from ..des_piff import PSF_KWARGS
+from ..des_files import MAGZP_REF
 
 
 class TrueDetectionRunner(Step):
@@ -68,12 +70,22 @@ class TrueDetectionRunner(Step):
             ('ymax_image', 'i4'),
             ('x_image', 'f4'),
             ('y_image', 'f4'),
+            ('x2_image', 'f4'),
+            ('y2_image', 'f4'),
+            ('errx2_image', 'f4'),
+            ('erry2_image', 'f4'),
             ('alpha_j2000', 'f8'),
             ('delta_j2000', 'f8'),
             ('a_world', 'f4'),
             ('b_world', 'f4'),
             ('flags', 'i2'),
-            ('flux_radius', 'f4')]
+            ('flux_radius', 'f4'),
+            ('isoarea_image', 'f4'),
+            ('flux_auto', 'f4'),
+            ("mag_auto", 'f4'),
+            ('fluxerr_auto', 'f4'),
+            ('magerr_auto', 'f4'),
+        ]
         srcext_cat = np.zeros(len(tdet), dtype=dtype)
         srcext_cat['number'] = np.arange(len(tdet)) + 1
         srcext_cat['x_image'] = tdet['x']
@@ -84,6 +96,11 @@ class TrueDetectionRunner(Step):
         srcext_cat['b_world'] = 0
         srcext_cat['flags'] = 0
         srcext_cat['flux_radius'] = 0
+        if f"mag_{band}" in tdet.dtype.names:
+            srcext_cat["mag_auto"] = tdet[f"mag_{band}"]
+            srcext_cat["flux_auto"] = 10**(
+                0.4*(MAGZP_REF - tdet[f"mag_{band}"])
+            )
 
         half = int(self.box_size / 2)
         xint = (tdet['x'] + 0.5).astype(np.int32)
@@ -102,9 +119,44 @@ class TrueDetectionRunner(Step):
             pyml["cat_path"] = srcext_cat_name
         fitsio.write(srcext_cat_name, srcext_cat, clobber=True)
 
+        # make the coadd object map file
+        dtype = [
+            ('id', 'i8'),
+            ('object_number', 'i8'),
+            ('gi_color', 'f8'),
+            ('iz_color', 'f8'),
+        ]
+        obj_cat = np.zeros(len(tdet), dtype=dtype)
+        obj_cat_name = coadd_file.replace(".fits", "_objmap.fits")
+        obj_cat["id"] = srcext_cat['number']
+        obj_cat["object_number"] = srcext_cat['number']
+        if "mag_g" in tdet.dtype.names and "mag_i" in tdet.dtype.names:
+            obj_cat["gi_color"] = tdet["mag_g"] - tdet["mag_i"]
+            bad = ~np.isfinite(obj_cat["gi_color"])
+            if np.any(bad):
+                obj_cat[bad] = PSF_KWARGS["r"]["GI_COLOR"]
+        else:
+            obj_cat["gi_color"] = PSF_KWARGS["r"]["GI_COLOR"]
+
+        if "mag_i" in tdet.dtype.names and "mag_z" in tdet.dtype.names:
+            obj_cat["iz_color"] = tdet["mag_i"] - tdet["mag_z"]
+            bad = ~np.isfinite(obj_cat["iz_color"])
+            if np.any(bad):
+                obj_cat[bad] = PSF_KWARGS["r"]["iz_COLOR"]
+        else:
+            obj_cat["iz_color"] = PSF_KWARGS["z"]["IZ_COLOR"]
+
+        fitsio.write(obj_cat_name, obj_cat, clobber=True)
+        with stash.update_output_pizza_cutter_yaml(tilename, band):
+            stash.set_filepaths(
+                "coadd_object_map", obj_cat_name, tilename, band=band,
+            )
+
     def _copy_and_munge_coadd_data(self, stash, tilename, band):
         # we need to set the coadd path and img ext for downstrem code
-        orig_coadd_path = stash.get_input_pizza_cutter_yaml(tilename, band)["image_path"]
+        orig_coadd_path = stash.get_input_pizza_cutter_yaml(
+            tilename, band
+        )["image_path"]
         coadd_path_from_imsim_data = os.path.relpath(
             orig_coadd_path, stash["imsim_data"])
         coadd_file = os.path.join(
@@ -145,5 +197,18 @@ class TrueDetectionRunner(Step):
             pyml["weight_ext"] = 2
             pyml["seg_path"] = ""
             pyml["seg_ext"] = -1
+
+        # copy the PSF model even though it is not the actual PSF
+        orig_psf_path = stash.get_input_pizza_cutter_yaml(
+            tilename, band
+        )["psf_path"]
+        psf_path_from_imsim_data = os.path.relpath(
+            orig_psf_path, stash["imsim_data"])
+        psf_file = os.path.join(
+            stash["base_dir"], psf_path_from_imsim_data)
+        safe_copy(
+            orig_psf_path,
+            psf_file,
+        )
 
         return coadd_file
