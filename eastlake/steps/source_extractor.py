@@ -8,7 +8,7 @@ import numpy as np
 
 from ..step import Step, run_and_check
 from ..stash import Stash
-from ..utils import get_relpath, pushd
+from ..utils import get_relpath, pushd, safe_copy
 from ..des_piff import PSF_KWARGS
 from .swarp import FITSEXTMAP
 
@@ -224,7 +224,21 @@ class SrcExtractorRunner(Step):
                 fitsio.write(obj_cat_name, obj_cat, clobber=True)
                 with stash.update_output_pizza_cutter_yaml(tilename, band):
                     stash.set_filepaths(
-                        "coadd_object_map", obj_cat, tilename, band=band,
+                        "coadd_object_map", obj_cat_name, tilename, band=band,
                     )
+
+            for band in stash["bands"]:
+                # copy the PSF model even though it is not the actual PSF
+                orig_psf_path = stash.get_input_pizza_cutter_yaml(
+                    tilename, band
+                )["psf_path"]
+                psf_path_from_imsim_data = os.path.relpath(
+                    orig_psf_path, stash["imsim_data"])
+                psf_file = os.path.join(
+                    stash["base_dir"], psf_path_from_imsim_data)
+                safe_copy(
+                    orig_psf_path,
+                    psf_file,
+                )
 
         return 0, stash

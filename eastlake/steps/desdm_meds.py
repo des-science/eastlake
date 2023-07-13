@@ -47,7 +47,7 @@ class DESDMMEDSRunner(Step):
                 multiprocessing.cpu_count()//2,
             )
         )
-        self.config["use_nwgint"] = self.config.get("use_nwgint", False)
+        self.config["use_nwgint"] = self.config.get("use_nwgint", True)
 
     def clear_stash(self, stash):
         # If we continued the pipeline from a previous job record file,
