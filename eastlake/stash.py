@@ -471,6 +471,7 @@ class Stash(dict):
                 ("psf_flist", "psf_path"),
                 ("seg_flist", "seg_path"),
                 ("nullwt_flist", "coadd_nwgint_path"),
+                ("nwgint_flist", "coadd_nwgint_path"),
                 ("finalcut_flist", "image_path"),
             ]:
                 fname = os.path.join(
@@ -487,7 +488,7 @@ class Stash(dict):
                 ):
                     os.makedirs(os.path.dirname(fname), exist_ok=True)
                     with open(fname, "w") as fp:
-                        if flist_name in ["finalcut_flist", "nwgint_flist"]:
+                        if flist_name in ["finalcut_flist", "nullwt_flist", "nwgint_flist"]:
                             for i in range(len(pyml["src_info"])):
                                 if ldir == "lists":
                                     fp.write(
