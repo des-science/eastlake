@@ -134,7 +134,7 @@ class TrueDetectionRunner(Step):
             obj_cat["gi_color"] = tdet["mag_g"] - tdet["mag_i"]
             bad = ~np.isfinite(obj_cat["gi_color"])
             if np.any(bad):
-                obj_cat[bad] = PSF_KWARGS["r"]["GI_COLOR"]
+                obj_cat["gi_color"][bad] = PSF_KWARGS["r"]["GI_COLOR"]
         else:
             obj_cat["gi_color"] = PSF_KWARGS["r"]["GI_COLOR"]
 
@@ -142,7 +142,7 @@ class TrueDetectionRunner(Step):
             obj_cat["iz_color"] = tdet["mag_i"] - tdet["mag_z"]
             bad = ~np.isfinite(obj_cat["iz_color"])
             if np.any(bad):
-                obj_cat[bad] = PSF_KWARGS["r"]["iz_COLOR"]
+                obj_cat["iz_color"][bad] = PSF_KWARGS["r"]["IZ_COLOR"]
         else:
             obj_cat["iz_color"] = PSF_KWARGS["z"]["IZ_COLOR"]
 
