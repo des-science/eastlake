@@ -56,6 +56,7 @@ class DeleteImages(Step):
                                                      keyerror=False)
                     if (coadd_file is not None):
                         if os.path.isfile(coadd_file):
+                            self.logger.error("removing file %s" % coadd_file)
                             os.remove(coadd_file)
 
                     # Also check for seg file
@@ -65,13 +66,16 @@ class DeleteImages(Step):
                         if (seg_file is not None):
                             if os.path.isfile(seg_file):
                                 self.logger.error("removing file %s" % seg_file)
+                                os.remove(seg_file)
 
                     # Also check for bkg and bkg-rms files
                     bkg_file = coadd_file.replace(".fits", "bkg.fits")
                     if os.path.isfile(bkg_file):
+                        self.logger.error("removing file %s" % bkg_file)
                         os.remove(bkg_file)
                     bkg_rms_file = coadd_file.replace(".fits", "bkg-rms.fits")
                     if os.path.isfile(bkg_rms_file):
+                        self.logger.error("removing file %s" % bkg_rms_file)
                         os.remove(bkg_rms_file)
 
             # Secondly se stuff
@@ -84,6 +88,7 @@ class DeleteImages(Step):
                     if (img_files is not None):
                         for f in img_files:
                             if os.path.isfile(f):
+                                self.logger.error("removing file %s" % f)
                                 os.remove(f)
 
             if self.config["delete_se_nwgint"]:
@@ -95,6 +100,7 @@ class DeleteImages(Step):
                     if (img_files is not None):
                         for f in img_files:
                             if os.path.isfile(f):
+                                self.logger.error("removing file %s" % f)
                                 os.remove(f)
 
         return 0, stash

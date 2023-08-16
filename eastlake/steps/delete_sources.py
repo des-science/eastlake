@@ -47,6 +47,7 @@ class DeleteSources(Step):
                 )
                 if (coadd_file is not None):
                     if os.path.isfile(coadd_file):
+                        self.logger.error("removing file %s" % coadd_file)
                         os.remove(coadd_file)
 
                 # Also check for seg file
@@ -62,9 +63,11 @@ class DeleteSources(Step):
                 # Also check for bkg and bkg-rms files
                 bkg_file = coadd_file.replace(".fits", "bkg.fits")
                 if os.path.isfile(bkg_file):
+                    self.logger.error("removing file %s" % bkg_file)
                     os.remove(bkg_file)
                 bkg_rms_file = coadd_file.replace(".fits", "bkg-rms.fits")
                 if os.path.isfile(bkg_rms_file):
+                    self.logger.error("removing file %s" % bkg_rms_file)
                     os.remove(bkg_rms_file)
 
             self.logger.error("deleting se images for tile %s" % tilename)
@@ -75,6 +78,7 @@ class DeleteSources(Step):
                 if (img_files is not None):
                     for f in img_files:
                         if os.path.isfile(f):
+                            self.logger.error("removing file %s" % f)
                             os.remove(f)
 
             self.logger.error("deleting se nwgint images for tile %s" % tilename)
@@ -85,6 +89,7 @@ class DeleteSources(Step):
                 if (img_files is not None):
                     for f in img_files:
                         if os.path.isfile(f):
+                            self.logger.error("removing file %s" % f)
                             os.remove(f)
 
             self.logger.error("deleting as much as we can for tile %s" % tilename)
@@ -99,6 +104,7 @@ class DeleteSources(Step):
                         ]
                         for t in totry:
                             if os.path.isfile(t):
+                                self.logger.error("removing file %s" % t)
                                 os.remove(t)
 
                     if k == "src_info":
@@ -112,6 +118,7 @@ class DeleteSources(Step):
                                     ]
                                     for t in totry:
                                         if os.path.isfile(t):
+                                            self.logger.error("removing file %s" % t)
                                             os.remove(t)
 
         return 0, stash
