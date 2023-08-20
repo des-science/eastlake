@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 from __future__ import print_function
 import os
-from eastlake.utils import get_logger
-from eastlake.pipeline import Pipeline as EnsemblePipeline
 import argparse
 import datetime
+
+if "OMP_PROC_BIND" not in os.environ:
+    os.environ["OMP_PROC_BIND"] = "false"
 
 
 def ParseVariables(variables, logger):
@@ -75,6 +76,8 @@ def parse_args():
 
 
 def main():
+    from eastlake.utils import get_logger
+    from eastlake.pipeline import Pipeline as EnsemblePipeline
 
     args = parse_args()
 
@@ -89,14 +92,20 @@ def main():
         try:
             from mpi4py import MPI  # noqa
         except ImportError as e:
-            print("found SLURM_STEP_NUM_TASKS=%d but mpi4py failed to import" % ntasks_srun)
+            print(
+                "found SLURM_STEP_NUM_TASKS=%d but "
+                "mpi4py failed to import" % ntasks_srun
+            )
             print("aborting.")
             raise e
     if ntasks_mpirun > 1:
         try:
             from mpi4py import MPI  # noqa
         except ImportError as e:
-            print("found OMPI_COMM_WORLD_SIZE=%d but mpi4py failed to import" % ntasks_mpirun)
+            print(
+                "found OMPI_COMM_WORLD_SIZE=%d but "
+                "mpi4py failed to import" % ntasks_mpirun
+            )
             print("aborting.")
             raise e
 
