@@ -6,9 +6,10 @@ import logging
 
 import yaml
 import numpy as np
+import fitsio
 
 from ..step import Step, run_and_check
-from ..utils import safe_mkdir, safe_copy, copy_ifnotexists
+from ..utils import safe_mkdir, safe_copy, copy_ifnotexists, safe_rm
 from ..des_files import get_pizza_cutter_yaml_path
 
 
@@ -86,6 +87,7 @@ class PizzaCutterRunner(Step):
                         in_pyml["src_info"][i]["psf_path"],
                         pyml["src_info"][i]["psf_path"],
                     )
+                self._copy_and_munge_coadd_data(stash, tilename, band)
 
                 pzyml_pth, info_file = self._prep_input_config_and_info_file(
                     tilename, band, stash, odir, stash["bands"],
@@ -199,3 +201,75 @@ class PizzaCutterRunner(Step):
                 yaml.dump(info, fp)
 
         return pzyml_pth, info_file_pth
+
+    def _copy_and_munge_coadd_data(self, stash, tilename, band):
+        curr_out_coadd_path = stash.get_output_pizza_cutter_yaml(
+            tilename, band
+        )["image_path"]
+
+        if not os.path.exists(curr_out_coadd_path):
+            # we need to set the coadd path and img ext for downstrem code
+            orig_coadd_path = stash.get_input_pizza_cutter_yaml(
+                tilename, band
+            )["image_path"]
+            coadd_path_from_imsim_data = os.path.relpath(
+                orig_coadd_path, stash["imsim_data"])
+            coadd_file = os.path.join(
+                stash["base_dir"], coadd_path_from_imsim_data)
+
+            # make a copy, decompress it if needed,
+            if coadd_file[-3:] != '.fz':
+                dest_coadd_file = coadd_file
+            else:
+                dest_coadd_file = coadd_file
+                coadd_file = coadd_file[:-3]
+
+            # delete them here to make sure things work ok
+            safe_rm(coadd_file)
+            safe_rm(dest_coadd_file)
+
+            safe_copy(
+                orig_coadd_path,
+                dest_coadd_file,
+            )
+
+            if orig_coadd_path.endswith('.fz'):
+                os.system('funpack %s' % dest_coadd_file)
+                safe_rm(dest_coadd_file)
+
+            # write all zeros in the image
+            with fitsio.FITS(coadd_file, mode='rw') as fp:
+                fp[0].write(
+                    np.zeros((10000, 10000)))
+
+            # update the file paths
+            with stash.update_output_pizza_cutter_yaml(tilename, band) as pyml:
+                pyml["image_path"] = coadd_file
+                pyml["image_ext"] = 0
+                pyml["bmask_path"] = coadd_file
+                pyml["bmask_ext"] = 1
+                pyml["weight_path"] = coadd_file
+                pyml["weight_ext"] = 2
+                pyml["seg_path"] = ""
+                pyml["seg_ext"] = -1
+
+        # copy the PSF model even though it is not the actual PSF
+        curr_out_psf_path = stash.get_output_pizza_cutter_yaml(
+            tilename, band
+        )["psf_path"]
+        if not os.path.exists(curr_out_psf_path):
+            orig_psf_path = stash.get_input_pizza_cutter_yaml(
+                tilename, band
+            )["psf_path"]
+            psf_path_from_imsim_data = os.path.relpath(
+                orig_psf_path, stash["imsim_data"])
+            psf_file = os.path.join(
+                stash["base_dir"], psf_path_from_imsim_data)
+            safe_copy(
+                orig_psf_path,
+                psf_file,
+            )
+            with stash.update_output_pizza_cutter_yaml(tilename, band) as pyml:
+                pyml["psf_path"] = psf_file
+
+        return coadd_file
