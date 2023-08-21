@@ -43,12 +43,12 @@ class DeleteImages(Step):
                     filename = stash.get_filepaths(key, tilename, keyerror=False)
                     if filename is not None:
                         if os.path.isfile(filename):
-                            self.logger.error("removing file %s" % filename)
+                            self.logger.debug("removing file %s" % filename)
                             os.remove(filename)
                         else:
-                            self.logger.error("file %s not found" % filename)
+                            self.logger.debug("file %s not found" % filename)
                     else:
-                        self.logger.error("key %s not present" % key)
+                        self.logger.debug("key %s not present" % key)
 
                 # Now the per-band coadds
                 for band in stash["bands"]:
@@ -56,6 +56,7 @@ class DeleteImages(Step):
                                                      keyerror=False)
                     if (coadd_file is not None):
                         if os.path.isfile(coadd_file):
+                            self.logger.debug("removing file %s" % coadd_file)
                             os.remove(coadd_file)
 
                     # Also check for seg file
@@ -64,14 +65,17 @@ class DeleteImages(Step):
                                                        keyerror=False)
                         if (seg_file is not None):
                             if os.path.isfile(seg_file):
-                                self.logger.error("removing file %s" % seg_file)
+                                self.logger.debug("removing file %s" % seg_file)
+                                os.remove(seg_file)
 
                     # Also check for bkg and bkg-rms files
                     bkg_file = coadd_file.replace(".fits", "bkg.fits")
                     if os.path.isfile(bkg_file):
+                        self.logger.debug("removing file %s" % bkg_file)
                         os.remove(bkg_file)
                     bkg_rms_file = coadd_file.replace(".fits", "bkg-rms.fits")
                     if os.path.isfile(bkg_rms_file):
+                        self.logger.debug("removing file %s" % bkg_rms_file)
                         os.remove(bkg_rms_file)
 
             # Secondly se stuff
@@ -84,6 +88,7 @@ class DeleteImages(Step):
                     if (img_files is not None):
                         for f in img_files:
                             if os.path.isfile(f):
+                                self.logger.debug("removing file %s" % f)
                                 os.remove(f)
 
             if self.config["delete_se_nwgint"]:
@@ -95,6 +100,7 @@ class DeleteImages(Step):
                     if (img_files is not None):
                         for f in img_files:
                             if os.path.isfile(f):
+                                self.logger.debug("removing file %s" % f)
                                 os.remove(f)
 
         return 0, stash

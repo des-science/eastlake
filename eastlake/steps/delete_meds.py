@@ -30,14 +30,14 @@ class DeleteMeds(Step):
             if meds_files is not None:
                 for m in meds_files:
                     if os.path.isfile(m):
-                        self.logger.error("removing meds file %s" % m)
+                        self.logger.debug("removing meds file %s" % m)
                         os.remove(m)
 
             meds_files = stash.get_filepaths("pizza_cutter_meds_files", tilename, keyerror=False)
             if meds_files is not None:
                 for m in meds_files:
                     if os.path.isfile(m):
-                        self.logger.error("removing pizza-cutter meds file %s" % m)
+                        self.logger.debug("removing pizza-cutter meds file %s" % m)
                         os.remove(m)
 
         return 0, stash
