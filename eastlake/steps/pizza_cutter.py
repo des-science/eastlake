@@ -271,5 +271,3 @@ class PizzaCutterRunner(Step):
             )
             with stash.update_output_pizza_cutter_yaml(tilename, band) as pyml:
                 pyml["psf_path"] = psf_file
-
-        return coadd_file
