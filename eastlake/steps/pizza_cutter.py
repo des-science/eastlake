@@ -139,19 +139,6 @@ class PizzaCutterRunner(Step):
             else:
                 pzyml["single_epoch"]["psf_type"] = "galsim"
 
-                # do this check to ensure things are ~constant
-                # not perfect but ok
-                for size_key in ["half_light_radius", "sigma", "fwhm"]:
-                    if size_key in stash["psf_config"]:
-                        try:
-                            float(stash["psf_config"][size_key])
-                        except ValueError as e:
-                            self.logger.error(
-                                "couldn't interpret psf %s "
-                                "as float" % (size_key))
-                            raise e
-                        break
-
                 # write the config info for later
                 with stash.update_output_pizza_cutter_yaml(tilename, band) as pyml:
                     for i in range(len(pyml["src_info"])):
