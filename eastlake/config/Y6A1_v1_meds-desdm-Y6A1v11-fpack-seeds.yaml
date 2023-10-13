@@ -1,0 +1,5673 @@
+DES0000+0252:
+  i:
+    image_cutouts: 9320
+    psf_cutouts: 9266
+    weight_cutous: 3866
+  pfw_attempt_id:
+    i: '3570748'
+    r: '3570748'
+    z: '3570748'
+  r:
+    image_cutouts: 9443
+    psf_cutouts: 73
+    weight_cutous: 4160
+  z:
+    image_cutouts: 9560
+    psf_cutouts: 9312
+    weight_cutous: 3999
+DES0000-0207:
+  i:
+    image_cutouts: 4733
+    psf_cutouts: 4508
+    weight_cutous: 3271
+  pfw_attempt_id:
+    i: '3570745'
+DES0000-3623:
+  g:
+    image_cutouts: 2509
+    psf_cutouts: 9198
+    weight_cutous: 8782
+  i:
+    image_cutouts: 3130
+    psf_cutouts: 9614
+    weight_cutous: 9773
+  pfw_attempt_id:
+    g: '3570753'
+    i: '3570753'
+    r: '3570753'
+    z: '3570753'
+  r:
+    image_cutouts: 3666
+    psf_cutouts: 9056
+    weight_cutous: 789
+  z:
+    image_cutouts: 3943
+    psf_cutouts: 3111
+    weight_cutous: 8274
+DES0001-4957:
+  g:
+    image_cutouts: 9838
+    psf_cutouts: 5109
+    weight_cutous: 874
+  i:
+    image_cutouts: 754
+    psf_cutouts: 5723
+    weight_cutous: 732
+  pfw_attempt_id:
+    g: '3570762'
+    i: '3570762'
+DES0002+0126:
+  g:
+    image_cutouts: 7158
+    psf_cutouts: 8425
+    weight_cutous: 560
+  i:
+    image_cutouts: 7868
+    psf_cutouts: 9667
+    weight_cutous: 7296
+  pfw_attempt_id:
+    g: '3570770'
+    i: '3570770'
+    r: '3570770'
+    z: '3570770'
+  r:
+    image_cutouts: 8335
+    psf_cutouts: 1496
+    weight_cutous: 8358
+  z:
+    image_cutouts: 8795
+    psf_cutouts: 6081
+    weight_cutous: 6685
+DES0002-0207:
+  pfw_attempt_id:
+    z: '3570771'
+  z:
+    image_cutouts: 7518
+    psf_cutouts: 9369
+    weight_cutous: 8974
+DES0002-3332:
+  g:
+    image_cutouts: 1934
+    psf_cutouts: 9009
+    weight_cutous: 5187
+  i:
+    image_cutouts: 2016
+    psf_cutouts: 7033
+    weight_cutous: 4292
+  pfw_attempt_id:
+    g: '3570773'
+    i: '3570773'
+    r: '3570773'
+    z: '3570773'
+  r:
+    image_cutouts: 2075
+    psf_cutouts: 7243
+    weight_cutous: 4503
+  z:
+    image_cutouts: 2128
+    psf_cutouts: 8092
+    weight_cutous: 4893
+DES0003-0250:
+  g:
+    image_cutouts: 4088
+    psf_cutouts: 4417
+    weight_cutous: 3382
+  i:
+    image_cutouts: 4528
+    psf_cutouts: 991
+    weight_cutous: 2657
+  pfw_attempt_id:
+    g: '3570785'
+    i: '3570785'
+    r: '3570785'
+    z: '3570785'
+  r:
+    image_cutouts: 4833
+    psf_cutouts: 2580
+    weight_cutous: 2665
+  z:
+    image_cutouts: 5167
+    psf_cutouts: 9169
+    weight_cutous: 1607
+DES0003-3249:
+  g:
+    image_cutouts: 6052
+    psf_cutouts: 5152
+    weight_cutous: 9969
+  i:
+    image_cutouts: 6263
+    psf_cutouts: 1169
+    weight_cutous: 8552
+  pfw_attempt_id:
+    g: '3570793'
+    i: '3570793'
+    r: '3570793'
+    z: '3570793'
+  r:
+    image_cutouts: 6315
+    psf_cutouts: 1110
+    weight_cutous: 8470
+  z:
+    image_cutouts: 6374
+    psf_cutouts: 1989
+    weight_cutous: 8956
+DES0003-3706:
+  g:
+    image_cutouts: 5878
+    psf_cutouts: 647
+    weight_cutous: 6476
+  i:
+    image_cutouts: 6848
+    psf_cutouts: 5551
+    weight_cutous: 9554
+  pfw_attempt_id:
+    g: '3570794'
+    i: '3570794'
+    r: '3570794'
+    z: '3570794'
+  r:
+    image_cutouts: 8897
+    psf_cutouts: 8248
+    weight_cutous: 1766
+  z:
+    image_cutouts: 395
+    psf_cutouts: 6444
+    weight_cutous: 7700
+DES0005+0126:
+  g:
+    image_cutouts: 5133
+    psf_cutouts: 270
+    weight_cutous: 6610
+  pfw_attempt_id:
+    g: '3570819'
+    r: '3570819'
+    z: '3570819'
+  r:
+    image_cutouts: 6435
+    psf_cutouts: 8215
+    weight_cutous: 217
+  z:
+    image_cutouts: 7584
+    psf_cutouts: 5621
+    weight_cutous: 1734
+DES0005-0250:
+  g:
+    image_cutouts: 4659
+    psf_cutouts: 5212
+    weight_cutous: 3935
+  i:
+    image_cutouts: 4907
+    psf_cutouts: 2087
+    weight_cutous: 2604
+  pfw_attempt_id:
+    g: '3570822'
+    i: '3570822'
+    r: '3570822'
+    z: '3570822'
+  r:
+    image_cutouts: 5131
+    psf_cutouts: 4943
+    weight_cutous: 3278
+  z:
+    image_cutouts: 5562
+    psf_cutouts: 2374
+    weight_cutous: 4240
+DES0005-4914:
+  g:
+    image_cutouts: 7770
+    psf_cutouts: 2066
+    weight_cutous: 8445
+  i:
+    image_cutouts: 8318
+    psf_cutouts: 96
+    weight_cutous: 6965
+  pfw_attempt_id:
+    g: '3570826'
+    i: '3570826'
+    r: '3570826'
+    z: '3570826'
+  r:
+    image_cutouts: 9133
+    psf_cutouts: 3230
+    weight_cutous: 9804
+  z:
+    image_cutouts: 9731
+    psf_cutouts: 3808
+    weight_cutous: 7486
+DES0005-5331:
+  i:
+    image_cutouts: 2939
+    psf_cutouts: 7098
+    weight_cutous: 9470
+  pfw_attempt_id:
+    i: '3570827'
+    r: '3570827'
+  r:
+    image_cutouts: 3108
+    psf_cutouts: 1459
+    weight_cutous: 1523
+DES0006+0500:
+  g:
+    image_cutouts: 5565
+    psf_cutouts: 4320
+    weight_cutous: 9340
+  i:
+    image_cutouts: 5809
+    psf_cutouts: 1697
+    weight_cutous: 8558
+  pfw_attempt_id:
+    g: '3566457'
+    i: '3566457'
+    r: '3566457'
+  r:
+    image_cutouts: 5938
+    psf_cutouts: 1118
+    weight_cutous: 8346
+DES0006-0416:
+  g:
+    image_cutouts: 3697
+    psf_cutouts: 7607
+    weight_cutous: 4811
+  i:
+    image_cutouts: 4152
+    psf_cutouts: 750
+    weight_cutous: 2189
+  pfw_attempt_id:
+    g: '3570833'
+    i: '3570833'
+    r: '3570833'
+    z: '3570833'
+  r:
+    image_cutouts: 4366
+    psf_cutouts: 234
+    weight_cutous: 1561
+  z:
+    image_cutouts: 4545
+    psf_cutouts: 9400
+    weight_cutous: 1436
+DES0006-5040:
+  g:
+    image_cutouts: 8646
+    psf_cutouts: 7054
+    weight_cutous: 6495
+  i:
+    image_cutouts: 9827
+    psf_cutouts: 4892
+    weight_cutous: 1288
+  pfw_attempt_id:
+    g: '3570846'
+    i: '3570846'
+    r: '3570846'
+    z: '3570846'
+  r:
+    image_cutouts: 433
+    psf_cutouts: 7929
+    weight_cutous: 2566
+  z:
+    image_cutouts: 1224
+    psf_cutouts: 562
+    weight_cutous: 1042
+DES0006-5914:
+  g:
+    image_cutouts: 7967
+    psf_cutouts: 3358
+    weight_cutous: 8851
+  i:
+    image_cutouts: 8651
+    psf_cutouts: 573
+    weight_cutous: 8143
+  pfw_attempt_id:
+    g: '3570848'
+    i: '3570848'
+    r: '3570848'
+    z: '3570848'
+  r:
+    image_cutouts: 9178
+    psf_cutouts: 1715
+    weight_cutous: 9163
+  z:
+    image_cutouts: 9632
+    psf_cutouts: 549
+    weight_cutous: 8970
+DES0007-0624:
+  g:
+    image_cutouts: 141
+    psf_cutouts: 6475
+    weight_cutous: 7997
+  i:
+    image_cutouts: 630
+    psf_cutouts: 763
+    weight_cutous: 4788
+  pfw_attempt_id:
+    g: '3570850'
+    i: '3570850'
+    r: '3570850'
+    z: '3570850'
+  r:
+    image_cutouts: 924
+    psf_cutouts: 9114
+    weight_cutous: 4577
+  z:
+    image_cutouts: 1022
+    psf_cutouts: 7972
+    weight_cutous: 4261
+DES0007-3706:
+  g:
+    image_cutouts: 4204
+    psf_cutouts: 4304
+    weight_cutous: 3260
+  i:
+    image_cutouts: 4450
+    psf_cutouts: 2050
+    weight_cutous: 2502
+  pfw_attempt_id:
+    g: '3570854'
+    i: '3570854'
+    r: '3570854'
+    z: '3570854'
+  r:
+    image_cutouts: 4662
+    psf_cutouts: 4126
+    weight_cutous: 3136
+  z:
+    image_cutouts: 4934
+    psf_cutouts: 2673
+    weight_cutous: 3638
+DES0008+0126:
+  g:
+    image_cutouts: 645
+    psf_cutouts: 9991
+    weight_cutous: 9473
+  i:
+    image_cutouts: 864
+    psf_cutouts: 6902
+    weight_cutous: 8280
+  pfw_attempt_id:
+    g: '3570866'
+    i: '3570866'
+    r: '3570866'
+    z: '3570866'
+  r:
+    image_cutouts: 1038
+    psf_cutouts: 7974
+    weight_cutous: 8918
+  z:
+    image_cutouts: 1238
+    psf_cutouts: 7320
+    weight_cutous: 8687
+DES0008-3040:
+  g:
+    image_cutouts: 1918
+    psf_cutouts: 6083
+    weight_cutous: 3863
+  i:
+    image_cutouts: 1970
+    psf_cutouts: 5241
+    weight_cutous: 3583
+  pfw_attempt_id:
+    g: '3570871'
+    i: '3570871'
+    r: '3570871'
+    z: '3570871'
+  r:
+    image_cutouts: 2008
+    psf_cutouts: 5186
+    weight_cutous: 3533
+  z:
+    image_cutouts: 2045
+    psf_cutouts: 5378
+    weight_cutous: 3605
+DES0009-5540:
+  g:
+    image_cutouts: 8444
+    psf_cutouts: 553
+    weight_cutous: 8072
+  i:
+    image_cutouts: 8890
+    psf_cutouts: 6651
+    weight_cutous: 6051
+  pfw_attempt_id:
+    g: '3570893'
+    i: '3570893'
+    r: '3570893'
+    z: '3570893'
+  r:
+    image_cutouts: 9254
+    psf_cutouts: 5712
+    weight_cutous: 6816
+  z:
+    image_cutouts: 9534
+    psf_cutouts: 5260
+    weight_cutous: 7290
+DES0009-6248:
+  g:
+    image_cutouts: 5206
+    psf_cutouts: 3410
+    weight_cutous: 3303
+  i:
+    image_cutouts: 5430
+    psf_cutouts: 3030
+    weight_cutous: 2735
+  pfw_attempt_id:
+    g: '3570896'
+    i: '3570896'
+    r: '3570896'
+    z: '3570896'
+  r:
+    image_cutouts: 5934
+    psf_cutouts: 9489
+    weight_cutous: 7161
+  z:
+    image_cutouts: 6565
+    psf_cutouts: 5243
+    weight_cutous: 5382
+DES0010-0541:
+  g:
+    image_cutouts: 5511
+    psf_cutouts: 6153
+    weight_cutous: 8942
+  i:
+    image_cutouts: 6433
+    psf_cutouts: 1374
+    weight_cutous: 7233
+  pfw_attempt_id:
+    g: '3566461'
+    i: '3566461'
+    r: '3566461'
+    z: '3566461'
+  r:
+    image_cutouts: 7301
+    psf_cutouts: 285
+    weight_cutous: 7994
+  z:
+    image_cutouts: 7993
+    psf_cutouts: 9845
+    weight_cutous: 7403
+DES0010-3832:
+  i:
+    image_cutouts: 4118
+    psf_cutouts: 1828
+    weight_cutous: 1459
+  pfw_attempt_id:
+    i: '3570901'
+    r: '3570901'
+  r:
+    image_cutouts: 4433
+    psf_cutouts: 3403
+    weight_cutous: 3008
+DES0011-0207:
+  g:
+    image_cutouts: 496
+    psf_cutouts: 8660
+    weight_cutous: 8831
+  i:
+    image_cutouts: 690
+    psf_cutouts: 4692
+    weight_cutous: 7109
+  pfw_attempt_id:
+    g: '3570919'
+    i: '3570919'
+    r: '3570919'
+    z: '3570919'
+  r:
+    image_cutouts: 850
+    psf_cutouts: 5530
+    weight_cutous: 7555
+  z:
+    image_cutouts: 1012
+    psf_cutouts: 5418
+    weight_cutous: 7631
+DES0011-0333:
+  g:
+    image_cutouts: 2833
+    psf_cutouts: 702
+    weight_cutous: 5577
+  i:
+    image_cutouts: 3910
+    psf_cutouts: 8896
+    weight_cutous: 4694
+  pfw_attempt_id:
+    g: '3570923'
+    i: '3570923'
+    r: '3570923'
+    z: '3570923'
+  r:
+    image_cutouts: 4634
+    psf_cutouts: 6282
+    weight_cutous: 4524
+  z:
+    image_cutouts: 5169
+    psf_cutouts: 6702
+    weight_cutous: 3766
+DES0011-5414:
+  pfw_attempt_id:
+    r: '3566464'
+    z: '3566464'
+  r:
+    image_cutouts: 343
+    psf_cutouts: 7360
+    weight_cutous: 8106
+  z:
+    image_cutouts: 565
+    psf_cutouts: 8636
+    weight_cutous: 8167
+DES0012-0416:
+  i:
+    image_cutouts: 2408
+    psf_cutouts: 9504
+    weight_cutous: 258
+  pfw_attempt_id:
+    i: '3570934'
+    z: '3570934'
+  z:
+    image_cutouts: 2869
+    psf_cutouts: 9271
+    weight_cutous: 501
+DES0012-5705:
+  g:
+    image_cutouts: 2583
+    psf_cutouts: 5818
+    weight_cutous: 2760
+  i:
+    image_cutouts: 3016
+    psf_cutouts: 3542
+    weight_cutous: 1853
+  pfw_attempt_id:
+    g: '3570943'
+    i: '3570943'
+    z: '3570943'
+  z:
+    image_cutouts: 3685
+    psf_cutouts: 9400
+    weight_cutous: 907
+DES0013-4040:
+  g:
+    image_cutouts: 8986
+    psf_cutouts: 9441
+    weight_cutous: 7726
+  pfw_attempt_id:
+    g: '3570950'
+    z: '3570950'
+  z:
+    image_cutouts: 31
+    psf_cutouts: 5543
+    weight_cutous: 7097
+DES0014+0001:
+  g:
+    image_cutouts: 986
+    psf_cutouts: 9757
+    weight_cutous: 7286
+  pfw_attempt_id:
+    g: '3570958'
+    z: '3570958'
+  z:
+    image_cutouts: 3431
+    psf_cutouts: 2337
+    weight_cutous: 3538
+DES0014-5248:
+  i:
+    image_cutouts: 8816
+    psf_cutouts: 7356
+    weight_cutous: 7220
+  pfw_attempt_id:
+    i: '3570979'
+    z: '3570979'
+  z:
+    image_cutouts: 9278
+    psf_cutouts: 6173
+    weight_cutous: 7063
+DES0015-3040:
+  i:
+    image_cutouts: 6781
+    psf_cutouts: 1818
+    weight_cutous: 3802
+  pfw_attempt_id:
+    i: '3570988'
+    r: '3570988'
+    z: '3570988'
+  r:
+    image_cutouts: 6969
+    psf_cutouts: 3188
+    weight_cutous: 4806
+  z:
+    image_cutouts: 7151
+    psf_cutouts: 2458
+    weight_cutous: 4051
+DES0015-5622:
+  g:
+    image_cutouts: 8454
+    psf_cutouts: 9528
+    weight_cutous: 7316
+  i:
+    image_cutouts: 8809
+    psf_cutouts: 7052
+    weight_cutous: 6747
+  pfw_attempt_id:
+    g: '3570997'
+    i: '3570997'
+    r: '3570997'
+    z: '3570997'
+  r:
+    image_cutouts: 9093
+    psf_cutouts: 7114
+    weight_cutous: 7310
+  z:
+    image_cutouts: 9380
+    psf_cutouts: 8319
+    weight_cutous: 8015
+DES0015-5831:
+  g:
+    image_cutouts: 4680
+    psf_cutouts: 2965
+    weight_cutous: 2778
+  i:
+    image_cutouts: 4908
+    psf_cutouts: 901
+    weight_cutous: 2117
+  pfw_attempt_id:
+    g: '3570998'
+    i: '3570998'
+DES0016+0001:
+  g:
+    image_cutouts: 1779
+    psf_cutouts: 2570
+    weight_cutous: 6330
+  i:
+    image_cutouts: 2304
+    psf_cutouts: 936
+    weight_cutous: 464
+  pfw_attempt_id:
+    g: '3566469'
+    i: '3566469'
+    z: '3566469'
+  z:
+    image_cutouts: 3067
+    psf_cutouts: 1798
+    weight_cutous: 2092
+DES0016+0043:
+  g:
+    image_cutouts: 6472
+    psf_cutouts: 1555
+    weight_cutous: 7879
+  pfw_attempt_id:
+    g: '3571001'
+DES0016-0707:
+  g:
+    image_cutouts: 496
+    psf_cutouts: 7252
+    weight_cutous: 3750
+  pfw_attempt_id:
+    g: '3571003'
+    r: '3571003'
+    z: '3571003'
+  r:
+    image_cutouts: 670
+    psf_cutouts: 5150
+    weight_cutous: 2748
+  z:
+    image_cutouts: 723
+    psf_cutouts: 5101
+    weight_cutous: 2740
+DES0016-2915:
+  g:
+    image_cutouts: 4178
+    psf_cutouts: 7897
+    weight_cutous: 4182
+  i:
+    image_cutouts: 4903
+    psf_cutouts: 6036
+    weight_cutous: 4339
+  pfw_attempt_id:
+    g: '3571005'
+    i: '3571005'
+    r: '3571005'
+    z: '3571005'
+  r:
+    image_cutouts: 5498
+    psf_cutouts: 9283
+    weight_cutous: 5354
+  z:
+    image_cutouts: 6260
+    psf_cutouts: 6759
+    weight_cutous: 6082
+DES0017+0126:
+  g:
+    image_cutouts: 806
+    psf_cutouts: 527
+    weight_cutous: 8381
+  i:
+    image_cutouts: 2369
+    psf_cutouts: 1359
+    weight_cutous: 4986
+  pfw_attempt_id:
+    g: '3566472'
+    i: '3566472'
+    r: '3566472'
+    z: '3566472'
+  r:
+    image_cutouts: 3425
+    psf_cutouts: 3385
+    weight_cutous: 6612
+  z:
+    image_cutouts: 4662
+    psf_cutouts: 1792
+    weight_cutous: 6103
+DES0017-0416:
+  g:
+    image_cutouts: 3140
+    psf_cutouts: 6236
+    weight_cutous: 3810
+  i:
+    image_cutouts: 3673
+    psf_cutouts: 2307
+    weight_cutous: 1711
+  pfw_attempt_id:
+    g: '3571018'
+    i: '3571018'
+    r: '3571018'
+    z: '3571018'
+  r:
+    image_cutouts: 4066
+    psf_cutouts: 587
+    weight_cutous: 2238
+  z:
+    image_cutouts: 4282
+    psf_cutouts: 8708
+    weight_cutous: 864
+DES0018-0458:
+  g:
+    image_cutouts: 9608
+    psf_cutouts: 3686
+    weight_cutous: 829
+  i:
+    image_cutouts: 20
+    psf_cutouts: 7624
+    weight_cutous: 7875
+  pfw_attempt_id:
+    g: '3571034'
+    i: '3571034'
+    r: '3571034'
+  r:
+    image_cutouts: 284
+    psf_cutouts: 8851
+    weight_cutous: 8425
+DES0018-3457:
+  i:
+    image_cutouts: 6396
+    psf_cutouts: 9992
+    weight_cutous: 2637
+  pfw_attempt_id:
+    i: '3571039'
+    z: '3571039'
+  z:
+    image_cutouts: 6715
+    psf_cutouts: 9707
+    weight_cutous: 2730
+DES0019-0041:
+  i:
+    image_cutouts: 6822
+    psf_cutouts: 5487
+    weight_cutous: 5242
+  pfw_attempt_id:
+    i: '3571050'
+    r: '3571050'
+  r:
+    image_cutouts: 7135
+    psf_cutouts: 6094
+    weight_cutous: 5611
+DES0019-0624:
+  i:
+    image_cutouts: 5011
+    psf_cutouts: 3429
+    weight_cutous: 8811
+  pfw_attempt_id:
+    i: '3571054'
+DES0019-2958:
+  g:
+    image_cutouts: 9608
+    psf_cutouts: 8501
+    weight_cutous: 2033
+  i:
+    image_cutouts: 514
+    psf_cutouts: 7632
+    weight_cutous: 2146
+  pfw_attempt_id:
+    g: '3571056'
+    i: '3571056'
+    r: '3571056'
+    z: '3571056'
+  r:
+    image_cutouts: 1672
+    psf_cutouts: 8815
+    weight_cutous: 3414
+  z:
+    image_cutouts: 2417
+    psf_cutouts: 7718
+    weight_cutous: 3296
+DES0020-0416:
+  i:
+    image_cutouts: 1721
+    psf_cutouts: 333
+    weight_cutous: 9881
+  pfw_attempt_id:
+    i: '3566477'
+    r: '3566477'
+  r:
+    image_cutouts: 2062
+    psf_cutouts: 2758
+    weight_cutous: 770
+DES0020-2832:
+  i:
+    image_cutouts: 3151
+    psf_cutouts: 7437
+    weight_cutous: 9605
+  pfw_attempt_id:
+    i: '3571074'
+DES0020-5831:
+  pfw_attempt_id:
+    r: '3566479'
+  r:
+    image_cutouts: 7480
+    psf_cutouts: 3147
+    weight_cutous: 8234
+DES0021-2749:
+  g:
+    image_cutouts: 9249
+    psf_cutouts: 8399
+    weight_cutous: 8695
+  i:
+    image_cutouts: 9516
+    psf_cutouts: 4989
+    weight_cutous: 6952
+  pfw_attempt_id:
+    g: '3571085'
+    i: '3571085'
+    r: '3571085'
+    z: '3571085'
+  r:
+    image_cutouts: 9694
+    psf_cutouts: 4859
+    weight_cutous: 6692
+  z:
+    image_cutouts: 9866
+    psf_cutouts: 4526
+    weight_cutous: 6686
+DES0021-3123:
+  g:
+    image_cutouts: 7449
+    psf_cutouts: 6424
+    weight_cutous: 7230
+  i:
+    image_cutouts: 7763
+    psf_cutouts: 2085
+    weight_cutous: 4298
+  pfw_attempt_id:
+    g: '3571087'
+    i: '3571087'
+    r: '3571087'
+    z: '3571087'
+  r:
+    image_cutouts: 7933
+    psf_cutouts: 2585
+    weight_cutous: 4599
+  z:
+    image_cutouts: 8101
+    psf_cutouts: 2197
+    weight_cutous: 4694
+DES0021-3832:
+  g:
+    image_cutouts: 1807
+    psf_cutouts: 4542
+    weight_cutous: 1959
+  i:
+    image_cutouts: 2312
+    psf_cutouts: 4727
+    weight_cutous: 2156
+  pfw_attempt_id:
+    g: '3571090'
+    i: '3571090'
+    r: '3571090'
+    z: '3571090'
+  r:
+    image_cutouts: 2918
+    psf_cutouts: 7648
+    weight_cutous: 3634
+  z:
+    image_cutouts: 3492
+    psf_cutouts: 9791
+    weight_cutous: 454
+DES0021-4206:
+  g:
+    image_cutouts: 6518
+    psf_cutouts: 7268
+    weight_cutous: 1531
+  i:
+    image_cutouts: 6642
+    psf_cutouts: 9210
+    weight_cutous: 2354
+  pfw_attempt_id:
+    g: '3571095'
+    i: '3571095'
+DES0022-0124:
+  g:
+    image_cutouts: 6021
+    psf_cutouts: 6814
+    weight_cutous: 9759
+  i:
+    image_cutouts: 6694
+    psf_cutouts: 3942
+    weight_cutous: 8912
+  pfw_attempt_id:
+    g: '3571105'
+    i: '3571105'
+    r: '3571105'
+    z: '3571105'
+  r:
+    image_cutouts: 7603
+    psf_cutouts: 3032
+    weight_cutous: 8234
+  z:
+    image_cutouts: 8365
+    psf_cutouts: 4734
+    weight_cutous: 494
+DES0022-0624:
+  g:
+    image_cutouts: 7415
+    psf_cutouts: 391
+    weight_cutous: 3348
+  pfw_attempt_id:
+    g: '3571109'
+    z: '3571109'
+  z:
+    image_cutouts: 7780
+    psf_cutouts: 7158
+    weight_cutous: 2195
+DES0022-3415:
+  g:
+    image_cutouts: 5011
+    psf_cutouts: 4563
+    weight_cutous: 3686
+  i:
+    image_cutouts: 5270
+    psf_cutouts: 4178
+    weight_cutous: 3489
+  pfw_attempt_id:
+    g: '3571112'
+    i: '3571112'
+    z: '3571112'
+  z:
+    image_cutouts: 6004
+    psf_cutouts: 679
+    weight_cutous: 3722
+DES0023-0333:
+  g:
+    image_cutouts: 6504
+    psf_cutouts: 4411
+    weight_cutous: 9387
+  i:
+    image_cutouts: 7521
+    psf_cutouts: 6060
+    weight_cutous: 5747
+  pfw_attempt_id:
+    g: '3571125'
+    i: '3571125'
+    r: '3571125'
+    z: '3571125'
+  r:
+    image_cutouts: 7777
+    psf_cutouts: 6564
+    weight_cutous: 6285
+  z:
+    image_cutouts: 8012
+    psf_cutouts: 5526
+    weight_cutous: 5908
+DES0023-4914:
+  i:
+    image_cutouts: 8238
+    psf_cutouts: 3219
+    weight_cutous: 9185
+  pfw_attempt_id:
+    i: '3571134'
+    r: '3571134'
+    z: '3571134'
+  r:
+    image_cutouts: 9162
+    psf_cutouts: 9059
+    weight_cutous: 7903
+  z:
+    image_cutouts: 9551
+    psf_cutouts: 100
+    weight_cutous: 8137
+DES0024-0624:
+  g:
+    image_cutouts: 3879
+    psf_cutouts: 3638
+    weight_cutous: 2488
+  i:
+    image_cutouts: 4329
+    psf_cutouts: 7976
+    weight_cutous: 9348
+  pfw_attempt_id:
+    g: '3571142'
+    i: '3571142'
+    r: '3571142'
+    z: '3571142'
+  r:
+    image_cutouts: 4688
+    psf_cutouts: 9001
+    weight_cutous: 1136
+  z:
+    image_cutouts: 4935
+    psf_cutouts: 6425
+    weight_cutous: 217
+DES0025+0043:
+  g:
+    image_cutouts: 2296
+    psf_cutouts: 4194
+    weight_cutous: 6105
+  i:
+    image_cutouts: 3308
+    psf_cutouts: 7677
+    weight_cutous: 3765
+  pfw_attempt_id:
+    g: '3571155'
+    i: '3571155'
+    r: '3571155'
+    z: '3571155'
+  r:
+    image_cutouts: 4148
+    psf_cutouts: 3562
+    weight_cutous: 6308
+  z:
+    image_cutouts: 5091
+    psf_cutouts: 4991
+    weight_cutous: 5868
+DES0025-2958:
+  g:
+    image_cutouts: 3410
+    psf_cutouts: 9648
+    weight_cutous: 4773
+  i:
+    image_cutouts: 4169
+    psf_cutouts: 6381
+    weight_cutous: 3654
+  pfw_attempt_id:
+    g: '3571162'
+    i: '3571162'
+    r: '3571162'
+    z: '3571162'
+  r:
+    image_cutouts: 4800
+    psf_cutouts: 7385
+    weight_cutous: 4929
+  z:
+    image_cutouts: 5454
+    psf_cutouts: 5841
+    weight_cutous: 4720
+DES0025-3540:
+  i:
+    image_cutouts: 8678
+    psf_cutouts: 5520
+    weight_cutous: 641
+  pfw_attempt_id:
+    i: '3571164'
+    z: '3571164'
+  z:
+    image_cutouts: 113
+    psf_cutouts: 4874
+    weight_cutous: 9010
+DES0025-4040:
+  pfw_attempt_id:
+    r: '3571170'
+  r:
+    image_cutouts: 9242
+    psf_cutouts: 9449
+    weight_cutous: 7342
+DES0026-0458:
+  g:
+    image_cutouts: 5146
+    psf_cutouts: 9087
+    weight_cutous: 5250
+  i:
+    image_cutouts: 5830
+    psf_cutouts: 8032
+    weight_cutous: 5667
+  pfw_attempt_id:
+    g: '3566488'
+    i: '3566488'
+    z: '3566488'
+  z:
+    image_cutouts: 6909
+    psf_cutouts: 4037
+    weight_cutous: 5305
+DES0027-2332:
+  g:
+    image_cutouts: 3437
+    psf_cutouts: 6178
+    weight_cutous: 9189
+  i:
+    image_cutouts: 3808
+    psf_cutouts: 5766
+    weight_cutous: 9072
+  pfw_attempt_id:
+    g: '3571196'
+    i: '3571196'
+    r: '3571196'
+    z: '3571196'
+  r:
+    image_cutouts: 4240
+    psf_cutouts: 4259
+    weight_cutous: 9722
+  z:
+    image_cutouts: 4404
+    psf_cutouts: 1276
+    weight_cutous: 7608
+DES0027-6414:
+  g:
+    image_cutouts: 7543
+    psf_cutouts: 5481
+    weight_cutous: 451
+  i:
+    image_cutouts: 8457
+    psf_cutouts: 2615
+    weight_cutous: 8764
+  pfw_attempt_id:
+    g: '3571206'
+    i: '3571206'
+    r: '3571206'
+    z: '3571206'
+  r:
+    image_cutouts: 9074
+    psf_cutouts: 3742
+    weight_cutous: 9602
+  z:
+    image_cutouts: 9680
+    psf_cutouts: 2891
+    weight_cutous: 9726
+DES0028+0126:
+  g:
+    image_cutouts: 6075
+    psf_cutouts: 1339
+    weight_cutous: 7649
+  i:
+    image_cutouts: 6576
+    psf_cutouts: 5730
+    weight_cutous: 4869
+  pfw_attempt_id:
+    g: '3571212'
+    i: '3571212'
+    r: '3571212'
+    z: '3571212'
+  r:
+    image_cutouts: 7005
+    psf_cutouts: 8445
+    weight_cutous: 6541
+  z:
+    image_cutouts: 7420
+    psf_cutouts: 5308
+    weight_cutous: 6511
+DES0028-2458:
+  g:
+    image_cutouts: 4038
+    psf_cutouts: 2506
+    weight_cutous: 2265
+  i:
+    image_cutouts: 4467
+    psf_cutouts: 542
+    weight_cutous: 1512
+  pfw_attempt_id:
+    g: '3571218'
+    i: '3571218'
+    z: '3571218'
+  z:
+    image_cutouts: 5005
+    psf_cutouts: 6673
+    weight_cutous: 292
+DES0028-3040:
+  g:
+    image_cutouts: 4380
+    psf_cutouts: 8249
+    weight_cutous: 4907
+  i:
+    image_cutouts: 5124
+    psf_cutouts: 6979
+    weight_cutous: 4820
+  pfw_attempt_id:
+    g: '3566494'
+    i: '3566494'
+    r: '3566494'
+    z: '3566494'
+  r:
+    image_cutouts: 5912
+    psf_cutouts: 176
+    weight_cutous: 5913
+  z:
+    image_cutouts: 6985
+    psf_cutouts: 7268
+    weight_cutous: 6088
+DES0028-5914:
+  g:
+    image_cutouts: 8402
+    psf_cutouts: 7222
+    weight_cutous: 745
+  i:
+    image_cutouts: 9257
+    psf_cutouts: 2628
+    weight_cutous: 9577
+  pfw_attempt_id:
+    g: '3571230'
+    i: '3571230'
+    r: '3571230'
+    z: '3571230'
+  r:
+    image_cutouts: 9842
+    psf_cutouts: 4900
+    weight_cutous: 478
+  z:
+    image_cutouts: 596
+    psf_cutouts: 692
+    weight_cutous: 9613
+DES0029-2915:
+  g:
+    image_cutouts: 1582
+    psf_cutouts: 819
+    weight_cutous: 3897
+  pfw_attempt_id:
+    g: '3571239'
+    r: '3571239'
+    z: '3571239'
+  r:
+    image_cutouts: 3822
+    psf_cutouts: 2001
+    weight_cutous: 6497
+  z:
+    image_cutouts: 4652
+    psf_cutouts: 4203
+    weight_cutous: 3974
+DES0029-3540:
+  g:
+    image_cutouts: 8425
+    psf_cutouts: 7186
+    weight_cutous: 259
+  i:
+    image_cutouts: 9345
+    psf_cutouts: 2717
+    weight_cutous: 9497
+  pfw_attempt_id:
+    g: '3571244'
+    i: '3571244'
+    r: '3571244'
+    z: '3571244'
+  r:
+    image_cutouts: 9968
+    psf_cutouts: 3546
+    weight_cutous: 123
+  z:
+    image_cutouts: 482
+    psf_cutouts: 408
+    weight_cutous: 9666
+DES0031+0043:
+  g:
+    image_cutouts: 7778
+    psf_cutouts: 1897
+    weight_cutous: 2824
+  i:
+    image_cutouts: 9005
+    psf_cutouts: 4993
+    weight_cutous: 394
+  pfw_attempt_id:
+    g: '3571267'
+    i: '3571267'
+    r: '3571267'
+    z: '3571267'
+  r:
+    image_cutouts: 1
+    psf_cutouts: 3204
+    weight_cutous: 4569
+  z:
+    image_cutouts: 1312
+    psf_cutouts: 3670
+    weight_cutous: 9837
+DES0031-5414:
+  g:
+    image_cutouts: 2340
+    psf_cutouts: 7948
+    weight_cutous: 2733
+  i:
+    image_cutouts: 3197
+    psf_cutouts: 6540
+    weight_cutous: 3065
+  pfw_attempt_id:
+    g: '3571283'
+    i: '3571283'
+    r: '3571283'
+    z: '3571283'
+  r:
+    image_cutouts: 3977
+    psf_cutouts: 6459
+    weight_cutous: 3311
+  z:
+    image_cutouts: 4813
+    psf_cutouts: 6477
+    weight_cutous: 4831
+DES0032-5457:
+  i:
+    image_cutouts: 240
+    psf_cutouts: 8574
+    weight_cutous: 2545
+  pfw_attempt_id:
+    i: '3571306'
+DES0033-2541:
+  g:
+    image_cutouts: 3202
+    psf_cutouts: 9398
+    weight_cutous: 9173
+  i:
+    image_cutouts: 5316
+    psf_cutouts: 2849
+    weight_cutous: 7475
+  pfw_attempt_id:
+    g: '3571310'
+    i: '3571310'
+    r: '3571310'
+    z: '3571310'
+  r:
+    image_cutouts: 6209
+    psf_cutouts: 8766
+    weight_cutous: 7068
+  z:
+    image_cutouts: 6580
+    psf_cutouts: 7247
+    weight_cutous: 6398
+DES0033-3249:
+  g:
+    image_cutouts: 7148
+    psf_cutouts: 602
+    weight_cutous: 2705
+  i:
+    image_cutouts: 8689
+    psf_cutouts: 4189
+    weight_cutous: 9841
+  pfw_attempt_id:
+    g: '3571313'
+    i: '3571313'
+    r: '3571313'
+    z: '3571313'
+  r:
+    image_cutouts: 9485
+    psf_cutouts: 6443
+    weight_cutous: 581
+  z:
+    image_cutouts: 391
+    psf_cutouts: 2263
+    weight_cutous: 1166
+DES0033-6039:
+  g:
+    image_cutouts: 8629
+    psf_cutouts: 6214
+    weight_cutous: 529
+  i:
+    image_cutouts: 9542
+    psf_cutouts: 5226
+    weight_cutous: 465
+  pfw_attempt_id:
+    g: '3571323'
+    i: '3571323'
+    r: '3571323'
+    z: '3571323'
+  r:
+    image_cutouts: 330
+    psf_cutouts: 4252
+    weight_cutous: 638
+  z:
+    image_cutouts: 1000
+    psf_cutouts: 2584
+    weight_cutous: 385
+DES0034+0209:
+  g:
+    image_cutouts: 6691
+    psf_cutouts: 8429
+    weight_cutous: 619
+  i:
+    image_cutouts: 7502
+    psf_cutouts: 824
+    weight_cutous: 7034
+  pfw_attempt_id:
+    g: '3571329'
+    i: '3571329'
+    z: '3571329'
+  z:
+    image_cutouts: 8999
+    psf_cutouts: 3577
+    weight_cutous: 190
+DES0034+0335:
+  i:
+    image_cutouts: 6225
+    psf_cutouts: 8721
+    weight_cutous: 5673
+  pfw_attempt_id:
+    i: '3571333'
+    r: '3571333'
+    z: '3571333'
+  r:
+    image_cutouts: 6753
+    psf_cutouts: 7149
+    weight_cutous: 6138
+  z:
+    image_cutouts: 7049
+    psf_cutouts: 8766
+    weight_cutous: 6999
+DES0034-0124:
+  g:
+    image_cutouts: 6541
+    psf_cutouts: 6451
+    weight_cutous: 9717
+  i:
+    image_cutouts: 7634
+    psf_cutouts: 2586
+    weight_cutous: 7963
+  pfw_attempt_id:
+    g: '3571326'
+    i: '3571326'
+    r: '3571326'
+    z: '3571326'
+  r:
+    image_cutouts: 8560
+    psf_cutouts: 1836
+    weight_cutous: 8462
+  z:
+    image_cutouts: 9248
+    psf_cutouts: 6090
+    weight_cutous: 7247
+DES0036-2206:
+  g:
+    image_cutouts: 7604
+    psf_cutouts: 1656
+    weight_cutous: 8040
+  i:
+    image_cutouts: 8577
+    psf_cutouts: 491
+    weight_cutous: 8488
+  pfw_attempt_id:
+    g: '3571370'
+    i: '3571370'
+    r: '3571370'
+    z: '3571370'
+  r:
+    image_cutouts: 9316
+    psf_cutouts: 1439
+    weight_cutous: 8779
+  z:
+    image_cutouts: 272
+    psf_cutouts: 8630
+    weight_cutous: 313
+DES0036-4123:
+  i:
+    image_cutouts: 6720
+    psf_cutouts: 7633
+    weight_cutous: 5738
+  pfw_attempt_id:
+    i: '3566508'
+DES0036-5414:
+  g:
+    image_cutouts: 229
+    psf_cutouts: 688
+    weight_cutous: 3255
+  i:
+    image_cutouts: 1001
+    psf_cutouts: 1284
+    weight_cutous: 9813
+  pfw_attempt_id:
+    g: '3571384'
+    i: '3571384'
+    r: '3571384'
+    z: '3571384'
+  r:
+    image_cutouts: 1413
+    psf_cutouts: 5172
+    weight_cutous: 846
+  z:
+    image_cutouts: 2336
+    psf_cutouts: 5533
+    weight_cutous: 3197
+DES0037-0124:
+  g:
+    image_cutouts: 3365
+    psf_cutouts: 8344
+    weight_cutous: 4090
+  i:
+    image_cutouts: 3984
+    psf_cutouts: 4773
+    weight_cutous: 3206
+  pfw_attempt_id:
+    g: '3571387'
+    i: '3571387'
+DES0037-0207:
+  g:
+    image_cutouts: 9476
+    psf_cutouts: 8694
+    weight_cutous: 1865
+  pfw_attempt_id:
+    g: '3571388'
+    z: '3571388'
+  z:
+    image_cutouts: 3136
+    psf_cutouts: 8047
+    weight_cutous: 3323
+DES0037-5457:
+  g:
+    image_cutouts: 6363
+    psf_cutouts: 3803
+    weight_cutous: 8031
+  i:
+    image_cutouts: 7373
+    psf_cutouts: 3190
+    weight_cutous: 8834
+  pfw_attempt_id:
+    g: '3571407'
+    i: '3571407'
+    r: '3571407'
+    z: '3571407'
+  r:
+    image_cutouts: 8103
+    psf_cutouts: 4136
+    weight_cutous: 9758
+  z:
+    image_cutouts: 9077
+    psf_cutouts: 9522
+    weight_cutous: 9768
+DES0038-2415:
+  g:
+    image_cutouts: 3326
+    psf_cutouts: 549
+    weight_cutous: 5538
+  i:
+    image_cutouts: 4150
+    psf_cutouts: 6197
+    weight_cutous: 3907
+  pfw_attempt_id:
+    g: '3571415'
+    i: '3571415'
+    r: '3571415'
+    z: '3571415'
+  r:
+    image_cutouts: 4883
+    psf_cutouts: 1680
+    weight_cutous: 5820
+  z:
+    image_cutouts: 5886
+    psf_cutouts: 4387
+    weight_cutous: 4651
+DES0039-1958:
+  g:
+    image_cutouts: 9865
+    psf_cutouts: 7881
+    weight_cutous: 7057
+  i:
+    image_cutouts: 603
+    psf_cutouts: 6031
+    weight_cutous: 7156
+  pfw_attempt_id:
+    g: '3571431'
+    i: '3571431'
+    r: '3571431'
+  r:
+    image_cutouts: 1225
+    psf_cutouts: 7504
+    weight_cutous: 8606
+DES0039-2206:
+  g:
+    image_cutouts: 5360
+    psf_cutouts: 3642
+    weight_cutous: 7212
+  i:
+    image_cutouts: 6369
+    psf_cutouts: 1895
+    weight_cutous: 8130
+  pfw_attempt_id:
+    g: '3571432'
+    i: '3571432'
+    r: '3571432'
+    z: '3571432'
+  r:
+    image_cutouts: 6964
+    psf_cutouts: 7264
+    weight_cutous: 6208
+  z:
+    image_cutouts: 7249
+    psf_cutouts: 5873
+    weight_cutous: 5972
+DES0039-2623:
+  i:
+    image_cutouts: 3156
+    psf_cutouts: 4121
+    weight_cutous: 1880
+  pfw_attempt_id:
+    i: '3571433'
+DES0039-2958:
+  g:
+    image_cutouts: 4110
+    psf_cutouts: 4857
+    weight_cutous: 3058
+  i:
+    image_cutouts: 4595
+    psf_cutouts: 676
+    weight_cutous: 1871
+  pfw_attempt_id:
+    g: '3571435'
+    i: '3571435'
+    r: '3571435'
+    z: '3571435'
+  r:
+    image_cutouts: 4805
+    psf_cutouts: 3096
+    weight_cutous: 2955
+  z:
+    image_cutouts: 5047
+    psf_cutouts: 1678
+    weight_cutous: 2423
+DES0039-3706:
+  g:
+    image_cutouts: 9124
+    psf_cutouts: 32
+    weight_cutous: 2602
+  i:
+    image_cutouts: 201
+    psf_cutouts: 6431
+    weight_cutous: 1649
+  pfw_attempt_id:
+    g: '3571438'
+    i: '3571438'
+    r: '3571438'
+    z: '3571438'
+  r:
+    image_cutouts: 1083
+    psf_cutouts: 4599
+    weight_cutous: 2085
+  z:
+    image_cutouts: 1619
+    psf_cutouts: 8170
+    weight_cutous: 9319
+DES0039-3749:
+  pfw_attempt_id:
+    z: '3571439'
+  z:
+    image_cutouts: 4046
+    psf_cutouts: 2749
+    weight_cutous: 2553
+DES0039-3832:
+  g:
+    image_cutouts: 5699
+    psf_cutouts: 5529
+    weight_cutous: 4094
+  i:
+    image_cutouts: 6063
+    psf_cutouts: 7358
+    weight_cutous: 5062
+  pfw_attempt_id:
+    g: '3571440'
+    i: '3571440'
+    r: '3571440'
+    z: '3571440'
+  r:
+    image_cutouts: 7048
+    psf_cutouts: 4811
+    weight_cutous: 9034
+  z:
+    image_cutouts: 8144
+    psf_cutouts: 9115
+    weight_cutous: 7560
+DES0039-4457:
+  g:
+    image_cutouts: 6845
+    psf_cutouts: 4304
+    weight_cutous: 8899
+  i:
+    image_cutouts: 7335
+    psf_cutouts: 8263
+    weight_cutous: 6871
+  pfw_attempt_id:
+    g: '3571442'
+    i: '3571442'
+    r: '3571442'
+    z: '3571442'
+  r:
+    image_cutouts: 7719
+    psf_cutouts: 409
+    weight_cutous: 7381
+  z:
+    image_cutouts: 8287
+    psf_cutouts: 8729
+    weight_cutous: 8280
+DES0039-5331:
+  pfw_attempt_id:
+    r: '3571444'
+  r:
+    image_cutouts: 6204
+    psf_cutouts: 675
+    weight_cutous: 6361
+DES0040-0416:
+  g:
+    image_cutouts: 9431
+    psf_cutouts: 9296
+    weight_cutous: 2278
+  i:
+    image_cutouts: 712
+    psf_cutouts: 6824
+    weight_cutous: 1861
+  pfw_attempt_id:
+    g: '3571452'
+    i: '3571452'
+    r: '3571452'
+  r:
+    image_cutouts: 1542
+    psf_cutouts: 8583
+    weight_cutous: 3855
+DES0041-2458:
+  g:
+    image_cutouts: 1597
+    psf_cutouts: 9610
+    weight_cutous: 4722
+  i:
+    image_cutouts: 2356
+    psf_cutouts: 63
+    weight_cutous: 270
+  pfw_attempt_id:
+    g: '3571474'
+    i: '3571474'
+    r: '3571474'
+    z: '3571474'
+  r:
+    image_cutouts: 2664
+    psf_cutouts: 3325
+    weight_cutous: 1136
+  z:
+    image_cutouts: 3038
+    psf_cutouts: 8899
+    weight_cutous: 368
+DES0041-5205:
+  g:
+    image_cutouts: 2631
+    psf_cutouts: 5537
+    weight_cutous: 2765
+  pfw_attempt_id:
+    g: '3571482'
+DES0042-0041:
+  g:
+    image_cutouts: 2757
+    psf_cutouts: 1268
+    weight_cutous: 6759
+  i:
+    image_cutouts: 3186
+    psf_cutouts: 3346
+    weight_cutous: 1942
+  pfw_attempt_id:
+    g: '3571487'
+    i: '3571487'
+    r: '3571487'
+    z: '3571487'
+  r:
+    image_cutouts: 3685
+    psf_cutouts: 5887
+    weight_cutous: 2926
+  z:
+    image_cutouts: 4239
+    psf_cutouts: 4528
+    weight_cutous: 3619
+DES0042-2206:
+  g:
+    image_cutouts: 8410
+    psf_cutouts: 7664
+    weight_cutous: 7374
+  i:
+    image_cutouts: 8979
+    psf_cutouts: 1255
+    weight_cutous: 9261
+  pfw_attempt_id:
+    g: '3571495'
+    i: '3571495'
+    r: '3571495'
+    z: '3571495'
+  r:
+    image_cutouts: 9579
+    psf_cutouts: 8202
+    weight_cutous: 8360
+  z:
+    image_cutouts: 9886
+    psf_cutouts: 7201
+    weight_cutous: 8295
+DES0042-2915:
+  g:
+    image_cutouts: 4031
+    psf_cutouts: 7120
+    weight_cutous: 5265
+  pfw_attempt_id:
+    g: '3571497'
+    r: '3571497'
+  r:
+    image_cutouts: 4601
+    psf_cutouts: 1930
+    weight_cutous: 2379
+DES0042-5457:
+  g:
+    image_cutouts: 972
+    psf_cutouts: 2050
+    weight_cutous: 9885
+  pfw_attempt_id:
+    g: '3571503'
+DES0043-0333:
+  g:
+    image_cutouts: 7628
+    psf_cutouts: 7015
+    weight_cutous: 8994
+  i:
+    image_cutouts: 8783
+    psf_cutouts: 7113
+    weight_cutous: 6688
+  pfw_attempt_id:
+    g: '3571508'
+    i: '3571508'
+    r: '3571508'
+    z: '3571508'
+  r:
+    image_cutouts: 9235
+    psf_cutouts: 2330
+    weight_cutous: 269
+  z:
+    image_cutouts: 9970
+    psf_cutouts: 7407
+    weight_cutous: 55
+DES0043-2541:
+  g:
+    image_cutouts: 7333
+    psf_cutouts: 3670
+    weight_cutous: 8044
+  i:
+    image_cutouts: 8450
+    psf_cutouts: 1367
+    weight_cutous: 8439
+  pfw_attempt_id:
+    g: '3571514'
+    i: '3571514'
+    z: '3571514'
+  z:
+    image_cutouts: 9610
+    psf_cutouts: 8700
+    weight_cutous: 8768
+DES0043-2832:
+  pfw_attempt_id:
+    z: '3571515'
+  z:
+    image_cutouts: 9932
+    psf_cutouts: 8380
+    weight_cutous: 9744
+DES0043-3457:
+  g:
+    image_cutouts: 6265
+    psf_cutouts: 9415
+    weight_cutous: 6598
+  i:
+    image_cutouts: 6886
+    psf_cutouts: 6367
+    weight_cutous: 5422
+  pfw_attempt_id:
+    g: '3571518'
+    i: '3571518'
+    r: '3571518'
+  r:
+    image_cutouts: 7288
+    psf_cutouts: 7827
+    weight_cutous: 6265
+DES0043-3540:
+  g:
+    image_cutouts: 8436
+    psf_cutouts: 6401
+    weight_cutous: 6694
+  i:
+    image_cutouts: 8656
+    psf_cutouts: 8005
+    weight_cutous: 6215
+  pfw_attempt_id:
+    g: '3571519'
+    i: '3571519'
+DES0043-4831:
+  g:
+    image_cutouts: 3514
+    psf_cutouts: 1326
+    weight_cutous: 1545
+  i:
+    image_cutouts: 3733
+    psf_cutouts: 9046
+    weight_cutous: 690
+  pfw_attempt_id:
+    g: '3571527'
+    i: '3571527'
+    r: '3571527'
+    z: '3571527'
+  r:
+    image_cutouts: 3919
+    psf_cutouts: 9715
+    weight_cutous: 931
+  z:
+    image_cutouts: 4111
+    psf_cutouts: 467
+    weight_cutous: 1678
+DES0044+0500:
+  g:
+    image_cutouts: 4359
+    psf_cutouts: 3384
+    weight_cutous: 8186
+  pfw_attempt_id:
+    g: '3571530'
+    r: '3571530'
+  r:
+    image_cutouts: 4624
+    psf_cutouts: 1456
+    weight_cutous: 7738
+DES0044-4206:
+  g:
+    image_cutouts: 4629
+    psf_cutouts: 4207
+    weight_cutous: 3326
+  i:
+    image_cutouts: 4872
+    psf_cutouts: 2768
+    weight_cutous: 2859
+  pfw_attempt_id:
+    g: '3571541'
+    i: '3571541'
+    z: '3571541'
+  z:
+    image_cutouts: 6041
+    psf_cutouts: 5827
+    weight_cutous: 5175
+DES0044-4623:
+  pfw_attempt_id:
+    r: '3571543'
+    z: '3571543'
+  r:
+    image_cutouts: 6315
+    psf_cutouts: 6433
+    weight_cutous: 5113
+  z:
+    image_cutouts: 6915
+    psf_cutouts: 4232
+    weight_cutous: 5283
+DES0044-5331:
+  i:
+    image_cutouts: 6802
+    psf_cutouts: 8633
+    weight_cutous: 6424
+  pfw_attempt_id:
+    i: '3571546'
+DES0045-2623:
+  g:
+    image_cutouts: 1906
+    psf_cutouts: 526
+    weight_cutous: 304
+  pfw_attempt_id:
+    g: '3571564'
+    r: '3571564'
+  r:
+    image_cutouts: 2357
+    psf_cutouts: 7796
+    weight_cutous: 9331
+DES0045-5914:
+  g:
+    image_cutouts: 3439
+    psf_cutouts: 5725
+    weight_cutous: 4337
+  i:
+    image_cutouts: 3949
+    psf_cutouts: 2624
+    weight_cutous: 1984
+  pfw_attempt_id:
+    g: '3571572'
+    i: '3571572'
+    r: '3571572'
+    z: '3571572'
+  r:
+    image_cutouts: 4465
+    psf_cutouts: 6801
+    weight_cutous: 3710
+  z:
+    image_cutouts: 5111
+    psf_cutouts: 5930
+    weight_cutous: 4881
+DES0046+0418:
+  g:
+    image_cutouts: 9678
+    psf_cutouts: 7425
+    weight_cutous: 7330
+  i:
+    image_cutouts: 203
+    psf_cutouts: 7150
+    weight_cutous: 7521
+  pfw_attempt_id:
+    g: '3571576'
+    i: '3571576'
+    r: '3571576'
+    z: '3571576'
+  r:
+    image_cutouts: 962
+    psf_cutouts: 9229
+    weight_cutous: 9278
+  z:
+    image_cutouts: 1507
+    psf_cutouts: 4731
+    weight_cutous: 8397
+DES0046-0333:
+  g:
+    image_cutouts: 3709
+    psf_cutouts: 7904
+    weight_cutous: 3906
+  i:
+    image_cutouts: 4373
+    psf_cutouts: 6377
+    weight_cutous: 3734
+  pfw_attempt_id:
+    g: '3571573'
+    i: '3571573'
+    r: '3571573'
+    z: '3571573'
+  r:
+    image_cutouts: 4967
+    psf_cutouts: 7048
+    weight_cutous: 4688
+  z:
+    image_cutouts: 5436
+    psf_cutouts: 157
+    weight_cutous: 2375
+DES0046-2332:
+  g:
+    image_cutouts: 8159
+    psf_cutouts: 4545
+    weight_cutous: 9704
+  i:
+    image_cutouts: 8782
+    psf_cutouts: 1387
+    weight_cutous: 8847
+  pfw_attempt_id:
+    g: '3571580'
+    i: '3571580'
+    r: '3571580'
+    z: '3571580'
+  r:
+    image_cutouts: 9302
+    psf_cutouts: 2404
+    weight_cutous: 9450
+  z:
+    image_cutouts: 9857
+    psf_cutouts: 418
+    weight_cutous: 9460
+DES0046-3457:
+  g:
+    image_cutouts: 620
+    psf_cutouts: 8347
+    weight_cutous: 8785
+  i:
+    image_cutouts: 856
+    psf_cutouts: 6464
+    weight_cutous: 7794
+  pfw_attempt_id:
+    g: '3571585'
+    i: '3571585'
+    r: '3571585'
+    z: '3571585'
+  r:
+    image_cutouts: 1102
+    psf_cutouts: 1795
+    weight_cutous: 9110
+  z:
+    image_cutouts: 1935
+    psf_cutouts: 8291
+    weight_cutous: 284
+DES0047-2041:
+  g:
+    image_cutouts: 9405
+    psf_cutouts: 3977
+    weight_cutous: 4692
+  i:
+    image_cutouts: 203
+    psf_cutouts: 4554
+    weight_cutous: 399
+  pfw_attempt_id:
+    g: '3571599'
+    i: '3571599'
+    r: '3571599'
+    z: '3571599'
+  r:
+    image_cutouts: 685
+    psf_cutouts: 9329
+    weight_cutous: 2511
+  z:
+    image_cutouts: 1465
+    psf_cutouts: 9156
+    weight_cutous: 5288
+DES0047-5957:
+  pfw_attempt_id:
+    z: '3566529'
+  z:
+    image_cutouts: 1730
+    psf_cutouts: 3246
+    weight_cutous: 753
+DES0048-2958:
+  g:
+    image_cutouts: 5099
+    psf_cutouts: 9145
+    weight_cutous: 5456
+  pfw_attempt_id:
+    g: '3571626'
+    r: '3571626'
+  r:
+    image_cutouts: 6266
+    psf_cutouts: 6563
+    weight_cutous: 5679
+DES0049-4623:
+  g:
+    image_cutouts: 2380
+    psf_cutouts: 7783
+    weight_cutous: 2821
+  pfw_attempt_id:
+    g: '3571649'
+    r: '3571649'
+  r:
+    image_cutouts: 3485
+    psf_cutouts: 4207
+    weight_cutous: 2912
+DES0050-3415:
+  g:
+    image_cutouts: 5266
+    psf_cutouts: 6543
+    weight_cutous: 5273
+  i:
+    image_cutouts: 5733
+    psf_cutouts: 3453
+    weight_cutous: 3531
+  pfw_attempt_id:
+    g: '3571661'
+    i: '3571661'
+    r: '3571661'
+    z: '3571661'
+  r:
+    image_cutouts: 6084
+    psf_cutouts: 4564
+    weight_cutous: 3975
+  z:
+    image_cutouts: 6489
+    psf_cutouts: 295
+    weight_cutous: 3317
+DES0050-3623:
+  g:
+    image_cutouts: 3772
+    psf_cutouts: 699
+    weight_cutous: 1295
+  i:
+    image_cutouts: 3976
+    psf_cutouts: 9173
+    weight_cutous: 557
+  pfw_attempt_id:
+    g: '3571664'
+    i: '3571664'
+    r: '3571664'
+    z: '3571664'
+  r:
+    image_cutouts: 4195
+    psf_cutouts: 854
+    weight_cutous: 1548
+  z:
+    image_cutouts: 4504
+    psf_cutouts: 7631
+    weight_cutous: 648
+DES0051-5622:
+  g:
+    image_cutouts: 4389
+    psf_cutouts: 4999
+    weight_cutous: 7605
+  i:
+    image_cutouts: 5394
+    psf_cutouts: 4120
+    weight_cutous: 6773
+  pfw_attempt_id:
+    g: '3571701'
+    i: '3571701'
+    r: '3571701'
+  r:
+    image_cutouts: 6791
+    psf_cutouts: 1242
+    weight_cutous: 7544
+DES0053-2249:
+  g:
+    image_cutouts: 1650
+    psf_cutouts: 3205
+    weight_cutous: 1359
+  pfw_attempt_id:
+    g: '3571721'
+DES0053-6122:
+  g:
+    image_cutouts: 8076
+    psf_cutouts: 9773
+    weight_cutous: 8066
+  i:
+    image_cutouts: 8535
+    psf_cutouts: 8638
+    weight_cutous: 6419
+  pfw_attempt_id:
+    g: '3571738'
+    i: '3571738'
+    r: '3571738'
+    z: '3571738'
+  r:
+    image_cutouts: 9225
+    psf_cutouts: 1861
+    weight_cutous: 8445
+  z:
+    image_cutouts: 9833
+    psf_cutouts: 2008
+    weight_cutous: 9729
+DES0054-1707:
+  g:
+    image_cutouts: 3972
+    psf_cutouts: 3365
+    weight_cutous: 8272
+  i:
+    image_cutouts: 4087
+    psf_cutouts: 1042
+    weight_cutous: 7346
+  pfw_attempt_id:
+    g: '3571750'
+    i: '3571750'
+    r: '3571750'
+    z: '3571750'
+  r:
+    image_cutouts: 4172
+    psf_cutouts: 1925
+    weight_cutous: 7527
+  z:
+    image_cutouts: 4375
+    psf_cutouts: 2163
+    weight_cutous: 8107
+DES0055+0418:
+  i:
+    image_cutouts: 8601
+    psf_cutouts: 3836
+    weight_cutous: 5450
+  pfw_attempt_id:
+    i: '3571768'
+    r: '3571768'
+    z: '3571768'
+  r:
+    image_cutouts: 8783
+    psf_cutouts: 6144
+    weight_cutous: 6505
+  z:
+    image_cutouts: 9095
+    psf_cutouts: 3778
+    weight_cutous: 5900
+DES0055+0500:
+  pfw_attempt_id:
+    r: '3571770'
+    z: '3571770'
+  r:
+    image_cutouts: 9455
+    psf_cutouts: 5499
+    weight_cutous: 2240
+  z:
+    image_cutouts: 9523
+    psf_cutouts: 5423
+    weight_cutous: 2258
+DES0056+0001:
+  g:
+    image_cutouts: 5772
+    psf_cutouts: 2378
+    weight_cutous: 7424
+  i:
+    image_cutouts: 6430
+    psf_cutouts: 6920
+    weight_cutous: 5214
+  pfw_attempt_id:
+    g: '3571783'
+    i: '3571783'
+    r: '3571783'
+    z: '3571783'
+  r:
+    image_cutouts: 6947
+    psf_cutouts: 8154
+    weight_cutous: 6073
+  z:
+    image_cutouts: 7369
+    psf_cutouts: 5600
+    weight_cutous: 5696
+DES0056-5748:
+  g:
+    image_cutouts: 5419
+    psf_cutouts: 4455
+    weight_cutous: 4000
+  i:
+    image_cutouts: 5639
+    psf_cutouts: 2013
+    weight_cutous: 2998
+  pfw_attempt_id:
+    g: '3571797'
+    i: '3571797'
+    r: '3571797'
+    z: '3571797'
+  r:
+    image_cutouts: 5850
+    psf_cutouts: 3769
+    weight_cutous: 3776
+  z:
+    image_cutouts: 6102
+    psf_cutouts: 3437
+    weight_cutous: 4156
+DES0057-0124:
+  pfw_attempt_id:
+    r: '3571801'
+  r:
+    image_cutouts: 8889
+    psf_cutouts: 2873
+    weight_cutous: 3340
+DES0057-2749:
+  g:
+    image_cutouts: 5177
+    psf_cutouts: 5829
+    weight_cutous: 8591
+  i:
+    image_cutouts: 6115
+    psf_cutouts: 3836
+    weight_cutous: 8059
+  pfw_attempt_id:
+    g: '3571814'
+    i: '3571814'
+    r: '3571814'
+    z: '3571814'
+  r:
+    image_cutouts: 7002
+    psf_cutouts: 6410
+    weight_cutous: 9466
+  z:
+    image_cutouts: 8041
+    psf_cutouts: 8550
+    weight_cutous: 9017
+DES0057-3206:
+  g:
+    image_cutouts: 9291
+    psf_cutouts: 6725
+    weight_cutous: 7124
+  i:
+    image_cutouts: 9502
+    psf_cutouts: 5666
+    weight_cutous: 6729
+  pfw_attempt_id:
+    g: '3571815'
+    i: '3571815'
+    r: '3571815'
+  r:
+    image_cutouts: 9697
+    psf_cutouts: 5295
+    weight_cutous: 6699
+DES0057-3540:
+  g:
+    image_cutouts: 5503
+    psf_cutouts: 3652
+    weight_cutous: 7387
+  pfw_attempt_id:
+    g: '3571820'
+    r: '3571820'
+    z: '3571820'
+  r:
+    image_cutouts: 7118
+    psf_cutouts: 2569
+    weight_cutous: 7710
+  z:
+    image_cutouts: 8086
+    psf_cutouts: 8101
+    weight_cutous: 8288
+DES0057-6456:
+  g:
+    image_cutouts: 1969
+    psf_cutouts: 3715
+    weight_cutous: 2486
+  pfw_attempt_id:
+    g: '3571829'
+    r: '3571829'
+    z: '3571829'
+  r:
+    image_cutouts: 2600
+    psf_cutouts: 1256
+    weight_cutous: 939
+  z:
+    image_cutouts: 2870
+    psf_cutouts: 2680
+    weight_cutous: 1937
+DES0058+0500:
+  g:
+    image_cutouts: 4081
+    psf_cutouts: 6281
+    weight_cutous: 9521
+  i:
+    image_cutouts: 4562
+    psf_cutouts: 9827
+    weight_cutous: 7009
+  pfw_attempt_id:
+    g: '3571832'
+    i: '3571832'
+    r: '3571832'
+    z: '3571832'
+  r:
+    image_cutouts: 4622
+    psf_cutouts: 9852
+    weight_cutous: 7026
+  z:
+    image_cutouts: 4681
+    psf_cutouts: 9867
+    weight_cutous: 7057
+DES0058-1958:
+  g:
+    image_cutouts: 8947
+    psf_cutouts: 810
+    weight_cutous: 8266
+  i:
+    image_cutouts: 9599
+    psf_cutouts: 3989
+    weight_cutous: 225
+  pfw_attempt_id:
+    g: '3566552'
+    i: '3566552'
+    r: '3566552'
+    z: '3566552'
+  r:
+    image_cutouts: 438
+    psf_cutouts: 4524
+    weight_cutous: 1406
+  z:
+    image_cutouts: 1294
+    psf_cutouts: 1363
+    weight_cutous: 9611
+DES0059+0126:
+  g:
+    image_cutouts: 5098
+    psf_cutouts: 9583
+    weight_cutous: 6165
+  i:
+    image_cutouts: 5401
+    psf_cutouts: 4526
+    weight_cutous: 4056
+  pfw_attempt_id:
+    g: '3571853'
+    i: '3571853'
+    r: '3571853'
+    z: '3571853'
+  r:
+    image_cutouts: 5673
+    psf_cutouts: 6241
+    weight_cutous: 4593
+  z:
+    image_cutouts: 5976
+    psf_cutouts: 4525
+    weight_cutous: 5037
+DES0059-0624:
+  g:
+    image_cutouts: 1279
+    psf_cutouts: 3366
+    weight_cutous: 7546
+  i:
+    image_cutouts: 1492
+    psf_cutouts: 3851
+    weight_cutous: 6660
+  pfw_attempt_id:
+    g: '3571854'
+    i: '3571854'
+    r: '3571854'
+    z: '3571854'
+  r:
+    image_cutouts: 1883
+    psf_cutouts: 2292
+    weight_cutous: 7304
+  z:
+    image_cutouts: 2039
+    psf_cutouts: 436
+    weight_cutous: 5951
+DES0059-4457:
+  pfw_attempt_id:
+    r: '3571863'
+  r:
+    image_cutouts: 3507
+    psf_cutouts: 1338
+    weight_cutous: 1523
+DES0059-5831:
+  g:
+    image_cutouts: 8090
+    psf_cutouts: 3413
+    weight_cutous: 8781
+  pfw_attempt_id:
+    g: '3571869'
+    r: '3571869'
+  r:
+    image_cutouts: 9775
+    psf_cutouts: 4556
+    weight_cutous: 343
+DES0059-5957:
+  g:
+    image_cutouts: 6957
+    psf_cutouts: 9033
+    weight_cutous: 6313
+  i:
+    image_cutouts: 7347
+    psf_cutouts: 5750
+    weight_cutous: 4905
+  pfw_attempt_id:
+    g: '3571870'
+    i: '3571870'
+    r: '3571870'
+    z: '3571870'
+  r:
+    image_cutouts: 7721
+    psf_cutouts: 6112
+    weight_cutous: 5870
+  z:
+    image_cutouts: 7989
+    psf_cutouts: 4293
+    weight_cutous: 5517
+DES0100-0207:
+  g:
+    image_cutouts: 5541
+    psf_cutouts: 8605
+    weight_cutous: 136
+  pfw_attempt_id:
+    g: '3566555'
+    r: '3566555'
+    z: '3566555'
+  r:
+    image_cutouts: 7753
+    psf_cutouts: 2113
+    weight_cutous: 7861
+  z:
+    image_cutouts: 8615
+    psf_cutouts: 104
+    weight_cutous: 8452
+DES0100-1832:
+  g:
+    image_cutouts: 3699
+    psf_cutouts: 2316
+    weight_cutous: 6298
+  i:
+    image_cutouts: 4847
+    psf_cutouts: 305
+    weight_cutous: 5816
+  pfw_attempt_id:
+    g: '3571880'
+    i: '3571880'
+    r: '3571880'
+    z: '3571880'
+  r:
+    image_cutouts: 5827
+    psf_cutouts: 3131
+    weight_cutous: 7002
+  z:
+    image_cutouts: 7158
+    psf_cutouts: 67
+    weight_cutous: 7984
+DES0100-3249:
+  g:
+    image_cutouts: 7656
+    psf_cutouts: 5851
+    weight_cutous: 5840
+  i:
+    image_cutouts: 7956
+    psf_cutouts: 4334
+    weight_cutous: 5381
+  pfw_attempt_id:
+    g: '3571885'
+    i: '3571885'
+    r: '3571885'
+    z: '3571885'
+  r:
+    image_cutouts: 8230
+    psf_cutouts: 5290
+    weight_cutous: 5752
+  z:
+    image_cutouts: 8489
+    psf_cutouts: 4095
+    weight_cutous: 5850
+DES0100-5040:
+  pfw_attempt_id:
+    z: '3571894'
+  z:
+    image_cutouts: 7288
+    psf_cutouts: 3592
+    weight_cutous: 5212
+DES0101-1958:
+  g:
+    image_cutouts: 4255
+    psf_cutouts: 655
+    weight_cutous: 5461
+  pfw_attempt_id:
+    g: '3571902'
+DES0101-3749:
+  g:
+    image_cutouts: 7606
+    psf_cutouts: 5601
+    weight_cutous: 9516
+  i:
+    image_cutouts: 8967
+    psf_cutouts: 2884
+    weight_cutous: 9221
+  pfw_attempt_id:
+    g: '3571910'
+    i: '3571910'
+    r: '3571910'
+    z: '3571910'
+  r:
+    image_cutouts: 9908
+    psf_cutouts: 5129
+    weight_cutous: 1146
+  z:
+    image_cutouts: 749
+    psf_cutouts: 8484
+    weight_cutous: 8926
+DES0102+0126:
+  g:
+    image_cutouts: 9859
+    psf_cutouts: 1906
+    weight_cutous: 4941
+  i:
+    image_cutouts: 650
+    psf_cutouts: 9624
+    weight_cutous: 9154
+  pfw_attempt_id:
+    g: '3571922'
+    i: '3571922'
+    r: '3571922'
+    z: '3571922'
+  r:
+    image_cutouts: 880
+    psf_cutouts: 885
+    weight_cutous: 9888
+  z:
+    image_cutouts: 1138
+    psf_cutouts: 8594
+    weight_cutous: 9161
+DES0102-0124:
+  i:
+    image_cutouts: 233
+    psf_cutouts: 5234
+    weight_cutous: 671
+  pfw_attempt_id:
+    i: '3566560'
+DES0102-0207:
+  g:
+    image_cutouts: 8255
+    psf_cutouts: 5597
+    weight_cutous: 9173
+  i:
+    image_cutouts: 9023
+    psf_cutouts: 8939
+    weight_cutous: 7629
+  pfw_attempt_id:
+    g: '3571923'
+    i: '3571923'
+    r: '3571923'
+    z: '3571923'
+  r:
+    image_cutouts: 9413
+    psf_cutouts: 1069
+    weight_cutous: 9255
+  z:
+    image_cutouts: 9885
+    psf_cutouts: 8808
+    weight_cutous: 8356
+DES0103-0250:
+  g:
+    image_cutouts: 2627
+    psf_cutouts: 9827
+    weight_cutous: 3948
+  pfw_attempt_id:
+    g: '3571942'
+    z: '3571942'
+  z:
+    image_cutouts: 4495
+    psf_cutouts: 2401
+    weight_cutous: 3838
+DES0103-4123:
+  g:
+    image_cutouts: 3923
+    psf_cutouts: 9077
+    weight_cutous: 4458
+  i:
+    image_cutouts: 4694
+    psf_cutouts: 7981
+    weight_cutous: 5086
+  pfw_attempt_id:
+    g: '3571955'
+    i: '3571955'
+    r: '3571955'
+    z: '3571955'
+  r:
+    image_cutouts: 5360
+    psf_cutouts: 1736
+    weight_cutous: 6404
+  z:
+    image_cutouts: 6247
+    psf_cutouts: 862
+    weight_cutous: 6673
+DES0104-2623:
+  g:
+    image_cutouts: 2705
+    psf_cutouts: 739
+    weight_cutous: 761
+  i:
+    image_cutouts: 2933
+    psf_cutouts: 8173
+    weight_cutous: 9863
+  pfw_attempt_id:
+    g: '3571969'
+    i: '3571969'
+    r: '3571969'
+    z: '3571969'
+  r:
+    image_cutouts: 3124
+    psf_cutouts: 9201
+    weight_cutous: 9564
+  z:
+    image_cutouts: 3492
+    psf_cutouts: 8389
+    weight_cutous: 511
+DES0104-2706:
+  g:
+    image_cutouts: 37
+    psf_cutouts: 7365
+    weight_cutous: 7804
+  i:
+    image_cutouts: 281
+    psf_cutouts: 4447
+    weight_cutous: 6573
+  pfw_attempt_id:
+    g: '3571970'
+    i: '3571970'
+    r: '3571970'
+    z: '3571970'
+  r:
+    image_cutouts: 492
+    psf_cutouts: 7503
+    weight_cutous: 7880
+  z:
+    image_cutouts: 753
+    psf_cutouts: 6224
+    weight_cutous: 7845
+DES0104-4249:
+  g:
+    image_cutouts: 2453
+    psf_cutouts: 807
+    weight_cutous: 4618
+  i:
+    image_cutouts: 3321
+    psf_cutouts: 6606
+    weight_cutous: 3128
+  pfw_attempt_id:
+    g: '3566565'
+    i: '3566565'
+    r: '3566565'
+    z: '3566565'
+  r:
+    image_cutouts: 3897
+    psf_cutouts: 6869
+    weight_cutous: 4208
+  z:
+    image_cutouts: 4314
+    psf_cutouts: 2897
+    weight_cutous: 3190
+DES0104-4540:
+  pfw_attempt_id:
+    z: '3571982'
+  z:
+    image_cutouts: 4100
+    psf_cutouts: 5501
+    weight_cutous: 3859
+DES0105+0209:
+  pfw_attempt_id:
+    r: '3571994'
+  r:
+    image_cutouts: 2364
+    psf_cutouts: 8317
+    weight_cutous: 1067
+DES0105+0252:
+  g:
+    image_cutouts: 4392
+    psf_cutouts: 7729
+    weight_cutous: 4191
+  pfw_attempt_id:
+    g: '3571996'
+    r: '3571996'
+  r:
+    image_cutouts: 5928
+    psf_cutouts: 1245
+    weight_cutous: 6275
+DES0105-0124:
+  g:
+    image_cutouts: 2949
+    psf_cutouts: 5634
+    weight_cutous: 4032
+  i:
+    image_cutouts: 3339
+    psf_cutouts: 249
+    weight_cutous: 822
+  pfw_attempt_id:
+    g: '3571991'
+    i: '3571991'
+    r: '3571991'
+    z: '3571991'
+  r:
+    image_cutouts: 3567
+    psf_cutouts: 1428
+    weight_cutous: 1488
+  z:
+    image_cutouts: 3784
+    psf_cutouts: 9435
+    weight_cutous: 978
+DES0105-0250:
+  g:
+    image_cutouts: 688
+    psf_cutouts: 2279
+    weight_cutous: 323
+  i:
+    image_cutouts: 1069
+    psf_cutouts: 9467
+    weight_cutous: 8837
+  pfw_attempt_id:
+    g: '3571995'
+    i: '3571995'
+    r: '3571995'
+    z: '3571995'
+  r:
+    image_cutouts: 1467
+    psf_cutouts: 740
+    weight_cutous: 9868
+  z:
+    image_cutouts: 1841
+    psf_cutouts: 1973
+    weight_cutous: 427
+DES0105-1915:
+  g:
+    image_cutouts: 7171
+    psf_cutouts: 6544
+    weight_cutous: 408
+  pfw_attempt_id:
+    g: '3571998'
+DES0105-2041:
+  g:
+    image_cutouts: 8924
+    psf_cutouts: 6562
+    weight_cutous: 717
+  i:
+    image_cutouts: 9559
+    psf_cutouts: 8020
+    weight_cutous: 7811
+  pfw_attempt_id:
+    g: '3595285'
+    i: '3595285'
+    r: '3595285'
+    z: '3595285'
+  r:
+    image_cutouts: 9856
+    psf_cutouts: 142
+    weight_cutous: 8999
+  z:
+    image_cutouts: 114
+    psf_cutouts: 8102
+    weight_cutous: 8437
+DES0106-0333:
+  pfw_attempt_id:
+    r: '3572012'
+  r:
+    image_cutouts: 1398
+    psf_cutouts: 6405
+    weight_cutous: 2488
+DES0106-1707:
+  g:
+    image_cutouts: 2691
+    psf_cutouts: 2207
+    weight_cutous: 490
+  i:
+    image_cutouts: 3334
+    psf_cutouts: 614
+    weight_cutous: 833
+  pfw_attempt_id:
+    g: '3572018'
+    i: '3572018'
+    r: '3572018'
+    z: '3572018'
+  r:
+    image_cutouts: 3756
+    psf_cutouts: 4650
+    weight_cutous: 2330
+  z:
+    image_cutouts: 4831
+    psf_cutouts: 6583
+    weight_cutous: 5139
+DES0106-2458:
+  g:
+    image_cutouts: 8480
+    psf_cutouts: 7319
+    weight_cutous: 7303
+  i:
+    image_cutouts: 8715
+    psf_cutouts: 5390
+    weight_cutous: 6189
+  pfw_attempt_id:
+    g: '3572021'
+    i: '3572021'
+    r: '3572021'
+    z: '3572021'
+  r:
+    image_cutouts: 8923
+    psf_cutouts: 5792
+    weight_cutous: 6481
+  z:
+    image_cutouts: 9122
+    psf_cutouts: 2267
+    weight_cutous: 5173
+DES0106-2749:
+  g:
+    image_cutouts: 356
+    psf_cutouts: 1685
+    weight_cutous: 9283
+  pfw_attempt_id:
+    g: '3572022'
+    r: '3572022'
+  r:
+    image_cutouts: 1549
+    psf_cutouts: 1200
+    weight_cutous: 9730
+DES0107-5622:
+  i:
+    image_cutouts: 510
+    psf_cutouts: 9919
+    weight_cutous: 9171
+  pfw_attempt_id:
+    i: '3595756'
+    r: '3595756'
+  r:
+    image_cutouts: 795
+    psf_cutouts: 786
+    weight_cutous: 9852
+DES0108-2623:
+  g:
+    image_cutouts: 9382
+    psf_cutouts: 8189
+    weight_cutous: 1695
+  i:
+    image_cutouts: 839
+    psf_cutouts: 9958
+    weight_cutous: 3373
+  pfw_attempt_id:
+    g: '3572069'
+    i: '3572069'
+    r: '3572069'
+    z: '3572069'
+  r:
+    image_cutouts: 2442
+    psf_cutouts: 9493
+    weight_cutous: 3916
+  z:
+    image_cutouts: 3953
+    psf_cutouts: 8202
+    weight_cutous: 5887
+DES0108-6205:
+  g:
+    image_cutouts: 4629
+    psf_cutouts: 8316
+    weight_cutous: 5062
+  i:
+    image_cutouts: 5011
+    psf_cutouts: 5938
+    weight_cutous: 4377
+  pfw_attempt_id:
+    g: '3572081'
+    i: '3572081'
+    r: '3572081'
+    z: '3572081'
+  r:
+    image_cutouts: 5362
+    psf_cutouts: 6607
+    weight_cutous: 4798
+  z:
+    image_cutouts: 5699
+    psf_cutouts: 5058
+    weight_cutous: 5248
+DES0109-0416:
+  pfw_attempt_id:
+    r: '3572085'
+    z: '3572085'
+  r:
+    image_cutouts: 6937
+    psf_cutouts: 6765
+    weight_cutous: 5067
+  z:
+    image_cutouts: 7461
+    psf_cutouts: 1552
+    weight_cutous: 4014
+DES0109-1832:
+  i:
+    image_cutouts: 323
+    psf_cutouts: 7387
+    weight_cutous: 8049
+  pfw_attempt_id:
+    i: '3572090'
+    r: '3572090'
+  r:
+    image_cutouts: 552
+    psf_cutouts: 8943
+    weight_cutous: 8695
+DES0109-2206:
+  g:
+    image_cutouts: 8540
+    psf_cutouts: 4785
+    weight_cutous: 2508
+  i:
+    image_cutouts: 9106
+    psf_cutouts: 6246
+    weight_cutous: 6916
+  pfw_attempt_id:
+    g: '3566575'
+    i: '3566575'
+    r: '3566575'
+    z: '3566575'
+  r:
+    image_cutouts: 9319
+    psf_cutouts: 8789
+    weight_cutous: 8160
+  z:
+    image_cutouts: 9549
+    psf_cutouts: 4945
+    weight_cutous: 6848
+DES0109-5205:
+  i:
+    image_cutouts: 8273
+    psf_cutouts: 1021
+    weight_cutous: 7247
+  pfw_attempt_id:
+    i: '3572099'
+    r: '3572099'
+    z: '3572099'
+  r:
+    image_cutouts: 8993
+    psf_cutouts: 7300
+    weight_cutous: 1645
+  z:
+    image_cutouts: 9666
+    psf_cutouts: 540
+    weight_cutous: 93
+DES0110-2415:
+  g:
+    image_cutouts: 7258
+    psf_cutouts: 5675
+    weight_cutous: 9260
+  i:
+    image_cutouts: 8731
+    psf_cutouts: 5372
+    weight_cutous: 9965
+  pfw_attempt_id:
+    g: '3572108'
+    i: '3572108'
+    r: '3572108'
+    z: '3572108'
+  r:
+    image_cutouts: 168
+    psf_cutouts: 7460
+    weight_cutous: 2036
+  z:
+    image_cutouts: 1341
+    psf_cutouts: 6141
+    weight_cutous: 9398
+DES0110-2706:
+  pfw_attempt_id:
+    z: '3572109'
+  z:
+    image_cutouts: 2299
+    psf_cutouts: 5686
+    weight_cutous: 8434
+DES0111-2332:
+  i:
+    image_cutouts: 6562
+    psf_cutouts: 7588
+    weight_cutous: 7527
+  pfw_attempt_id:
+    i: '3572128'
+    r: '3572128'
+  r:
+    image_cutouts: 7113
+    psf_cutouts: 5250
+    weight_cutous: 5862
+DES0111-4206:
+  g:
+    image_cutouts: 3975
+    psf_cutouts: 5297
+    weight_cutous: 3718
+  i:
+    image_cutouts: 4354
+    psf_cutouts: 2512
+    weight_cutous: 2778
+  pfw_attempt_id:
+    g: '3572140'
+    i: '3572140'
+    r: '3572140'
+    z: '3572140'
+  r:
+    image_cutouts: 4610
+    psf_cutouts: 810
+    weight_cutous: 1972
+  z:
+    image_cutouts: 4810
+    psf_cutouts: 3258
+    weight_cutous: 2917
+DES0112-2458:
+  g:
+    image_cutouts: 8166
+    psf_cutouts: 5370
+    weight_cutous: 9758
+  pfw_attempt_id:
+    g: '3572158'
+    r: '3572158'
+  r:
+    image_cutouts: 425
+    psf_cutouts: 4843
+    weight_cutous: 1241
+DES0112-2832:
+  g:
+    image_cutouts: 9396
+    psf_cutouts: 3638
+    weight_cutous: 8536
+  i:
+    image_cutouts: 156
+    psf_cutouts: 8796
+    weight_cutous: 7982
+  pfw_attempt_id:
+    g: '3572159'
+    i: '3572159'
+    r: '3572159'
+    z: '3572159'
+  r:
+    image_cutouts: 701
+    psf_cutouts: 12
+    weight_cutous: 9845
+  z:
+    image_cutouts: 1221
+    psf_cutouts: 2221
+    weight_cutous: 8904
+DES0112-3749:
+  pfw_attempt_id:
+    z: '3566584'
+  z:
+    image_cutouts: 4737
+    psf_cutouts: 4540
+    weight_cutous: 3505
+DES0112-4249:
+  g:
+    image_cutouts: 4716
+    psf_cutouts: 9453
+    weight_cutous: 5025
+  i:
+    image_cutouts: 5425
+    psf_cutouts: 9825
+    weight_cutous: 4628
+  pfw_attempt_id:
+    g: '3572164'
+    i: '3572164'
+    r: '3572164'
+    z: '3572164'
+  r:
+    image_cutouts: 6713
+    psf_cutouts: 2687
+    weight_cutous: 7839
+  z:
+    image_cutouts: 7679
+    psf_cutouts: 6189
+    weight_cutous: 9783
+DES0112-4540:
+  g:
+    image_cutouts: 8805
+    psf_cutouts: 7698
+    weight_cutous: 7264
+  i:
+    image_cutouts: 9042
+    psf_cutouts: 6109
+    weight_cutous: 6563
+  pfw_attempt_id:
+    g: '3572165'
+    i: '3572165'
+    r: '3572165'
+    z: '3572165'
+  r:
+    image_cutouts: 9276
+    psf_cutouts: 8259
+    weight_cutous: 7515
+  z:
+    image_cutouts: 9686
+    psf_cutouts: 182
+    weight_cutous: 6811
+DES0112-5748:
+  g:
+    image_cutouts: 3136
+    psf_cutouts: 5305
+    weight_cutous: 3088
+  i:
+    image_cutouts: 3411
+    psf_cutouts: 9087
+    weight_cutous: 387
+  pfw_attempt_id:
+    g: '3572169'
+    i: '3572169'
+    r: '3572169'
+    z: '3572169'
+  r:
+    image_cutouts: 3605
+    psf_cutouts: 2658
+    weight_cutous: 1986
+  z:
+    image_cutouts: 3873
+    psf_cutouts: 856
+    weight_cutous: 1858
+DES0113-0624:
+  g:
+    image_cutouts: 1801
+    psf_cutouts: 5089
+    weight_cutous: 7615
+  i:
+    image_cutouts: 2121
+    psf_cutouts: 2930
+    weight_cutous: 7098
+  pfw_attempt_id:
+    g: '3572172'
+    i: '3572172'
+    r: '3572172'
+    z: '3572172'
+  r:
+    image_cutouts: 2308
+    psf_cutouts: 2303
+    weight_cutous: 7086
+  z:
+    image_cutouts: 2451
+    psf_cutouts: 1341
+    weight_cutous: 6595
+DES0113-2749:
+  pfw_attempt_id:
+    r: '3572179'
+    z: '3572179'
+  r:
+    image_cutouts: 3539
+    psf_cutouts: 8195
+    weight_cutous: 90
+  z:
+    image_cutouts: 3722
+    psf_cutouts: 7942
+    weight_cutous: 488
+DES0113-5914:
+  i:
+    image_cutouts: 4936
+    psf_cutouts: 3163
+    weight_cutous: 6974
+  pfw_attempt_id:
+    i: '3572185'
+DES0114-6205:
+  i:
+    image_cutouts: 3121
+    psf_cutouts: 7633
+    weight_cutous: 3931
+  pfw_attempt_id:
+    i: '3572211'
+    r: '3572211'
+  r:
+    image_cutouts: 3938
+    psf_cutouts: 8066
+    weight_cutous: 4159
+DES0115-1415:
+  g:
+    image_cutouts: 4304
+    psf_cutouts: 3261
+    weight_cutous: 2827
+  pfw_attempt_id:
+    g: '3572216'
+    z: '3572216'
+  z:
+    image_cutouts: 4957
+    psf_cutouts: 1071
+    weight_cutous: 2388
+DES0115-4206:
+  g:
+    image_cutouts: 4409
+    psf_cutouts: 3078
+    weight_cutous: 5742
+  i:
+    image_cutouts: 5146
+    psf_cutouts: 6432
+    weight_cutous: 4761
+  pfw_attempt_id:
+    g: '3572229'
+    i: '3572229'
+    r: '3572229'
+    z: '3572229'
+  r:
+    image_cutouts: 5530
+    psf_cutouts: 6157
+    weight_cutous: 4862
+  z:
+    image_cutouts: 5829
+    psf_cutouts: 5406
+    weight_cutous: 4684
+DES0116-6331:
+  g:
+    image_cutouts: 7562
+    psf_cutouts: 2855
+    weight_cutous: 8542
+  i:
+    image_cutouts: 8196
+    psf_cutouts: 8529
+    weight_cutous: 7639
+  pfw_attempt_id:
+    g: '3572254'
+    i: '3572254'
+    r: '3572254'
+    z: '3572254'
+  r:
+    image_cutouts: 8524
+    psf_cutouts: 7338
+    weight_cutous: 6872
+  z:
+    image_cutouts: 8776
+    psf_cutouts: 6926
+    weight_cutous: 6936
+DES0117+0126:
+  g:
+    image_cutouts: 6947
+    psf_cutouts: 6759
+    weight_cutous: 9575
+  pfw_attempt_id:
+    g: '3572256'
+    z: '3572256'
+  z:
+    image_cutouts: 46
+    psf_cutouts: 1521
+    weight_cutous: 749
+DES0117+0335:
+  pfw_attempt_id:
+    r: '3572262'
+    z: '3572262'
+  r:
+    image_cutouts: 7173
+    psf_cutouts: 9094
+    weight_cutous: 9738
+  z:
+    image_cutouts: 8739
+    psf_cutouts: 2183
+    weight_cutous: 3579
+DES0117-0333:
+  g:
+    image_cutouts: 9257
+    psf_cutouts: 5692
+    weight_cutous: 695
+  i:
+    image_cutouts: 9896
+    psf_cutouts: 2338
+    weight_cutous: 22
+  pfw_attempt_id:
+    g: '3572261'
+    i: '3572261'
+    r: '3572261'
+    z: '3572261'
+  r:
+    image_cutouts: 528
+    psf_cutouts: 3205
+    weight_cutous: 9989
+  z:
+    image_cutouts: 1086
+    psf_cutouts: 3396
+    weight_cutous: 288
+DES0117-1332:
+  g:
+    image_cutouts: 4304
+    psf_cutouts: 9804
+    weight_cutous: 6333
+  i:
+    image_cutouts: 5299
+    psf_cutouts: 7486
+    weight_cutous: 4909
+  pfw_attempt_id:
+    g: '3572263'
+    i: '3572263'
+    r: '3572263'
+    z: '3572263'
+  r:
+    image_cutouts: 6491
+    psf_cutouts: 218
+    weight_cutous: 6953
+  z:
+    image_cutouts: 7273
+    psf_cutouts: 4826
+    weight_cutous: 3720
+DES0117-3332:
+  g:
+    image_cutouts: 2614
+    psf_cutouts: 9000
+    weight_cutous: 5499
+  i:
+    image_cutouts: 3367
+    psf_cutouts: 4857
+    weight_cutous: 2894
+  pfw_attempt_id:
+    g: '3566599'
+    i: '3566599'
+    r: '3566599'
+    z: '3566599'
+  r:
+    image_cutouts: 3870
+    psf_cutouts: 7340
+    weight_cutous: 4253
+  z:
+    image_cutouts: 4409
+    psf_cutouts: 6132
+    weight_cutous: 3780
+DES0117-4331:
+  g:
+    image_cutouts: 8963
+    psf_cutouts: 6316
+    weight_cutous: 464
+  i:
+    image_cutouts: 96
+    psf_cutouts: 5348
+    weight_cutous: 967
+  pfw_attempt_id:
+    g: '3572271'
+    i: '3572271'
+    r: '3572271'
+    z: '3572271'
+  r:
+    image_cutouts: 974
+    psf_cutouts: 7883
+    weight_cutous: 2501
+  z:
+    image_cutouts: 1838
+    psf_cutouts: 9699
+    weight_cutous: 8052
+DES0117-5622:
+  g:
+    image_cutouts: 4530
+    psf_cutouts: 4774
+    weight_cutous: 3004
+  i:
+    image_cutouts: 4894
+    psf_cutouts: 4175
+    weight_cutous: 3372
+  pfw_attempt_id:
+    g: '3572275'
+    i: '3572275'
+    r: '3572275'
+    z: '3572275'
+  r:
+    image_cutouts: 5212
+    psf_cutouts: 7707
+    weight_cutous: 4858
+  z:
+    image_cutouts: 5777
+    psf_cutouts: 9059
+    weight_cutous: 6340
+DES0118+0418:
+  i:
+    image_cutouts: 9881
+    psf_cutouts: 5921
+    weight_cutous: 6963
+  pfw_attempt_id:
+    i: '3572277'
+    r: '3572277'
+    z: '3572277'
+  r:
+    image_cutouts: 273
+    psf_cutouts: 1421
+    weight_cutous: 8568
+  z:
+    image_cutouts: 1265
+    psf_cutouts: 4635
+    weight_cutous: 2523
+DES0118-3623:
+  g:
+    image_cutouts: 5815
+    psf_cutouts: 7843
+    weight_cutous: 5614
+  i:
+    image_cutouts: 6241
+    psf_cutouts: 4498
+    weight_cutous: 4608
+  pfw_attempt_id:
+    g: '3572296'
+    i: '3572296'
+    r: '3572296'
+    z: '3572296'
+  r:
+    image_cutouts: 6560
+    psf_cutouts: 5177
+    weight_cutous: 4937
+  z:
+    image_cutouts: 6802
+    psf_cutouts: 1827
+    weight_cutous: 3721
+DES0118-4123:
+  g:
+    image_cutouts: 2428
+    psf_cutouts: 6359
+    weight_cutous: 2810
+  i:
+    image_cutouts: 3121
+    psf_cutouts: 6663
+    weight_cutous: 2370
+  pfw_attempt_id:
+    g: '3572298'
+    i: '3572298'
+    r: '3572298'
+    z: '3572298'
+  r:
+    image_cutouts: 4535
+    psf_cutouts: 7409
+    weight_cutous: 4328
+  z:
+    image_cutouts: 5274
+    psf_cutouts: 5354
+    weight_cutous: 4935
+DES0119+0126:
+  g:
+    image_cutouts: 2454
+    psf_cutouts: 7033
+    weight_cutous: 7412
+  i:
+    image_cutouts: 4056
+    psf_cutouts: 4585
+    weight_cutous: 8860
+  pfw_attempt_id:
+    g: '3572310'
+    i: '3572310'
+    r: '3572310'
+    z: '3572310'
+  r:
+    image_cutouts: 6656
+    psf_cutouts: 9627
+    weight_cutous: 948
+  z:
+    image_cutouts: 8384
+    psf_cutouts: 2418
+    weight_cutous: 3829
+DES0120-5540:
+  i:
+    image_cutouts: 5711
+    psf_cutouts: 3530
+    weight_cutous: 7603
+  pfw_attempt_id:
+    i: '3572345'
+    r: '3572345'
+    z: '3572345'
+  r:
+    image_cutouts: 7202
+    psf_cutouts: 5674
+    weight_cutous: 9313
+  z:
+    image_cutouts: 8867
+    psf_cutouts: 1155
+    weight_cutous: 2460
+DES0120-6205:
+  g:
+    image_cutouts: 4430
+    psf_cutouts: 9039
+    weight_cutous: 5201
+  pfw_attempt_id:
+    g: '3566611'
+    r: '3566611'
+    z: '3566611'
+  r:
+    image_cutouts: 6243
+    psf_cutouts: 8697
+    weight_cutous: 5843
+  z:
+    image_cutouts: 6939
+    psf_cutouts: 6449
+    weight_cutous: 5627
+DES0121-0541:
+  i:
+    image_cutouts: 5317
+    psf_cutouts: 5232
+    weight_cutous: 3958
+  pfw_attempt_id:
+    i: '3572349'
+    r: '3572349'
+  r:
+    image_cutouts: 5750
+    psf_cutouts: 7765
+    weight_cutous: 5324
+DES0121-2041:
+  g:
+    image_cutouts: 8488
+    psf_cutouts: 1791
+    weight_cutous: 8920
+  i:
+    image_cutouts: 8847
+    psf_cutouts: 7305
+    weight_cutous: 7089
+  pfw_attempt_id:
+    g: '3572355'
+    i: '3572355'
+    r: '3572355'
+    z: '3572355'
+  r:
+    image_cutouts: 9087
+    psf_cutouts: 9435
+    weight_cutous: 8151
+  z:
+    image_cutouts: 9343
+    psf_cutouts: 5769
+    weight_cutous: 6968
+DES0121-2249:
+  g:
+    image_cutouts: 9966
+    psf_cutouts: 9155
+    weight_cutous: 2457
+  i:
+    image_cutouts: 1805
+    psf_cutouts: 6389
+    weight_cutous: 2469
+  pfw_attempt_id:
+    g: '3572356'
+    i: '3572356'
+    r: '3572356'
+    z: '3572356'
+  r:
+    image_cutouts: 2772
+    psf_cutouts: 7510
+    weight_cutous: 3450
+  z:
+    image_cutouts: 3734
+    psf_cutouts: 6344
+    weight_cutous: 4487
+DES0122-0207:
+  g:
+    image_cutouts: 1672
+    psf_cutouts: 366
+    weight_cutous: 3606
+  i:
+    image_cutouts: 2902
+    psf_cutouts: 1661
+    weight_cutous: 1133
+  pfw_attempt_id:
+    g: '3572374'
+    i: '3572374'
+    r: '3572374'
+    z: '3572374'
+  r:
+    image_cutouts: 3275
+    psf_cutouts: 4382
+    weight_cutous: 1947
+  z:
+    image_cutouts: 3817
+    psf_cutouts: 3779
+    weight_cutous: 3342
+DES0122-2749:
+  g:
+    image_cutouts: 7238
+    psf_cutouts: 8100
+    weight_cutous: 7749
+  i:
+    image_cutouts: 7615
+    psf_cutouts: 3455
+    weight_cutous: 4717
+  pfw_attempt_id:
+    g: '3572385'
+    i: '3572385'
+    r: '3572385'
+    z: '3572385'
+  r:
+    image_cutouts: 7823
+    psf_cutouts: 4577
+    weight_cutous: 5277
+  z:
+    image_cutouts: 8023
+    psf_cutouts: 3028
+    weight_cutous: 5265
+DES0123+0335:
+  g:
+    image_cutouts: 5835
+    psf_cutouts: 7935
+    weight_cutous: 9106
+  i:
+    image_cutouts: 6653
+    psf_cutouts: 234
+    weight_cutous: 7462
+  pfw_attempt_id:
+    g: '3572401'
+    i: '3572401'
+    r: '3572401'
+    z: '3572401'
+  r:
+    image_cutouts: 7210
+    psf_cutouts: 8524
+    weight_cutous: 7191
+  z:
+    image_cutouts: 7582
+    psf_cutouts: 5418
+    weight_cutous: 5779
+DES0123+0418:
+  pfw_attempt_id:
+    r: '3572403'
+    z: '3572403'
+  r:
+    image_cutouts: 1415
+    psf_cutouts: 7891
+    weight_cutous: 8561
+  z:
+    image_cutouts: 1909
+    psf_cutouts: 5942
+    weight_cutous: 9755
+DES0123-2706:
+  g:
+    image_cutouts: 3847
+    psf_cutouts: 805
+    weight_cutous: 5173
+  i:
+    image_cutouts: 4931
+    psf_cutouts: 6163
+    weight_cutous: 5005
+  pfw_attempt_id:
+    g: '3572409'
+    i: '3572409'
+    r: '3572409'
+    z: '3572409'
+  r:
+    image_cutouts: 5413
+    psf_cutouts: 6044
+    weight_cutous: 4298
+  z:
+    image_cutouts: 5862
+    psf_cutouts: 9533
+    weight_cutous: 2803
+DES0124-1415:
+  i:
+    image_cutouts: 5985
+    psf_cutouts: 2157
+    weight_cutous: 3236
+  pfw_attempt_id:
+    i: '3572420'
+    r: '3572420'
+  r:
+    image_cutouts: 6183
+    psf_cutouts: 3870
+    weight_cutous: 3814
+DES0124-2249:
+  g:
+    image_cutouts: 1966
+    psf_cutouts: 1023
+    weight_cutous: 1007
+  i:
+    image_cutouts: 2243
+    psf_cutouts: 8649
+    weight_cutous: 9657
+  pfw_attempt_id:
+    g: '3572423'
+    i: '3572423'
+    r: '3572423'
+    z: '3572423'
+  r:
+    image_cutouts: 2465
+    psf_cutouts: 8758
+    weight_cutous: 9825
+  z:
+    image_cutouts: 2671
+    psf_cutouts: 7792
+    weight_cutous: 9759
+DES0125-3040:
+  g:
+    image_cutouts: 8333
+    psf_cutouts: 1985
+    weight_cutous: 8259
+  i:
+    image_cutouts: 8811
+    psf_cutouts: 5183
+    weight_cutous: 748
+  pfw_attempt_id:
+    g: '3572455'
+    i: '3572455'
+    r: '3572455'
+    z: '3572455'
+  r:
+    image_cutouts: 9477
+    psf_cutouts: 8056
+    weight_cutous: 3240
+  z:
+    image_cutouts: 210
+    psf_cutouts: 4337
+    weight_cutous: 176
+DES0125-3540:
+  g:
+    image_cutouts: 9850
+    psf_cutouts: 9161
+    weight_cutous: 8474
+  i:
+    image_cutouts: 91
+    psf_cutouts: 4984
+    weight_cutous: 6837
+  pfw_attempt_id:
+    g: '3572457'
+    i: '3572457'
+    r: '3572457'
+    z: '3572457'
+  r:
+    image_cutouts: 278
+    psf_cutouts: 7164
+    weight_cutous: 7478
+  z:
+    image_cutouts: 579
+    psf_cutouts: 6095
+    weight_cutous: 7971
+DES0125-5414:
+  g:
+    image_cutouts: 9962
+    psf_cutouts: 9760
+    weight_cutous: 2582
+  i:
+    image_cutouts: 1407
+    psf_cutouts: 7688
+    weight_cutous: 2394
+  pfw_attempt_id:
+    g: '3572465'
+    i: '3572465'
+    r: '3572465'
+    z: '3572465'
+  r:
+    image_cutouts: 2473
+    psf_cutouts: 9813
+    weight_cutous: 3968
+  z:
+    image_cutouts: 3534
+    psf_cutouts: 6924
+    weight_cutous: 4526
+DES0126-0333:
+  g:
+    image_cutouts: 3149
+    psf_cutouts: 7476
+    weight_cutous: 3793
+  i:
+    image_cutouts: 3673
+    psf_cutouts: 1966
+    weight_cutous: 1986
+  pfw_attempt_id:
+    g: '3572470'
+    i: '3572470'
+    r: '3572470'
+    z: '3572470'
+  r:
+    image_cutouts: 4048
+    psf_cutouts: 6061
+    weight_cutous: 3862
+  z:
+    image_cutouts: 4662
+    psf_cutouts: 7046
+    weight_cutous: 5394
+DES0126-1915:
+  g:
+    image_cutouts: 5261
+    psf_cutouts: 7213
+    weight_cutous: 4922
+  i:
+    image_cutouts: 5800
+    psf_cutouts: 5298
+    weight_cutous: 4870
+  pfw_attempt_id:
+    g: '3572474'
+    i: '3572474'
+    r: '3572474'
+    z: '3572474'
+  r:
+    image_cutouts: 6155
+    psf_cutouts: 4485
+    weight_cutous: 4811
+  z:
+    image_cutouts: 6422
+    psf_cutouts: 1298
+    weight_cutous: 3509
+DES0127-1250:
+  g:
+    image_cutouts: 7767
+    psf_cutouts: 4826
+    weight_cutous: 9138
+  pfw_attempt_id:
+    g: '3566627'
+DES0127-1707:
+  g:
+    image_cutouts: 1725
+    psf_cutouts: 3951
+    weight_cutous: 1331
+  i:
+    image_cutouts: 2171
+    psf_cutouts: 4095
+    weight_cutous: 1157
+  pfw_attempt_id:
+    g: '3572489'
+    i: '3572489'
+    z: '3572489'
+  z:
+    image_cutouts: 3116
+    psf_cutouts: 6904
+    weight_cutous: 9508
+DES0127-2249:
+  g:
+    image_cutouts: 9365
+    psf_cutouts: 9069
+    weight_cutous: 8382
+  i:
+    image_cutouts: 9608
+    psf_cutouts: 6366
+    weight_cutous: 7236
+  pfw_attempt_id:
+    g: '3572492'
+    i: '3572492'
+    r: '3572492'
+    z: '3572492'
+  r:
+    image_cutouts: 9804
+    psf_cutouts: 8560
+    weight_cutous: 8330
+  z:
+    image_cutouts: 75
+    psf_cutouts: 6289
+    weight_cutous: 7478
+DES0128+0043:
+  g:
+    image_cutouts: 9617
+    psf_cutouts: 1614
+    weight_cutous: 9642
+  i:
+    image_cutouts: 34
+    psf_cutouts: 8326
+    weight_cutous: 8126
+  pfw_attempt_id:
+    g: '3572507'
+    i: '3572507'
+    r: '3572507'
+    z: '3572507'
+  r:
+    image_cutouts: 423
+    psf_cutouts: 8334
+    weight_cutous: 8897
+  z:
+    image_cutouts: 680
+    psf_cutouts: 7036
+    weight_cutous: 8381
+DES0129-0333:
+  g:
+    image_cutouts: 4338
+    psf_cutouts: 207
+    weight_cutous: 5333
+  i:
+    image_cutouts: 5006
+    psf_cutouts: 2651
+    weight_cutous: 2769
+  pfw_attempt_id:
+    g: '3572532'
+    i: '3572532'
+    r: '3572532'
+    z: '3572532'
+  r:
+    image_cutouts: 5369
+    psf_cutouts: 4450
+    weight_cutous: 4087
+  z:
+    image_cutouts: 5663
+    psf_cutouts: 3894
+    weight_cutous: 3836
+DES0129-0416:
+  g:
+    image_cutouts: 7285
+    psf_cutouts: 3809
+    weight_cutous: 8819
+  i:
+    image_cutouts: 8111
+    psf_cutouts: 5528
+    weight_cutous: 5873
+  pfw_attempt_id:
+    g: '3566634'
+    i: '3566634'
+    r: '3566634'
+    z: '3566634'
+  r:
+    image_cutouts: 8677
+    psf_cutouts: 8000
+    weight_cutous: 7279
+  z:
+    image_cutouts: 9185
+    psf_cutouts: 231
+    weight_cutous: 9131
+DES0129-2415:
+  g:
+    image_cutouts: 4882
+    psf_cutouts: 7543
+    weight_cutous: 4595
+  i:
+    image_cutouts: 5575
+    psf_cutouts: 6652
+    weight_cutous: 4477
+  pfw_attempt_id:
+    g: '3566635'
+    i: '3566635'
+    r: '3566635'
+    z: '3566635'
+  r:
+    image_cutouts: 6402
+    psf_cutouts: 587
+    weight_cutous: 6529
+  z:
+    image_cutouts: 7229
+    psf_cutouts: 2086
+    weight_cutous: 4890
+DES0129-5914:
+  g:
+    image_cutouts: 6388
+    psf_cutouts: 3303
+    weight_cutous: 4334
+  i:
+    image_cutouts: 6636
+    psf_cutouts: 2633
+    weight_cutous: 3766
+  pfw_attempt_id:
+    g: '3572550'
+    i: '3572550'
+    r: '3572550'
+    z: '3572550'
+  r:
+    image_cutouts: 6842
+    psf_cutouts: 3716
+    weight_cutous: 4536
+  z:
+    image_cutouts: 7051
+    psf_cutouts: 3395
+    weight_cutous: 4589
+DES0129-6331:
+  g:
+    image_cutouts: 254
+    psf_cutouts: 9129
+    weight_cutous: 8708
+  i:
+    image_cutouts: 583
+    psf_cutouts: 8569
+    weight_cutous: 8413
+  pfw_attempt_id:
+    g: '3572552'
+    i: '3572552'
+DES0130-0541:
+  i:
+    image_cutouts: 8479
+    psf_cutouts: 8922
+    weight_cutous: 7792
+  pfw_attempt_id:
+    i: '3572554'
+    z: '3572554'
+  z:
+    image_cutouts: 9579
+    psf_cutouts: 1968
+    weight_cutous: 9731
+DES0130-4123:
+  g:
+    image_cutouts: 7636
+    psf_cutouts: 6375
+    weight_cutous: 6695
+  i:
+    image_cutouts: 7968
+    psf_cutouts: 3547
+    weight_cutous: 5092
+  pfw_attempt_id:
+    g: '3572565'
+    i: '3572565'
+    r: '3572565'
+    z: '3572565'
+  r:
+    image_cutouts: 8182
+    psf_cutouts: 4571
+    weight_cutous: 5680
+  z:
+    image_cutouts: 8416
+    psf_cutouts: 4365
+    weight_cutous: 5778
+DES0131-1124:
+  pfw_attempt_id:
+    r: '3572579'
+    z: '3572579'
+  r:
+    image_cutouts: 5227
+    psf_cutouts: 2266
+    weight_cutous: 8426
+  z:
+    image_cutouts: 5307
+    psf_cutouts: 1565
+    weight_cutous: 8213
+DES0131-1332:
+  g:
+    image_cutouts: 7006
+    psf_cutouts: 2827
+    weight_cutous: 7701
+  i:
+    image_cutouts: 7811
+    psf_cutouts: 7387
+    weight_cutous: 6543
+  pfw_attempt_id:
+    g: '3572580'
+    i: '3572580'
+    r: '3572580'
+    z: '3572580'
+  r:
+    image_cutouts: 8262
+    psf_cutouts: 1946
+    weight_cutous: 8086
+  z:
+    image_cutouts: 8981
+    psf_cutouts: 5912
+    weight_cutous: 7716
+DES0131-1749:
+  g:
+    image_cutouts: 1646
+    psf_cutouts: 293
+    weight_cutous: 9909
+  i:
+    image_cutouts: 1919
+    psf_cutouts: 207
+    weight_cutous: 9810
+  pfw_attempt_id:
+    g: '3572582'
+    i: '3572582'
+    r: '3572582'
+    z: '3572582'
+  r:
+    image_cutouts: 2423
+    psf_cutouts: 1518
+    weight_cutous: 590
+  z:
+    image_cutouts: 2836
+    psf_cutouts: 3562
+    weight_cutous: 7837
+DES0132-0333:
+  pfw_attempt_id:
+    z: '3572600'
+  z:
+    image_cutouts: 8333
+    psf_cutouts: 8961
+    weight_cutous: 8369
+DES0132-2415:
+  g:
+    image_cutouts: 3511
+    psf_cutouts: 1921
+    weight_cutous: 6081
+  i:
+    image_cutouts: 4441
+    psf_cutouts: 6617
+    weight_cutous: 4086
+  pfw_attempt_id:
+    g: '3572612'
+    i: '3572612'
+    r: '3572612'
+    z: '3572612'
+  r:
+    image_cutouts: 5143
+    psf_cutouts: 5885
+    weight_cutous: 4220
+  z:
+    image_cutouts: 5577
+    psf_cutouts: 2994
+    weight_cutous: 3977
+DES0132-5205:
+  g:
+    image_cutouts: 2053
+    psf_cutouts: 1494
+    weight_cutous: 4891
+  pfw_attempt_id:
+    g: '3572623'
+    z: '3572623'
+  z:
+    image_cutouts: 4715
+    psf_cutouts: 836
+    weight_cutous: 1624
+DES0133-0624:
+  g:
+    image_cutouts: 1490
+    psf_cutouts: 7625
+    weight_cutous: 7257
+  pfw_attempt_id:
+    g: '3572628'
+    r: '3572628'
+  r:
+    image_cutouts: 4601
+    psf_cutouts: 3665
+    weight_cutous: 7122
+DES0133-0915:
+  g:
+    image_cutouts: 7443
+    psf_cutouts: 5758
+    weight_cutous: 5754
+  i:
+    image_cutouts: 7844
+    psf_cutouts: 1600
+    weight_cutous: 3478
+  pfw_attempt_id:
+    g: '3572630'
+    i: '3572630'
+    r: '3572630'
+    z: '3572630'
+  r:
+    image_cutouts: 8269
+    psf_cutouts: 6372
+    weight_cutous: 6115
+  z:
+    image_cutouts: 8926
+    psf_cutouts: 1140
+    weight_cutous: 4451
+DES0133-4540:
+  g:
+    image_cutouts: 6145
+    psf_cutouts: 5631
+    weight_cutous: 4602
+  i:
+    image_cutouts: 6502
+    psf_cutouts: 4061
+    weight_cutous: 3966
+  pfw_attempt_id:
+    g: '3572643'
+    i: '3572643'
+    r: '3572643'
+    z: '3572643'
+  r:
+    image_cutouts: 6822
+    psf_cutouts: 4349
+    weight_cutous: 4200
+  z:
+    image_cutouts: 7127
+    psf_cutouts: 735
+    weight_cutous: 3708
+DES0134-0250:
+  pfw_attempt_id:
+    r: '3572656'
+    z: '3572656'
+  r:
+    image_cutouts: 4066
+    psf_cutouts: 3514
+    weight_cutous: 2389
+  z:
+    image_cutouts: 4567
+    psf_cutouts: 8900
+    weight_cutous: 1853
+DES0134-1124:
+  g:
+    image_cutouts: 163
+    psf_cutouts: 6583
+    weight_cutous: 7524
+  i:
+    image_cutouts: 452
+    psf_cutouts: 5538
+    weight_cutous: 7242
+  pfw_attempt_id:
+    g: '3572662'
+    i: '3572662'
+    r: '3572662'
+    z: '3572662'
+  r:
+    image_cutouts: 737
+    psf_cutouts: 5079
+    weight_cutous: 7401
+  z:
+    image_cutouts: 953
+    psf_cutouts: 2748
+    weight_cutous: 6346
+DES0134-1749:
+  g:
+    image_cutouts: 5763
+    psf_cutouts: 7920
+    weight_cutous: 5350
+  pfw_attempt_id:
+    g: '3572666'
+    r: '3572666'
+    z: '3572666'
+  r:
+    image_cutouts: 6480
+    psf_cutouts: 6915
+    weight_cutous: 5368
+  z:
+    image_cutouts: 6818
+    psf_cutouts: 1281
+    weight_cutous: 3780
+DES0134-1958:
+  g:
+    image_cutouts: 8957
+    psf_cutouts: 2879
+    weight_cutous: 9534
+  i:
+    image_cutouts: 9253
+    psf_cutouts: 7592
+    weight_cutous: 7447
+  pfw_attempt_id:
+    g: '3572667'
+    i: '3572667'
+    r: '3572667'
+    z: '3572667'
+  r:
+    image_cutouts: 9509
+    psf_cutouts: 437
+    weight_cutous: 9560
+  z:
+    image_cutouts: 9759
+    psf_cutouts: 6574
+    weight_cutous: 7515
+DES0134-4206:
+  g:
+    image_cutouts: 5084
+    psf_cutouts: 3586
+    weight_cutous: 7401
+  i:
+    image_cutouts: 5989
+    psf_cutouts: 6658
+    weight_cutous: 8964
+  pfw_attempt_id:
+    g: '3572676'
+    i: '3572676'
+    z: '3572676'
+  z:
+    image_cutouts: 8955
+    psf_cutouts: 9869
+    weight_cutous: 2454
+DES0134-4623:
+  g:
+    image_cutouts: 1448
+    psf_cutouts: 1332
+    weight_cutous: 4533
+  i:
+    image_cutouts: 2452
+    psf_cutouts: 8154
+    weight_cutous: 3508
+  pfw_attempt_id:
+    g: '3572678'
+    i: '3572678'
+    r: '3572678'
+    z: '3572678'
+  r:
+    image_cutouts: 3402
+    psf_cutouts: 3359
+    weight_cutous: 5924
+  z:
+    image_cutouts: 4692
+    psf_cutouts: 4138
+    weight_cutous: 5784
+DES0135-0416:
+  g:
+    image_cutouts: 7519
+    psf_cutouts: 9184
+    weight_cutous: 7208
+  i:
+    image_cutouts: 7807
+    psf_cutouts: 5398
+    weight_cutous: 6018
+  pfw_attempt_id:
+    g: '3572683'
+    i: '3572683'
+    r: '3572683'
+    z: '3572683'
+  r:
+    image_cutouts: 8213
+    psf_cutouts: 5848
+    weight_cutous: 6512
+  z:
+    image_cutouts: 8507
+    psf_cutouts: 3118
+    weight_cutous: 5204
+DES0135-1041:
+  g:
+    image_cutouts: 5549
+    psf_cutouts: 3580
+    weight_cutous: 3723
+  i:
+    image_cutouts: 5793
+    psf_cutouts: 1839
+    weight_cutous: 3057
+  pfw_attempt_id:
+    g: '3572686'
+    i: '3572686'
+    r: '3572686'
+    z: '3572686'
+  r:
+    image_cutouts: 5986
+    psf_cutouts: 2104
+    weight_cutous: 3222
+  z:
+    image_cutouts: 6192
+    psf_cutouts: 723
+    weight_cutous: 2865
+DES0135-1915:
+  g:
+    image_cutouts: 5655
+    psf_cutouts: 5772
+    weight_cutous: 4260
+  i:
+    image_cutouts: 5974
+    psf_cutouts: 2763
+    weight_cutous: 3336
+  pfw_attempt_id:
+    g: '3572688'
+    i: '3572688'
+    r: '3572688'
+    z: '3572688'
+  r:
+    image_cutouts: 6261
+    psf_cutouts: 5594
+    weight_cutous: 4791
+  z:
+    image_cutouts: 6593
+    psf_cutouts: 1571
+    weight_cutous: 3098
+DES0136-0624:
+  g:
+    image_cutouts: 2469
+    psf_cutouts: 9037
+    weight_cutous: 3289
+  i:
+    image_cutouts: 3349
+    psf_cutouts: 4013
+    weight_cutous: 2389
+  pfw_attempt_id:
+    g: '3572710'
+    i: '3572710'
+    r: '3572710'
+    z: '3572710'
+  r:
+    image_cutouts: 3818
+    psf_cutouts: 3912
+    weight_cutous: 3091
+  z:
+    image_cutouts: 4213
+    psf_cutouts: 6805
+    weight_cutous: 4872
+DES0136-2041:
+  pfw_attempt_id:
+    r: '3572718'
+    z: '3572718'
+  r:
+    image_cutouts: 3399
+    psf_cutouts: 9563
+    weight_cutous: 4544
+  z:
+    image_cutouts: 4256
+    psf_cutouts: 9676
+    weight_cutous: 1456
+DES0136-3706:
+  g:
+    image_cutouts: 110
+    psf_cutouts: 4085
+    weight_cutous: 646
+  i:
+    image_cutouts: 595
+    psf_cutouts: 9206
+    weight_cutous: 8994
+  pfw_attempt_id:
+    g: '3572724'
+    i: '3572724'
+    r: '3572724'
+    z: '3572724'
+  r:
+    image_cutouts: 866
+    psf_cutouts: 2426
+    weight_cutous: 644
+  z:
+    image_cutouts: 1138
+    psf_cutouts: 7384
+    weight_cutous: 8661
+DES0137-4540:
+  i:
+    image_cutouts: 7189
+    psf_cutouts: 6820
+    weight_cutous: 5931
+  pfw_attempt_id:
+    i: '3572749'
+    r: '3572749'
+    z: '3572749'
+  r:
+    image_cutouts: 7635
+    psf_cutouts: 9732
+    weight_cutous: 7054
+  z:
+    image_cutouts: 8273
+    psf_cutouts: 4872
+    weight_cutous: 7092
+DES0137-6248:
+  g:
+    image_cutouts: 9106
+    psf_cutouts: 9025
+    weight_cutous: 8064
+  i:
+    image_cutouts: 9357
+    psf_cutouts: 8130
+    weight_cutous: 7817
+  pfw_attempt_id:
+    g: '3572756'
+    i: '3572756'
+    z: '3572756'
+  z:
+    image_cutouts: 9841
+    psf_cutouts: 5101
+    weight_cutous: 6839
+DES0138-1915:
+  g:
+    image_cutouts: 2590
+    psf_cutouts: 1625
+    weight_cutous: 1122
+  i:
+    image_cutouts: 2817
+    psf_cutouts: 8413
+    weight_cutous: 9815
+  pfw_attempt_id:
+    g: '3572766'
+    i: '3572766'
+    r: '3572766'
+    z: '3572766'
+  r:
+    image_cutouts: 3002
+    psf_cutouts: 262
+    weight_cutous: 543
+  z:
+    image_cutouts: 3307
+    psf_cutouts: 8129
+    weight_cutous: 107
+DES0139+0001:
+  i:
+    image_cutouts: 7465
+    psf_cutouts: 1914
+    weight_cutous: 8003
+  pfw_attempt_id:
+    i: '3572781'
+    r: '3572781'
+  r:
+    image_cutouts: 8378
+    psf_cutouts: 3113
+    weight_cutous: 8905
+DES0139-1415:
+  g:
+    image_cutouts: 8130
+    psf_cutouts: 3963
+    weight_cutous: 9232
+  i:
+    image_cutouts: 9099
+    psf_cutouts: 9434
+    weight_cutous: 7884
+  pfw_attempt_id:
+    g: '3572789'
+    i: '3572789'
+    r: '3572789'
+    z: '3572789'
+  r:
+    image_cutouts: 9703
+    psf_cutouts: 3083
+    weight_cutous: 9620
+  z:
+    image_cutouts: 397
+    psf_cutouts: 8945
+    weight_cutous: 8752
+DES0139-4831:
+  g:
+    image_cutouts: 258
+    psf_cutouts: 8584
+    weight_cutous: 3137
+  pfw_attempt_id:
+    g: '3572801'
+DES0140+0252:
+  g:
+    image_cutouts: 8291
+    psf_cutouts: 8602
+    weight_cutous: 7410
+  pfw_attempt_id:
+    g: '3572810'
+DES0140+0335:
+  g:
+    image_cutouts: 9575
+    psf_cutouts: 4481
+    weight_cutous: 346
+  i:
+    image_cutouts: 314
+    psf_cutouts: 1524
+    weight_cutous: 9124
+  pfw_attempt_id:
+    g: '3572812'
+    i: '3572812'
+    r: '3572812'
+    z: '3572812'
+  r:
+    image_cutouts: 900
+    psf_cutouts: 2219
+    weight_cutous: 97
+  z:
+    image_cutouts: 1386
+    psf_cutouts: 7293
+    weight_cutous: 8979
+DES0140-0333:
+  pfw_attempt_id:
+    r: '3572811'
+  r:
+    image_cutouts: 5843
+    psf_cutouts: 2512
+    weight_cutous: 3279
+DES0140-0707:
+  g:
+    image_cutouts: 461
+    psf_cutouts: 807
+    weight_cutous: 9670
+  i:
+    image_cutouts: 710
+    psf_cutouts: 8183
+    weight_cutous: 8578
+  pfw_attempt_id:
+    g: '3572815'
+    i: '3572815'
+    r: '3572815'
+    z: '3572815'
+  r:
+    image_cutouts: 929
+    psf_cutouts: 8892
+    weight_cutous: 9008
+  z:
+    image_cutouts: 1154
+    psf_cutouts: 8981
+    weight_cutous: 9267
+DES0140-1749:
+  g:
+    image_cutouts: 1829
+    psf_cutouts: 2042
+    weight_cutous: 3801
+  i:
+    image_cutouts: 2849
+    psf_cutouts: 5692
+    weight_cutous: 2628
+  pfw_attempt_id:
+    g: '3572820'
+    i: '3572820'
+    r: '3572820'
+    z: '3572820'
+  r:
+    image_cutouts: 3433
+    psf_cutouts: 5278
+    weight_cutous: 2694
+  z:
+    image_cutouts: 4043
+    psf_cutouts: 179
+    weight_cutous: 6386
+DES0141-0541:
+  i:
+    image_cutouts: 1263
+    psf_cutouts: 7714
+    weight_cutous: 8552
+  pfw_attempt_id:
+    i: '3572830'
+    r: '3572830'
+    z: '3572830'
+  r:
+    image_cutouts: 1474
+    psf_cutouts: 7658
+    weight_cutous: 8879
+  z:
+    image_cutouts: 1674
+    psf_cutouts: 5371
+    weight_cutous: 8019
+DES0141-6122:
+  pfw_attempt_id:
+    r: '3572852'
+  r:
+    image_cutouts: 8487
+    psf_cutouts: 1414
+    weight_cutous: 8402
+DES0142-2332:
+  g:
+    image_cutouts: 3296
+    psf_cutouts: 4697
+    weight_cutous: 1389
+  i:
+    image_cutouts: 4885
+    psf_cutouts: 1378
+    weight_cutous: 5497
+  pfw_attempt_id:
+    g: '3572866'
+    i: '3572866'
+    r: '3572866'
+    z: '3572866'
+  r:
+    image_cutouts: 6061
+    psf_cutouts: 8778
+    weight_cutous: 9884
+  z:
+    image_cutouts: 7305
+    psf_cutouts: 2600
+    weight_cutous: 1517
+DES0143-0958:
+  g:
+    image_cutouts: 8108
+    psf_cutouts: 2652
+    weight_cutous: 9353
+  i:
+    image_cutouts: 8604
+    psf_cutouts: 9330
+    weight_cutous: 7532
+  pfw_attempt_id:
+    g: '3572885'
+    i: '3572885'
+    r: '3572885'
+    z: '3572885'
+  r:
+    image_cutouts: 9076
+    psf_cutouts: 1295
+    weight_cutous: 8506
+  z:
+    image_cutouts: 9479
+    psf_cutouts: 6844
+    weight_cutous: 7389
+DES0143-5123:
+  i:
+    image_cutouts: 999
+    psf_cutouts: 7033
+    weight_cutous: 8261
+  pfw_attempt_id:
+    i: '3572900'
+    r: '3572900'
+    z: '3572900'
+  r:
+    image_cutouts: 1253
+    psf_cutouts: 9406
+    weight_cutous: 9446
+  z:
+    image_cutouts: 1607
+    psf_cutouts: 6880
+    weight_cutous: 8857
+DES0144-0833:
+  i:
+    image_cutouts: 779
+    psf_cutouts: 848
+    weight_cutous: 9427
+  pfw_attempt_id:
+    i: '3572906'
+    r: '3572906'
+    z: '3572906'
+  r:
+    image_cutouts: 1244
+    psf_cutouts: 776
+    weight_cutous: 122
+  z:
+    image_cutouts: 1594
+    psf_cutouts: 1781
+    weight_cutous: 1420
+DES0144-3040:
+  g:
+    image_cutouts: 9722
+    psf_cutouts: 9693
+    weight_cutous: 7806
+  i:
+    image_cutouts: 153
+    psf_cutouts: 6551
+    weight_cutous: 7679
+  pfw_attempt_id:
+    g: '3566675'
+    i: '3566675'
+    r: '3566675'
+    z: '3566675'
+  r:
+    image_cutouts: 442
+    psf_cutouts: 9807
+    weight_cutous: 8903
+  z:
+    image_cutouts: 914
+    psf_cutouts: 6629
+    weight_cutous: 7748
+DES0144-4831:
+  g:
+    image_cutouts: 3357
+    psf_cutouts: 3225
+    weight_cutous: 2232
+  i:
+    image_cutouts: 3597
+    psf_cutouts: 8403
+    weight_cutous: 312
+  pfw_attempt_id:
+    g: '3572919'
+    i: '3572919'
+    r: '3572919'
+    z: '3572919'
+  r:
+    image_cutouts: 3776
+    psf_cutouts: 438
+    weight_cutous: 1322
+  z:
+    image_cutouts: 3975
+    psf_cutouts: 9490
+    weight_cutous: 1490
+DES0144-5248:
+  g:
+    image_cutouts: 2271
+    psf_cutouts: 7390
+    weight_cutous: 3216
+  i:
+    image_cutouts: 3009
+    psf_cutouts: 258
+    weight_cutous: 798
+  pfw_attempt_id:
+    g: '3566676'
+    i: '3566676'
+    r: '3566676'
+    z: '3566676'
+  r:
+    image_cutouts: 3541
+    psf_cutouts: 409
+    weight_cutous: 1231
+  z:
+    image_cutouts: 3841
+    psf_cutouts: 6472
+    weight_cutous: 9709
+DES0145-0207:
+  i:
+    image_cutouts: 7095
+    psf_cutouts: 7855
+    weight_cutous: 5558
+  pfw_attempt_id:
+    i: '3572926'
+DES0145-0624:
+  g:
+    image_cutouts: 6059
+    psf_cutouts: 7293
+    weight_cutous: 5604
+  i:
+    image_cutouts: 6311
+    psf_cutouts: 2771
+    weight_cutous: 3550
+  pfw_attempt_id:
+    g: '3572928'
+    i: '3572928'
+    r: '3572928'
+    z: '3572928'
+  r:
+    image_cutouts: 6519
+    psf_cutouts: 4681
+    weight_cutous: 4489
+  z:
+    image_cutouts: 6796
+    psf_cutouts: 3426
+    weight_cutous: 4855
+DES0145-2706:
+  g:
+    image_cutouts: 2600
+    psf_cutouts: 9093
+    weight_cutous: 3538
+  i:
+    image_cutouts: 3440
+    psf_cutouts: 6646
+    weight_cutous: 3168
+  pfw_attempt_id:
+    g: '3566678'
+    i: '3566678'
+    r: '3566678'
+    z: '3566678'
+  r:
+    image_cutouts: 4097
+    psf_cutouts: 9801
+    weight_cutous: 5203
+  z:
+    image_cutouts: 4926
+    psf_cutouts: 7691
+    weight_cutous: 5758
+DES0145-3832:
+  g:
+    image_cutouts: 2585
+    psf_cutouts: 7420
+    weight_cutous: 2689
+  i:
+    image_cutouts: 3286
+    psf_cutouts: 3148
+    weight_cutous: 1984
+  pfw_attempt_id:
+    g: '3572942'
+    i: '3572942'
+    r: '3572942'
+  r:
+    image_cutouts: 3727
+    psf_cutouts: 6069
+    weight_cutous: 3524
+DES0146-2249:
+  i:
+    image_cutouts: 1944
+    psf_cutouts: 4518
+    weight_cutous: 2420
+  pfw_attempt_id:
+    i: '3572964'
+    z: '3572964'
+  z:
+    image_cutouts: 3012
+    psf_cutouts: 876
+    weight_cutous: 1117
+DES0146-3623:
+  g:
+    image_cutouts: 3742
+    psf_cutouts: 3653
+    weight_cutous: 2918
+  i:
+    image_cutouts: 4125
+    psf_cutouts: 9373
+    weight_cutous: 1274
+  pfw_attempt_id:
+    g: '3572968'
+    i: '3572968'
+    r: '3572968'
+    z: '3572968'
+  r:
+    image_cutouts: 4342
+    psf_cutouts: 9560
+    weight_cutous: 1377
+  z:
+    image_cutouts: 4516
+    psf_cutouts: 7751
+    weight_cutous: 632
+DES0146-3914:
+  g:
+    image_cutouts: 9056
+    psf_cutouts: 6677
+    weight_cutous: 6921
+  i:
+    image_cutouts: 9276
+    psf_cutouts: 4609
+    weight_cutous: 6215
+  pfw_attempt_id:
+    g: '3572969'
+    i: '3572969'
+    r: '3572969'
+    z: '3572969'
+  r:
+    image_cutouts: 9468
+    psf_cutouts: 5415
+    weight_cutous: 6562
+  z:
+    image_cutouts: 9677
+    psf_cutouts: 5910
+    weight_cutous: 7202
+DES0147+0500:
+  g:
+    image_cutouts: 6308
+    psf_cutouts: 5387
+    weight_cutous: 464
+  i:
+    image_cutouts: 6631
+    psf_cutouts: 3276
+    weight_cutous: 22
+  pfw_attempt_id:
+    g: '3572979'
+    i: '3572979'
+DES0147-3706:
+  g:
+    image_cutouts: 6200
+    psf_cutouts: 4564
+    weight_cutous: 9106
+  i:
+    image_cutouts: 7538
+    psf_cutouts: 211
+    weight_cutous: 7267
+  pfw_attempt_id:
+    g: '3572987'
+    i: '3572987'
+    z: '3572987'
+  z:
+    image_cutouts: 9335
+    psf_cutouts: 2316
+    weight_cutous: 6320
+DES0148+0209:
+  g:
+    image_cutouts: 627
+    psf_cutouts: 1342
+    weight_cutous: 9568
+  i:
+    image_cutouts: 966
+    psf_cutouts: 6639
+    weight_cutous: 7976
+  pfw_attempt_id:
+    g: '3572997'
+    i: '3572997'
+    r: '3572997'
+    z: '3572997'
+  r:
+    image_cutouts: 1227
+    psf_cutouts: 8467
+    weight_cutous: 9184
+  z:
+    image_cutouts: 1479
+    psf_cutouts: 5880
+    weight_cutous: 8160
+DES0148-2041:
+  i:
+    image_cutouts: 5075
+    psf_cutouts: 3647
+    weight_cutous: 3425
+  pfw_attempt_id:
+    i: '3573005'
+    r: '3573005'
+    z: '3573005'
+  r:
+    image_cutouts: 5362
+    psf_cutouts: 6648
+    weight_cutous: 4438
+  z:
+    image_cutouts: 5690
+    psf_cutouts: 5696
+    weight_cutous: 5619
+DES0148-4957:
+  g:
+    image_cutouts: 2443
+    psf_cutouts: 1943
+    weight_cutous: 1303
+  i:
+    image_cutouts: 2680
+    psf_cutouts: 9
+    weight_cutous: 9866
+  pfw_attempt_id:
+    g: '3573018'
+    i: '3573018'
+    z: '3573018'
+  z:
+    image_cutouts: 3148
+    psf_cutouts: 7953
+    weight_cutous: 3
+DES0148-5123:
+  i:
+    image_cutouts: 13
+    psf_cutouts: 4521
+    weight_cutous: 675
+  pfw_attempt_id:
+    i: '3573019'
+    z: '3573019'
+  z:
+    image_cutouts: 1981
+    psf_cutouts: 6074
+    weight_cutous: 2907
+DES0149+0335:
+  g:
+    image_cutouts: 4264
+    psf_cutouts: 5470
+    weight_cutous: 2678
+  pfw_attempt_id:
+    g: '3573026'
+DES0149-1749:
+  g:
+    image_cutouts: 9804
+    psf_cutouts: 3985
+    weight_cutous: 4606
+  pfw_attempt_id:
+    g: '3566695'
+    z: '3566695'
+  z:
+    image_cutouts: 4889
+    psf_cutouts: 607
+    weight_cutous: 304
+DES0149-2706:
+  g:
+    image_cutouts: 9638
+    psf_cutouts: 8047
+    weight_cutous: 1995
+  i:
+    image_cutouts: 595
+    psf_cutouts: 7882
+    weight_cutous: 2155
+  pfw_attempt_id:
+    g: '3566696'
+    i: '3566696'
+    r: '3566696'
+    z: '3566696'
+  r:
+    image_cutouts: 1644
+    psf_cutouts: 2535
+    weight_cutous: 4714
+  z:
+    image_cutouts: 2890
+    psf_cutouts: 3808
+    weight_cutous: 4638
+DES0149-3415:
+  g:
+    image_cutouts: 475
+    psf_cutouts: 9314
+    weight_cutous: 9531
+  i:
+    image_cutouts: 760
+    psf_cutouts: 7205
+    weight_cutous: 8616
+  pfw_attempt_id:
+    g: '3573035'
+    i: '3573035'
+    r: '3573035'
+    z: '3573035'
+  r:
+    image_cutouts: 1081
+    psf_cutouts: 6704
+    weight_cutous: 8087
+  z:
+    image_cutouts: 1288
+    psf_cutouts: 9293
+    weight_cutous: 9067
+DES0150-2206:
+  pfw_attempt_id:
+    z: '3573053'
+  z:
+    image_cutouts: 9649
+    psf_cutouts: 7817
+    weight_cutous: 8140
+DES0150-2458:
+  g:
+    image_cutouts: 9014
+    psf_cutouts: 8280
+    weight_cutous: 1599
+  i:
+    image_cutouts: 167
+    psf_cutouts: 6200
+    weight_cutous: 1489
+  pfw_attempt_id:
+    g: '3573054'
+    i: '3573054'
+    z: '3573054'
+  z:
+    image_cutouts: 1744
+    psf_cutouts: 6075
+    weight_cutous: 8429
+DES0151+0209:
+  g:
+    image_cutouts: 7555
+    psf_cutouts: 2113
+    weight_cutous: 7720
+  i:
+    image_cutouts: 8580
+    psf_cutouts: 9204
+    weight_cutous: 7509
+  pfw_attempt_id:
+    g: '3573070'
+    i: '3573070'
+    r: '3573070'
+    z: '3573070'
+  r:
+    image_cutouts: 9267
+    psf_cutouts: 1820
+    weight_cutous: 8766
+  z:
+    image_cutouts: 9863
+    psf_cutouts: 5076
+    weight_cutous: 7819
+DES0151-0207:
+  g:
+    image_cutouts: 6753
+    psf_cutouts: 4410
+    weight_cutous: 8696
+  i:
+    image_cutouts: 7863
+    psf_cutouts: 8534
+    weight_cutous: 7468
+  pfw_attempt_id:
+    g: '3573069'
+    i: '3573069'
+    r: '3573069'
+    z: '3573069'
+  r:
+    image_cutouts: 8501
+    psf_cutouts: 476
+    weight_cutous: 7660
+  z:
+    image_cutouts: 9063
+    psf_cutouts: 6621
+    weight_cutous: 7472
+DES0151-0250:
+  g:
+    image_cutouts: 8353
+    psf_cutouts: 9278
+    weight_cutous: 990
+  pfw_attempt_id:
+    g: '3573071'
+    r: '3573071'
+    z: '3573071'
+  r:
+    image_cutouts: 19
+    psf_cutouts: 5189
+    weight_cutous: 9872
+  z:
+    image_cutouts: 518
+    psf_cutouts: 6910
+    weight_cutous: 8074
+DES0151-1250:
+  pfw_attempt_id:
+    r: '3573076'
+    z: '3573076'
+  r:
+    image_cutouts: 7202
+    psf_cutouts: 1501
+    weight_cutous: 1974
+  z:
+    image_cutouts: 8257
+    psf_cutouts: 4943
+    weight_cutous: 1949
+DES0151-1832:
+  g:
+    image_cutouts: 426
+    psf_cutouts: 7112
+    weight_cutous: 2618
+  i:
+    image_cutouts: 935
+    psf_cutouts: 1941
+    weight_cutous: 9959
+  pfw_attempt_id:
+    g: '3573078'
+    i: '3573078'
+    r: '3573078'
+    z: '3573078'
+  r:
+    image_cutouts: 1396
+    psf_cutouts: 2522
+    weight_cutous: 1338
+  z:
+    image_cutouts: 1766
+    psf_cutouts: 9613
+    weight_cutous: 779
+DES0151-2041:
+  g:
+    image_cutouts: 1172
+    psf_cutouts: 5877
+    weight_cutous: 1994
+  i:
+    image_cutouts: 1807
+    psf_cutouts: 9487
+    weight_cutous: 9801
+  pfw_attempt_id:
+    g: '3573079'
+    i: '3573079'
+    r: '3573079'
+  r:
+    image_cutouts: 2052
+    psf_cutouts: 1134
+    weight_cutous: 717
+DES0151-3706:
+  i:
+    image_cutouts: 6910
+    psf_cutouts: 4581
+    weight_cutous: 4919
+  pfw_attempt_id:
+    i: '3573089'
+DES0152+0418:
+  pfw_attempt_id:
+    r: '3573101'
+  r:
+    image_cutouts: 3090
+    psf_cutouts: 6698
+    weight_cutous: 9410
+DES0152-0458:
+  g:
+    image_cutouts: 284
+    psf_cutouts: 1143
+    weight_cutous: 4041
+  pfw_attempt_id:
+    g: '3573102'
+    z: '3573102'
+  z:
+    image_cutouts: 2572
+    psf_cutouts: 8482
+    weight_cutous: 9700
+DES0152-1458:
+  g:
+    image_cutouts: 4922
+    psf_cutouts: 4737
+    weight_cutous: 5217
+  i:
+    image_cutouts: 7443
+    psf_cutouts: 5124
+    weight_cutous: 7693
+  pfw_attempt_id:
+    g: '3566702'
+    i: '3566702'
+    r: '3566702'
+    z: '3566702'
+  r:
+    image_cutouts: 9523
+    psf_cutouts: 8714
+    weight_cutous: 914
+  z:
+    image_cutouts: 1671
+    psf_cutouts: 9788
+    weight_cutous: 2485
+DES0152-5457:
+  g:
+    image_cutouts: 3238
+    psf_cutouts: 4017
+    weight_cutous: 324
+  i:
+    image_cutouts: 4504
+    psf_cutouts: 4195
+    weight_cutous: 8053
+  pfw_attempt_id:
+    g: '3566704'
+    i: '3566704'
+DES0153-1541:
+  g:
+    image_cutouts: 7630
+    psf_cutouts: 9193
+    weight_cutous: 6492
+  i:
+    image_cutouts: 8767
+    psf_cutouts: 1063
+    weight_cutous: 5743
+  pfw_attempt_id:
+    g: '3573130'
+    i: '3573130'
+    r: '3573130'
+    z: '3573130'
+  r:
+    image_cutouts: 375
+    psf_cutouts: 4822
+    weight_cutous: 9812
+  z:
+    image_cutouts: 1812
+    psf_cutouts: 4537
+    weight_cutous: 9208
+DES0153-6414:
+  g:
+    image_cutouts: 1895
+    psf_cutouts: 3111
+    weight_cutous: 6329
+  i:
+    image_cutouts: 2924
+    psf_cutouts: 6377
+    weight_cutous: 3231
+  pfw_attempt_id:
+    g: '3573142'
+    i: '3573142'
+    r: '3573142'
+  r:
+    image_cutouts: 3382
+    psf_cutouts: 7909
+    weight_cutous: 4630
+DES0154-2915:
+  g:
+    image_cutouts: 4383
+    psf_cutouts: 6234
+    weight_cutous: 8171
+  pfw_attempt_id:
+    g: '3566710'
+    r: '3566710'
+  r:
+    image_cutouts: 7393
+    psf_cutouts: 8879
+    weight_cutous: 2224
+DES0154-2958:
+  g:
+    image_cutouts: 7871
+    psf_cutouts: 4130
+    weight_cutous: 9919
+  pfw_attempt_id:
+    g: '3573160'
+DES0154-4748:
+  g:
+    image_cutouts: 1842
+    psf_cutouts: 942
+    weight_cutous: 7057
+  i:
+    image_cutouts: 3181
+    psf_cutouts: 5186
+    weight_cutous: 7782
+  pfw_attempt_id:
+    g: '3573168'
+    i: '3573168'
+    z: '3573168'
+  z:
+    image_cutouts: 4520
+    psf_cutouts: 7973
+    weight_cutous: 5924
+DES0155-2249:
+  g:
+    image_cutouts: 4311
+    psf_cutouts: 8853
+    weight_cutous: 2333
+  i:
+    image_cutouts: 5747
+    psf_cutouts: 5903
+    weight_cutous: 2732
+  pfw_attempt_id:
+    g: '3573183'
+    i: '3573183'
+DES0155-2623:
+  g:
+    image_cutouts: 4915
+    psf_cutouts: 3883
+    weight_cutous: 3351
+  pfw_attempt_id:
+    g: '3573184'
+    z: '3573184'
+  z:
+    image_cutouts: 6104
+    psf_cutouts: 187
+    weight_cutous: 2555
+DES0157-0333:
+  pfw_attempt_id:
+    r: '3573229'
+  r:
+    image_cutouts: 1798
+    psf_cutouts: 5768
+    weight_cutous: 1807
+DES0157-0707:
+  g:
+    image_cutouts: 3536
+    psf_cutouts: 251
+    weight_cutous: 4999
+  i:
+    image_cutouts: 4344
+    psf_cutouts: 9105
+    weight_cutous: 4719
+  pfw_attempt_id:
+    g: '3573231'
+    i: '3573231'
+    r: '3573231'
+  r:
+    image_cutouts: 5009
+    psf_cutouts: 3978
+    weight_cutous: 7612
+DES0157-1124:
+  g:
+    image_cutouts: 5696
+    psf_cutouts: 8816
+    weight_cutous: 139
+  pfw_attempt_id:
+    g: '3573233'
+    r: '3573233'
+  r:
+    image_cutouts: 7568
+    psf_cutouts: 7883
+    weight_cutous: 9943
+DES0157-4957:
+  pfw_attempt_id:
+    z: '3573243'
+  z:
+    image_cutouts: 2153
+    psf_cutouts: 1776
+    weight_cutous: 1082
+DES0158+0418:
+  pfw_attempt_id:
+    r: '3573250'
+    z: '3573250'
+  r:
+    image_cutouts: 1884
+    psf_cutouts: 6259
+    weight_cutous: 2090
+  z:
+    image_cutouts: 2666
+    psf_cutouts: 8764
+    weight_cutous: 1575
+DES0158-1749:
+  pfw_attempt_id:
+    r: '3566716'
+    z: '3566716'
+  r:
+    image_cutouts: 9379
+    psf_cutouts: 6987
+    weight_cutous: 8260
+  z:
+    image_cutouts: 9642
+    psf_cutouts: 5799
+    weight_cutous: 6932
+DES0158-2249:
+  g:
+    image_cutouts: 5655
+    psf_cutouts: 7063
+    weight_cutous: 3039
+  pfw_attempt_id:
+    g: '3566717'
+DES0159-1915:
+  g:
+    image_cutouts: 5043
+    psf_cutouts: 305
+    weight_cutous: 305
+  pfw_attempt_id:
+    g: '3573285'
+    z: '3573285'
+  z:
+    image_cutouts: 8745
+    psf_cutouts: 1672
+    weight_cutous: 3246
+DES0159-4040:
+  g:
+    image_cutouts: 278
+    psf_cutouts: 2431
+    weight_cutous: 4026
+  pfw_attempt_id:
+    g: '3573295'
+    r: '3573295'
+    z: '3573295'
+  r:
+    image_cutouts: 2532
+    psf_cutouts: 3021
+    weight_cutous: 5653
+  z:
+    image_cutouts: 3455
+    psf_cutouts: 1826
+    weight_cutous: 5343
+DES0159-4748:
+  i:
+    image_cutouts: 3426
+    psf_cutouts: 4862
+    weight_cutous: 2674
+  pfw_attempt_id:
+    i: '3573298'
+    r: '3573298'
+    z: '3573298'
+  r:
+    image_cutouts: 3926
+    psf_cutouts: 1894
+    weight_cutous: 5433
+  z:
+    image_cutouts: 4959
+    psf_cutouts: 1364
+    weight_cutous: 6230
+DES0159-4914:
+  g:
+    image_cutouts: 7142
+    psf_cutouts: 3561
+    weight_cutous: 4576
+  pfw_attempt_id:
+    g: '3573299'
+DES0159-5414:
+  pfw_attempt_id:
+    r: '3573301'
+  r:
+    image_cutouts: 4876
+    psf_cutouts: 9437
+    weight_cutous: 5112
+DES0159-6122:
+  g:
+    image_cutouts: 9393
+    psf_cutouts: 4428
+    weight_cutous: 5903
+  pfw_attempt_id:
+    g: '3573304'
+DES0201-3623:
+  pfw_attempt_id:
+    z: '3573347'
+  z:
+    image_cutouts: 3495
+    psf_cutouts: 741
+    weight_cutous: 1536
+DES0204-3123:
+  pfw_attempt_id:
+    z: '3573418'
+  z:
+    image_cutouts: 7576
+    psf_cutouts: 4221
+    weight_cutous: 5168
+DES0205+0043:
+  pfw_attempt_id:
+    r: '3573430'
+    z: '3573430'
+  r:
+    image_cutouts: 1735
+    psf_cutouts: 1025
+    weight_cutous: 12
+  z:
+    image_cutouts: 2068
+    psf_cutouts: 512
+    weight_cutous: 589
+DES0205-2623:
+  i:
+    image_cutouts: 7982
+    psf_cutouts: 7858
+    weight_cutous: 7046
+  pfw_attempt_id:
+    i: '3573443'
+DES0206-0750:
+  g:
+    image_cutouts: 6673
+    psf_cutouts: 995
+    weight_cutous: 7546
+  pfw_attempt_id:
+    g: '3573462'
+DES0209-3706:
+  g:
+    image_cutouts: 4453
+    psf_cutouts: 5846
+    weight_cutous: 3317
+  pfw_attempt_id:
+    g: '3573546'
+DES0209-4706:
+  i:
+    image_cutouts: 3825
+    psf_cutouts: 8365
+    weight_cutous: 3752
+  pfw_attempt_id:
+    i: '3573551'
+DES0210-1041:
+  i:
+    image_cutouts: 2721
+    psf_cutouts: 454
+    weight_cutous: 981
+  pfw_attempt_id:
+    i: '3573560'
+DES0210-4414:
+  pfw_attempt_id:
+    r: '3566754'
+  r:
+    image_cutouts: 2831
+    psf_cutouts: 1549
+    weight_cutous: 1334
+DES0214-2832:
+  i:
+    image_cutouts: 4442
+    psf_cutouts: 7625
+    weight_cutous: 349
+  pfw_attempt_id:
+    i: '3573670'
+DES0215-5331:
+  i:
+    image_cutouts: 2301
+    psf_cutouts: 9067
+    weight_cutous: 9897
+  pfw_attempt_id:
+    i: '3573703'
+DES0216-3332:
+  i:
+    image_cutouts: 6698
+    psf_cutouts: 5531
+    weight_cutous: 4909
+  pfw_attempt_id:
+    i: '3573717'
