@@ -11,7 +11,7 @@ try:
         check=True,
     )
     subprocess.run(
-        "easyaccess --db desoper -c 'select * from gruendl.prelim_meds_compression_seed; > meds_seeds.fits'",
+        "easyaccess --db desoper -c 'select * from gruendl.meds_compression_seed; > meds_seeds.fits'",
         shell=True,
         check=True,
     )
