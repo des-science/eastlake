@@ -208,7 +208,8 @@ class DESDMMEDSRunner(Step):
                 fpack_seeds = yaml.safe_load(fp.read())
 
             if fpack_seeds.get(tilename, {}).get(band, None) is not None:
-                meds_yml["fpack_seeds"] = fpack_seeds[tilename][band]
+                kwargs_tmp = "-qz%d 4"
+                meds_yml["fpack_kwargs"] = kwargs_tmp % fpack_seeds[tilename][band]["image_cutouts"]
             else:
                 raise RuntimeError(
                     f"Could not find fpack seeds for {tilename} {band}!"
