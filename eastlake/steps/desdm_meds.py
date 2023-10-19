@@ -48,6 +48,16 @@ class DESDMMEDSRunner(Step):
             )
         )
         self.config["use_nwgint"] = self.config.get("use_nwgint", True)
+        self.fpack_seeds_file = os.path.abspath(
+            os.path.expanduser(
+                os.path.expandvars(
+                    self.config.get(
+                        "fpack_seeds_file",
+                        _get_default_config("Y6A1_v1_meds-desdm-Y6A1v11-fpack-seeds.yaml"),
+                    )
+                )
+            )
+        )
 
     def clear_stash(self, stash):
         # If we continued the pipeline from a previous job record file,
@@ -191,8 +201,23 @@ class DESDMMEDSRunner(Step):
         )
         with open(meds_yml_pth, "r") as fp:
             meds_yml = yaml.safe_load(fp.read())
+
+        # read the fpack seeds and set them
+        if os.path.exists(self.fpack_seeds_file):
+            with open(self.fpack_seeds_file, "r") as fp:
+                fpack_seeds = yaml.safe_load(fp.read())
+
+            if fpack_seeds.get(tilename, {}).get(band, None) is not None:
+                kwargs_tmp = "-qz%d 4"
+                meds_yml["fpack_kwargs"] = kwargs_tmp % fpack_seeds[tilename][band]["image_cutouts"]
+            else:
+                raise RuntimeError(
+                    f"Could not find fpack seeds for {tilename} {band}!"
+                )
+
         if "joblib" in meds_yml:
             meds_yml["joblib"]["max_workers"] = self.config["n_jobs"]
+
         with open(meds_yml_pth, "w") as fp:
             yaml.dump(meds_yml, fp)
 
