@@ -1,7 +1,5 @@
 from __future__ import print_function, absolute_import
 import os
-import copy
-import logging
 import pkg_resources
 
 import fitsio
@@ -9,7 +7,7 @@ import joblib
 import numpy as np
 
 from ..step import Step, run_and_check
-from ..utils import safe_mkdir, copy_ifnotexists, safe_rm
+from ..utils import safe_mkdir, safe_rm
 
 
 def _get_default_config(nm):
@@ -84,7 +82,6 @@ class FitvdRunner(Step):
         else:
             CMD_PREFIX = []
         self.CMD_PREFIX = CMD_PREFIX
-
 
     def execute(self, stash, new_params=None):
         rng = np.random.RandomState(seed=stash["step_primary_seed"])
@@ -164,7 +161,7 @@ class FitvdRunner(Step):
                 "shredx-make-fofs",
             )
 
-            ## Prepare chunks
+            # Prepare chunks
             fofs_chunks = get_fofs_chunks(
                 n_chunks=self.config.get("n_jobs"),
                 fofs_path=shredx_fofslist,
@@ -295,15 +292,14 @@ class FitvdRunner(Step):
 
             # Cleaning up
 
-            ## Remove intermediate outputs
+            # Remove intermediate outputs
             safe_rm(shredx_fofslist)
             for outfile in shredx_chunklist:
                 safe_rm(outfile)
             for outfile in sof_output:
                 safe_rm(outfile)
 
-            ## Inform the stash of the final outputs
+            # Inform the stash of the final outputs
             stash.set_filepaths("fitvd_files", fitvd_files, tilename)
 
         return 0, stash
-
