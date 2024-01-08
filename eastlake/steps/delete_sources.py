@@ -22,6 +22,7 @@ class DeleteSources(Step):
 
     def execute(self, stash, new_params=None):
 
+        base_dir = stash["base_dir"]
         tilenames = stash["tilenames"]
         for tilename in tilenames:
             if tilename in self.config["save_tilenames"]:
@@ -120,6 +121,26 @@ class DeleteSources(Step):
                                     for t in totry:
                                         if os.path.isfile(t):
                                             self.logger.debug("removing file %s" % t)
-                                            os.remove(t)
+                                            safe_rm(t)
+
+                self.logger.error("removing psf links for %s" % tilename)
+
+                psf_link = os.path.join(
+                    base_dir, stash["desrun"], tilename, "psfs",
+                    os.path.basename(pyml["psf_path"])
+                )
+                safe_rm(psf_link)
+
+                for sri in pyml["src_info"]:
+                    psf_link = os.path.join(
+                        base_dir, stash["desrun"], tilename, "psfs",
+                        os.path.basename(sri["psf_path"])
+                    )
+                    safe_rm(psf_link)
+
+                psf_path = os.path.join(
+                    base_dir, stash["desrun"], tilename, "psfs",
+                )
+                safe_rmdir(psf_path)
 
         return 0, stash
