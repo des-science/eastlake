@@ -143,4 +143,12 @@ class DeleteSources(Step):
                 )
                 safe_rmdir(psf_path)
 
+        self.logger.error("deleting empty dirs")
+
+        for root, dirs, files in os.walk(base_dir, topdown=False):
+            for name in dirs:
+                full_dir = os.path.join(root, name)
+                if len(os.listdir(full_dir)) == 0:
+                    safe_rmdir(full_dir)
+
         return 0, stash
