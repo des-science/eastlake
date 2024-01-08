@@ -2,6 +2,7 @@ from __future__ import print_function, absolute_import
 import os
 
 from ..step import Step
+from ..utils import safe_rm, safe_rmdir
 
 
 class DeleteSources(Step):
@@ -33,7 +34,7 @@ class DeleteSources(Step):
                 if filename is not None:
                     if os.path.isfile(filename):
                         self.logger.debug("removing file %s" % filename)
-                        os.remove(filename)
+                        safe_rm(filename)
                     else:
                         self.logger.debug("file %s not found" % filename)
                 else:
@@ -48,7 +49,7 @@ class DeleteSources(Step):
                 if (coadd_file is not None):
                     if os.path.isfile(coadd_file):
                         self.logger.debug("removing file %s" % coadd_file)
-                        os.remove(coadd_file)
+                        safe_rm(coadd_file)
 
                 # Also check for seg file
                 seg_file = stash.get_filepaths(
@@ -58,17 +59,17 @@ class DeleteSources(Step):
                 if (seg_file is not None):
                     if os.path.isfile(seg_file):
                         self.logger.debug("removing file %s" % seg_file)
-                        os.remove(seg_file)
+                        safe_rm(seg_file)
 
                 # Also check for bkg and bkg-rms files
                 bkg_file = coadd_file.replace(".fits", "bkg.fits")
                 if os.path.isfile(bkg_file):
                     self.logger.debug("removing file %s" % bkg_file)
-                    os.remove(bkg_file)
+                    safe_rm(bkg_file)
                 bkg_rms_file = coadd_file.replace(".fits", "bkg-rms.fits")
                 if os.path.isfile(bkg_rms_file):
                     self.logger.debug("removing file %s" % bkg_rms_file)
-                    os.remove(bkg_rms_file)
+                    safe_rm(bkg_rms_file)
 
             self.logger.error("deleting se images for tile %s" % tilename)
             for band in stash["bands"]:
@@ -79,7 +80,7 @@ class DeleteSources(Step):
                     for f in img_files:
                         if os.path.isfile(f):
                             self.logger.debug("removing file %s" % f)
-                            os.remove(f)
+                            safe_rm(f)
 
             self.logger.error("deleting se nwgint images for tile %s" % tilename)
             for band in stash["bands"]:
@@ -90,7 +91,7 @@ class DeleteSources(Step):
                     for f in img_files:
                         if os.path.isfile(f):
                             self.logger.debug("removing file %s" % f)
-                            os.remove(f)
+                            safe_rm(f)
 
             self.logger.error("deleting as much as we can for tile %s" % tilename)
             for band in stash["bands"]:
@@ -105,7 +106,7 @@ class DeleteSources(Step):
                         for t in totry:
                             if os.path.isfile(t):
                                 self.logger.debug("removing file %s" % t)
-                                os.remove(t)
+                                safe_rm(t)
 
                     if k == "src_info":
                         for srci in pyml["src_info"]:
