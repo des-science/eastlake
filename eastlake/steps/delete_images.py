@@ -2,6 +2,7 @@ from __future__ import print_function, absolute_import
 import os
 
 from ..step import Step
+from ..utils import safe_rm
 
 
 class DeleteImages(Step):
@@ -44,7 +45,7 @@ class DeleteImages(Step):
                     if filename is not None:
                         if os.path.isfile(filename):
                             self.logger.debug("removing file %s" % filename)
-                            os.remove(filename)
+                            safe_rm(filename)
                         else:
                             self.logger.debug("file %s not found" % filename)
                     else:
@@ -57,7 +58,7 @@ class DeleteImages(Step):
                     if (coadd_file is not None):
                         if os.path.isfile(coadd_file):
                             self.logger.debug("removing file %s" % coadd_file)
-                            os.remove(coadd_file)
+                            safe_rm(coadd_file)
 
                     # Also check for seg file
                     if self.config["delete_seg"]:
@@ -66,17 +67,17 @@ class DeleteImages(Step):
                         if (seg_file is not None):
                             if os.path.isfile(seg_file):
                                 self.logger.debug("removing file %s" % seg_file)
-                                os.remove(seg_file)
+                                safe_rm(seg_file)
 
                     # Also check for bkg and bkg-rms files
                     bkg_file = coadd_file.replace(".fits", "bkg.fits")
                     if os.path.isfile(bkg_file):
                         self.logger.debug("removing file %s" % bkg_file)
-                        os.remove(bkg_file)
+                        safe_rm(bkg_file)
                     bkg_rms_file = coadd_file.replace(".fits", "bkg-rms.fits")
                     if os.path.isfile(bkg_rms_file):
                         self.logger.debug("removing file %s" % bkg_rms_file)
-                        os.remove(bkg_rms_file)
+                        safe_rm(bkg_rms_file)
 
             # Secondly se stuff
             if self.config["delete_se"]:
@@ -89,7 +90,7 @@ class DeleteImages(Step):
                         for f in img_files:
                             if os.path.isfile(f):
                                 self.logger.debug("removing file %s" % f)
-                                os.remove(f)
+                                safe_rm(f)
 
             if self.config["delete_se_nwgint"]:
                 self.logger.error("deleting se nwgint images for tile %s" % tilename)
@@ -101,6 +102,6 @@ class DeleteImages(Step):
                         for f in img_files:
                             if os.path.isfile(f):
                                 self.logger.debug("removing file %s" % f)
-                                os.remove(f)
+                                safe_rm(f)
 
         return 0, stash

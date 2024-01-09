@@ -64,6 +64,15 @@ def safe_rm(pth, verbose=False):
         pass
 
 
+def safe_rmdir(pth, verbose=False):
+    try:
+        os.rmdir(pth)
+    except Exception as e:
+        if verbose:
+            print("removing dir %s failed w/ error %r" % (pth, e))
+        pass
+
+
 def safe_copy(src, dst):
     safe_mkdir(os.path.dirname(dst))
     shutil.copy2(src, dst)
