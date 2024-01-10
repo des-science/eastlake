@@ -39,6 +39,29 @@ def get_fofs_chunks(*, n_chunks=None, fofs_path=None):
 
     return starts_ends
 
+def get_fitvd_chunks(*, n_chunks=None, shredx_fits_path=None):
+
+    with fitsio.FITS(shredx_fits_path) as fits:
+        shredx = fits[1].read()
+
+    n_objs = len(shredx)
+
+    print("fitvd objs: ", n_objs)
+    n_objs_chunks = n_objs // n_chunks
+
+    print("n_chunks : ", n_chunks)
+    print("n_objs_chunks : ", n_objs_chunks)
+
+    starts_ends = []
+    for i in range(n_chunks):
+        start = i * n_objs_chunks
+        end = i * n_objs_chunks + n_objs_chunks - 1
+        if i == n_chunks - 1:
+            end = n_objs - 1
+        starts_ends.append((start, end))
+
+    return starts_ends
+
 
 class FitvdRunner(Step):
     """
@@ -161,7 +184,7 @@ class FitvdRunner(Step):
                 "shredx-make-fofs",
             )
 
-            # Prepare chunks
+            # Prepare fof chunks
             fofs_chunks = get_fofs_chunks(
                 n_chunks=self.config.get("n_jobs"),
                 fofs_path=shredx_fofslist,
@@ -171,13 +194,6 @@ class FitvdRunner(Step):
                 os.path.join(
                     shredx_dir,
                     f"{tilename}_shredx-chunk-{start}-{end}.fits",
-                )
-                for start, end in fofs_chunks
-            ]
-            sof_output = [
-                os.path.join(
-                    sof_dir,
-                    f"{tilename}_sof-chunk-{start}-{end}.fits",
                 )
                 for start, end in fofs_chunks
             ]
@@ -243,6 +259,19 @@ class FitvdRunner(Step):
 
             fitvd_files.append(shredx_fits)
 
+            # Prepare fitvd chunks
+            fitvd_chunks = get_fitvd_chunks(
+                n_chunks=self.config.get("n_jobs"),
+                shredx_fits_path=shredx_fits,
+            )
+            sof_output = [
+                os.path.join(
+                    sof_dir,
+                    f"{tilename}_sof-chunk-{start}-{end}.fits",
+                )
+                for start, end in fitvd_chunks
+            ]
+
             # 4. Run fitvd
             cmd_list = [
                 [
@@ -255,7 +284,7 @@ class FitvdRunner(Step):
                     "--output", sof_output[i],
                     *[meds_paths[band] for band in bands],
                 ]
-                for i, (start, end) in enumerate(fofs_chunks)
+                for i, (start, end) in enumerate(fitvd_chunks)
             ]
 
             jobs = []
