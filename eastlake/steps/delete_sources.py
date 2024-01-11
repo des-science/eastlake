@@ -72,6 +72,16 @@ class DeleteSources(Step):
                     self.logger.debug("removing file %s" % bkg_rms_file)
                     safe_rm(bkg_rms_file)
 
+                # ...and coadd object map
+                coadd_object_map_file = stash.get_filepaths(
+                    "coadd_object_map", tilename, band=band,
+                    keyerror=False,
+                )
+                if (coadd_object_map_file is not None):
+                    if os.path.isfile(coadd_object_map_file):
+                        self.logger.debug("removing file %s" % coadd_object_map_file)
+                        safe_rm(coadd_object_map_file)
+
             self.logger.error("deleting se images for tile %s" % tilename)
             for band in stash["bands"]:
                 img_files = stash.get_filepaths(
