@@ -1,0 +1,37 @@
+fofs:
+    # minimum fof size to process
+    min_fofsize: 1
+
+data:
+    # zero weights for pixels with these bits set in the mask plane
+    zero_weight_badpix: 1
+
+guess:
+    # the guess for each object will be initially laid out with relative flux and
+    # sizes for each gaussian based on this model
+
+    # dev uses 10 gaussians
+    model: 'dev'
+
+shredding:
+    # number of gaussians to represent the psf
+    psf_ngauss: 5
+
+    # tolerance for coadd and flux fitting.  For the main fit it is the
+    # relative change in the log likelihood. For the flux fit it is the
+    # relative change in the total flux
+    # tol: 0.001
+
+    # min and max number of iterations for the main fit on the coadd of all
+    # bands
+    # miniter: 40
+    # maxiter: 500
+    # miniter: 40
+
+    # min and max number of iterations for the flux only adjustments for each
+    # band
+    # flux_miniter: 20
+    # flux_maxiter: 500
+
+    # fill in zero weight pixels with the model on each iteration
+    # fill_zero_weight: True
