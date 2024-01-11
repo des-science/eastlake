@@ -123,20 +123,34 @@ class DeleteSources(Step):
                                             self.logger.debug("removing file %s" % t)
                                             safe_rm(t)
 
-            self.logger.error("removing psf links for %s" % tilename)
+                self.logger.error("deleting %s-band nullwt links for %s" % (band, tilename))
 
-            psf_link = os.path.join(
-                base_dir, stash["desrun"], tilename, "psfs",
-                os.path.basename(pyml["psf_path"])
-            )
-            safe_rm(psf_link)
+                for sri in pyml["src_info"]:
+                    nullwt_link = os.path.join(
+                        base_dir, stash["desrun"], tilename, f"nullwt-{band}",
+                        os.path.basename(sri["coadd_nwgint_path"])
+                    )
+                    safe_rm(nullwt_link)
 
-            for sri in pyml["src_info"]:
+                nullwt_path = os.path.join(
+                    base_dir, stash["desrun"], tilename, f"nullwt-{band}",
+                )
+                safe_rmdir(nullwt_path)
+
+                self.logger.error("deleting %s-band psfs links for %s" % (band, tilename))
+
                 psf_link = os.path.join(
                     base_dir, stash["desrun"], tilename, "psfs",
-                    os.path.basename(sri["psf_path"])
+                    os.path.basename(pyml["psf_path"])
                 )
                 safe_rm(psf_link)
+
+                for sri in pyml["src_info"]:
+                    psf_link = os.path.join(
+                        base_dir, stash["desrun"], tilename, "psfs",
+                        os.path.basename(sri["psf_path"])
+                    )
+                    safe_rm(psf_link)
 
             psf_path = os.path.join(
                 base_dir, stash["desrun"], tilename, "psfs",
