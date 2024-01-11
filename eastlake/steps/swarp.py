@@ -104,9 +104,10 @@ class SWarpRunner(Step):
 
             self._det_coadd(tilename, stash, band_coadd_data)
 
-            for band, fns in band_coadd_data.items():
-                for fn in fns.values():
-                    safe_rm(fn)
+            if self.config.get("debug", False) is False:
+                for band, fns in band_coadd_data.items():
+                    for fn in fns.values():
+                        safe_rm(fn)
 
             self.logger.error(
                 "%s complete for tile %s" % (self.name, tilename))
@@ -231,9 +232,10 @@ class SWarpRunner(Step):
         output_coadd_mask_file = os.path.join(
             output_coadd_dir, "%s_%s_msk.fits" % (tilename, band))
 
-        safe_rm(output_coadd_sci_file)
-        safe_rm(output_coadd_weight_file)
-        safe_rm(output_coadd_mask_file)
+        if self.config.get("debug", False) is False:
+            safe_rm(output_coadd_sci_file)
+            safe_rm(output_coadd_weight_file)
+            safe_rm(output_coadd_mask_file)
 
         # make the output directory and then move here to run swarp
         # this prevents the intermediate files being fucked up by
@@ -330,7 +332,8 @@ class SWarpRunner(Step):
                 "running swarp for tile %s, band %s w/ mask:\n\t%s" % (
                     tilename, band, " ".join(mask_cmd)))
             run_and_check(mask_cmd, "Mask SWarp", logger=self.logger)
-            safe_rm(dummy_mask_coadd)
+            if self.config.get("debug", False) is False:
+                safe_rm(dummy_mask_coadd)
 
             # now run coadd_assemble
             safe_rm(output_coadd_path)
@@ -376,6 +379,13 @@ class SWarpRunner(Step):
                 "fpack SWarp",
                 logger=self.logger
             )
+
+            # Remove tmp swarp convenience files
+            if self.config.get("debug", False) is False:
+                safe_rm(im_file_list)
+                safe_rm(wgt_file_list)
+                safe_rm(wgt_me_file_list)
+                safe_rm(msk_file_list)
 
         with stash.update_output_pizza_cutter_yaml(tilename, band) as pyml:
             pyml["image_path"] = output_coadd_path + ".fz"
@@ -565,9 +575,10 @@ class SWarpRunner(Step):
             run_and_check(asmb_cmd, "coadd_assemble", logger=self.logger)
 
             # remove tmp files
-            safe_rm(mask_tmp_file)
-            safe_rm(coadd_file)
-            safe_rm(weight_file)
-            safe_rm(mask_file)
+            if self.config.get("debug", False) is False:
+                safe_rm(mask_tmp_file)
+                safe_rm(coadd_file)
+                safe_rm(weight_file)
+                safe_rm(mask_file)
 
         stash.set_filepaths("det_coadd_file", det_coadd_file, tilename)
