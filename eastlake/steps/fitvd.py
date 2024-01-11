@@ -39,6 +39,7 @@ def get_fofs_chunks(*, n_chunks=None, fofs_path=None):
 
     return starts_ends
 
+
 def get_fitvd_chunks(*, n_chunks=None, shredx_fits_path=None):
 
     with fitsio.FITS(shredx_fits_path) as fits:
