@@ -85,7 +85,6 @@ class DeleteSources(Step):
                         safe_rm(coadd_object_map_file)
 
             self.logger.error("deleting swarp files %s" % tilename)
-            coadd_bands = []
             for band in stash["bands"]:
                 # Clean up any single-band files leftover from swarp
                 orig_coadd_path = stash.get_input_pizza_cutter_yaml(tilename, band)["image_path"]
@@ -144,9 +143,9 @@ class DeleteSources(Step):
                         or weight_file_re.fullmatch(coadd_file)
                         or mask_tmp_file_re.fullmatch(coadd_file)
                         or mask_file_re.fullmatch(coadd_file)
-                     ):
-                         coadd_file_path = os.path.join(coadd_dir, coadd_file)
-                         safe_rm(coadd_file_path)
+                    ):
+                        coadd_file_path = os.path.join(coadd_dir, coadd_file)
+                        safe_rm(coadd_file_path)
 
             self.logger.error("deleting se images for tile %s" % tilename)
             for band in stash["bands"]:
