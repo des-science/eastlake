@@ -1,8 +1,9 @@
 from __future__ import print_function, absolute_import
 import os
+import re
 
 from ..step import Step
-from ..utils import safe_rm, safe_rmdir
+from ..utils import safe_rm, safe_rmdir, get_relpath
 
 
 class DeleteSources(Step):
@@ -43,6 +44,7 @@ class DeleteSources(Step):
 
             # Now the per-band coadds
             for band in stash["bands"]:
+
                 coadd_file = stash.get_filepaths(
                     "coadd_file", tilename, band=band,
                     keyerror=False,
@@ -71,6 +73,79 @@ class DeleteSources(Step):
                 if os.path.isfile(bkg_rms_file):
                     self.logger.debug("removing file %s" % bkg_rms_file)
                     safe_rm(bkg_rms_file)
+
+                # ...and coadd object map
+                coadd_object_map_file = stash.get_filepaths(
+                    "coadd_object_map", tilename, band=band,
+                    keyerror=False,
+                )
+                if (coadd_object_map_file is not None):
+                    if os.path.isfile(coadd_object_map_file):
+                        self.logger.debug("removing file %s" % coadd_object_map_file)
+                        safe_rm(coadd_object_map_file)
+
+            self.logger.error("deleting swarp files %s" % tilename)
+            for band in stash["bands"]:
+                # Clean up any single-band files leftover from swarp
+                orig_coadd_path = stash.get_input_pizza_cutter_yaml(tilename, band)["image_path"]
+                coadd_path_from_imsim_data = get_relpath(
+                    orig_coadd_path, stash["imsim_data"])
+                output_coadd_path = os.path.join(
+                    base_dir, coadd_path_from_imsim_data)
+                if output_coadd_path.endswith("fits.fz"):
+                    output_coadd_path = output_coadd_path[:-3]
+                output_coadd_dir = os.path.dirname(output_coadd_path)
+
+                output_coadd_sci_file = os.path.join(
+                    output_coadd_dir, "%s_%s_sci.fits" % (tilename, band))
+                output_coadd_weight_file = os.path.join(
+                    output_coadd_dir, "%s_%s_wgt.fits" % (tilename, band))
+                output_coadd_mask_file = os.path.join(
+                    output_coadd_dir, "%s_%s_msk.fits" % (tilename, band))
+
+                safe_rm(output_coadd_sci_file)
+                safe_rm(output_coadd_weight_file)
+                safe_rm(output_coadd_mask_file)
+
+                dummy_mask_coadd = os.path.join(
+                    output_coadd_dir, "%s_%s_msk-tmp.fits" % (tilename, band))
+                safe_rm(dummy_mask_coadd)
+
+                safe_rm(output_coadd_path + ".fz")
+
+                im_file_list = os.path.join(output_coadd_dir, "im_file_list.dat")
+                wgt_file_list = os.path.join(output_coadd_dir, "wgt_file_list.dat")
+                wgt_me_file_list = os.path.join(output_coadd_dir, "wgt_me_file_list.dat")
+                msk_file_list = os.path.join(output_coadd_dir, "msk_file_list.dat")
+                safe_rm(im_file_list)
+                safe_rm(wgt_file_list)
+                safe_rm(wgt_me_file_list)
+                safe_rm(msk_file_list)
+
+            # Remove swarp coadd files
+            # Match the coadd bands with regular expressions as the swarp
+            # coadds may be made with a different subset of bands
+            coadd_dir = os.path.join(
+                base_dir, stash["desrun"], tilename, "coadd")
+            if os.path.isdir(coadd_dir):
+                bands = "".join(stash["bands"])
+
+                det_coadd_file_re = re.compile(f"{tilename}_coadd_det_[{bands}]+.fits")
+                coadd_file_re = re.compile(f"{tilename}_coadd_[{bands}]+.fits")
+                weight_file_re = re.compile(f"{tilename}_coadd_weight_[{bands}]+.fits")
+                mask_tmp_file_re = re.compile(f"{tilename}_coadd_[{bands}]+_tmp.fits")
+                mask_file_re = re.compile(f"{tilename}_coadd_[{bands}]+_msk.fits")
+
+                for coadd_file in os.listdir(coadd_dir):
+                    if (
+                        det_coadd_file_re.fullmatch(coadd_file)
+                        or coadd_file_re.fullmatch(coadd_file)
+                        or weight_file_re.fullmatch(coadd_file)
+                        or mask_tmp_file_re.fullmatch(coadd_file)
+                        or mask_file_re.fullmatch(coadd_file)
+                    ):
+                        coadd_file_path = os.path.join(coadd_dir, coadd_file)
+                        safe_rm(coadd_file_path)
 
             self.logger.error("deleting se images for tile %s" % tilename)
             for band in stash["bands"]:
@@ -123,33 +198,104 @@ class DeleteSources(Step):
                                             self.logger.debug("removing file %s" % t)
                                             safe_rm(t)
 
-            self.logger.error("removing psf links for %s" % tilename)
+                self.logger.error("deleting %s-band nullwt links for %s" % (band, tilename))
 
-            psf_link = os.path.join(
-                base_dir, stash["desrun"], tilename, "psfs",
-                os.path.basename(pyml["psf_path"])
-            )
-            safe_rm(psf_link)
+                for sri in pyml["src_info"]:
+                    nullwt_link = os.path.join(
+                        base_dir, stash["desrun"], tilename, f"nullwt-{band}",
+                        os.path.basename(sri["coadd_nwgint_path"])
+                    )
+                    safe_rm(nullwt_link)
 
-            for sri in pyml["src_info"]:
+                nullwt_path = os.path.join(
+                    base_dir, stash["desrun"], tilename, f"nullwt-{band}",
+                )
+                safe_rmdir(nullwt_path)
+
+                self.logger.error("deleting %s-band psfs links for %s" % (band, tilename))
+
                 psf_link = os.path.join(
                     base_dir, stash["desrun"], tilename, "psfs",
-                    os.path.basename(sri["psf_path"])
+                    os.path.basename(pyml["psf_path"])
                 )
                 safe_rm(psf_link)
+
+                for sri in pyml["src_info"]:
+                    psf_link = os.path.join(
+                        base_dir, stash["desrun"], tilename, "psfs",
+                        os.path.basename(sri["psf_path"])
+                    )
+                    safe_rm(psf_link)
+
+                self.logger.error("deleting %s-band psfmap for %s" % (band, tilename))
+                pmap_fn = os.path.join(
+                    base_dir, stash["desrun"], tilename,
+                    f"{tilename}_{band}_psfmap-{stash['desrun']}.dat"
+                )
+                safe_rm(pmap_fn)
+
+                self.logger.error("deleting %s-band lists for %s" % (band, tilename))
+                fileconf = os.path.join(
+                    base_dir, stash["desrun"], tilename, f"lists-{band}",
+                    f"{tilename}_{band}_fileconf-{stash['desrun']}.yaml"
+                )
+                safe_rm(fileconf)
+                for listdir in ["lists", f"lists-{band}"]:
+                    bkg_flist = os.path.join(
+                        base_dir, stash["desrun"], tilename, listdir,
+                        f"{tilename}_{band}_bkg-flist-{stash['desrun']}.dat"
+                    )
+                    finalcut = os.path.join(
+                        base_dir, stash["desrun"], tilename, listdir,
+                        f"{tilename}_{band}_finalcut-flist-{stash['desrun']}.dat"
+                    )
+                    nullwt = os.path.join(
+                        base_dir, stash["desrun"], tilename, listdir,
+                        f"{tilename}_{band}_nullwt-flist-{stash['desrun']}.dat"
+                    )
+                    nwgint = os.path.join(
+                        base_dir, stash["desrun"], tilename, listdir,
+                        f"{tilename}_{band}_nwgint-flist-{stash['desrun']}.dat"
+                    )
+                    piff = os.path.join(
+                        base_dir, stash["desrun"], tilename, listdir,
+                        f"{tilename}_{band}_piff-flist-{stash['desrun']}.dat"
+                    )
+                    psf = os.path.join(
+                        base_dir, stash["desrun"], tilename, listdir,
+                        f"{tilename}_{band}_psf-flist-{stash['desrun']}.dat"
+                    )
+                    seg = os.path.join(
+                        base_dir, stash["desrun"], tilename, listdir,
+                        f"{tilename}_{band}_seg-flist-{stash['desrun']}.dat"
+                    )
+                    safe_rm(bkg_flist)
+                    safe_rm(finalcut)
+                    safe_rm(nullwt)
+                    safe_rm(nwgint)
+                    safe_rm(piff)
+                    safe_rm(psf)
+                    safe_rm(seg)
 
             psf_path = os.path.join(
                 base_dir, stash["desrun"], tilename, "psfs",
             )
             safe_rmdir(psf_path)
 
+            pmap_fn = os.path.join(
+                base_dir, stash["desrun"], tilename,
+                f"{tilename}_all_psfmap.dat"
+            )
+            safe_rm(pmap_fn)
+
             self.logger.error("deleting empty dirs")
 
             tile_path = os.path.join(base_dir, stash["desrun"], tilename)
-            for root, dirs, files in os.walk(tile_path, topdown=False):
-                for name in dirs:
-                    full_dir = os.path.join(root, name)
-                    if len(os.listdir(full_dir)) == 0:
-                        safe_rmdir(full_dir)
+            if os.path.isdir(tile_path):
+                for root, dirs, files in os.walk(tile_path, topdown=False):
+                    for name in dirs:
+                        full_dir = os.path.join(root, name)
+                        if len(os.listdir(full_dir)) == 0:
+                            safe_rmdir(full_dir)
 
         return 0, stash
