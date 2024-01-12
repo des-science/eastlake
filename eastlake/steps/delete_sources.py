@@ -128,25 +128,25 @@ class DeleteSources(Step):
             # coadds may be made with a different subset of bands
             coadd_dir = os.path.join(
                 base_dir, stash["desrun"], tilename, "coadd")
+            if os.path.isdir(coadd_dir):
+                bands = "".join(stash["bands"])
 
-            bands = "".join(stash["bands"])
+                det_coadd_file_re = re.compile(f"{tilename}_coadd_det_[{bands}]+.fits")
+                coadd_file_re = re.compile(f"{tilename}_coadd_[{bands}]+.fits")
+                weight_file_re = re.compile(f"{tilename}_coadd_weight_[{bands}]+.fits")
+                mask_tmp_file_re = re.compile(f"{tilename}_coadd_[{bands}]+_tmp.fits")
+                mask_file_re = re.compile(f"{tilename}_coadd_[{bands}]+_msk.fits")
 
-            det_coadd_file_re = re.compile(f"{tilename}_coadd_det_[{bands}]+.fits")
-            coadd_file_re = re.compile(f"{tilename}_coadd_[{bands}]+.fits")
-            weight_file_re = re.compile(f"{tilename}_coadd_weight_[{bands}]+.fits")
-            mask_tmp_file_re = re.compile(f"{tilename}_coadd_[{bands}]+_tmp.fits")
-            mask_file_re = re.compile(f"{tilename}_coadd_[{bands}]+_msk.fits")
-
-            for coadd_file in os.listdir(coadd_dir):
-                if (
-                    det_coadd_file_re.fullmatch(coadd_file)
-                    or coadd_file_re.fullmatch(coadd_file)
-                    or weight_file_re.fullmatch(coadd_file)
-                    or mask_tmp_file_re.fullmatch(coadd_file)
-                    or mask_file_re.fullmatch(coadd_file)
-                 ):
-                     coadd_file_path = os.path.join(coadd_dir, coadd_file)
-                     safe_rm(coadd_file_path)
+                for coadd_file in os.listdir(coadd_dir):
+                    if (
+                        det_coadd_file_re.fullmatch(coadd_file)
+                        or coadd_file_re.fullmatch(coadd_file)
+                        or weight_file_re.fullmatch(coadd_file)
+                        or mask_tmp_file_re.fullmatch(coadd_file)
+                        or mask_file_re.fullmatch(coadd_file)
+                     ):
+                         coadd_file_path = os.path.join(coadd_dir, coadd_file)
+                         safe_rm(coadd_file_path)
 
             self.logger.error("deleting se images for tile %s" % tilename)
             for band in stash["bands"]:
@@ -236,10 +236,11 @@ class DeleteSources(Step):
             self.logger.error("deleting empty dirs")
 
             tile_path = os.path.join(base_dir, stash["desrun"], tilename)
-            for root, dirs, files in os.walk(tile_path, topdown=False):
-                for name in dirs:
-                    full_dir = os.path.join(root, name)
-                    if len(os.listdir(full_dir)) == 0:
-                        safe_rmdir(full_dir)
+            if os.path.isdir(tile_path):
+                for root, dirs, files in os.walk(tile_path, topdown=False):
+                    for name in dirs:
+                        full_dir = os.path.join(root, name)
+                        if len(os.listdir(full_dir)) == 0:
+                            safe_rmdir(full_dir)
 
         return 0, stash
