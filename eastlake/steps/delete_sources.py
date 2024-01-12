@@ -227,10 +227,66 @@ class DeleteSources(Step):
                     )
                     safe_rm(psf_link)
 
+                self.logger.error("deleting %s-band psfmap for %s" % (band, tilename))
+                pmap_fn = os.path.join(
+                    base_dir, stash["desrun"], tilename,
+                    f"{tilename}_{band}_psfmap-{stash['desrun']}.dat"
+                )
+                safe_rm(pmap_fn)
+
+                self.logger.error("deleting %s-band lists for %s" % (band, tilename))
+                fileconf = os.path.join(
+                    base_dir, stash["desrun"], tilename, f"lists-{band}",
+                    f"{tilename}_{band}_fileconf-{stash['desrun']}.yaml"
+                )
+                safe_rm(fileconf)
+                for listdir in ["lists", f"lists-{band}"]:
+                    bkg_flist = os.path.join(
+                        base_dir, stash["desrun"], tilename, listdir,
+                        f"{tilename}_{band}_bkg-flist-{stash['desrun']}.dat"
+                    )
+                    finalcut = os.path.join(
+                        base_dir, stash["desrun"], tilename, listdir,
+                        f"{tilename}_{band}_finalcut-flist-{stash['desrun']}.dat"
+                    )
+                    nullwt = os.path.join(
+                        base_dir, stash["desrun"], tilename, listdir,
+                        f"{tilename}_{band}_nullwt-flist-{stash['desrun']}.dat"
+                    )
+                    nwgint = os.path.join(
+                        base_dir, stash["desrun"], tilename, listdir,
+                        f"{tilename}_{band}_nwgint-flist-{stash['desrun']}.dat"
+                    )
+                    piff = os.path.join(
+                        base_dir, stash["desrun"], tilename, listdir,
+                        f"{tilename}_{band}_piff-flist-{stash['desrun']}.dat"
+                    )
+                    psf = os.path.join(
+                        base_dir, stash["desrun"], tilename, listdir,
+                        f"{tilename}_{band}_psf-flist-{stash['desrun']}.dat"
+                    )
+                    seg = os.path.join(
+                        base_dir, stash["desrun"], tilename, listdir,
+                        f"{tilename}_{band}_seg-flist-{stash['desrun']}.dat"
+                    )
+                    safe_rm(bkg_flist)
+                    safe_rm(finalcut)
+                    safe_rm(nullwt)
+                    safe_rm(nwgint)
+                    safe_rm(piff)
+                    safe_rm(psf)
+                    safe_rm(seg)
+
             psf_path = os.path.join(
                 base_dir, stash["desrun"], tilename, "psfs",
             )
             safe_rmdir(psf_path)
+
+            pmap_fn = os.path.join(
+                base_dir, stash["desrun"], tilename,
+                f"{tilename}_all_psfmap.dat"
+            )
+            safe_rm(pmap_fn)
 
             self.logger.error("deleting empty dirs")
 
