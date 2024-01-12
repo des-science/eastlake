@@ -1,5 +1,6 @@
 from __future__ import print_function, absolute_import
 import os
+import re
 
 from ..step import Step
 from ..utils import safe_rm, safe_rmdir, get_relpath
@@ -122,32 +123,30 @@ class DeleteSources(Step):
                 safe_rm(wgt_me_file_list)
                 safe_rm(msk_file_list)
 
-                if "coadd_bands" in self.config.get("swarp", {}):
-                    if band not in self.config["swarp"]["coadd_bands"]:
-                        self.logger.error(
-                            "Not including band=%s in coadd" % (band))
-                        continue
-                coadd_bands.append(band)
-
             # Remove swarp coadd files
+            # Match the coadd bands with regular expressions as the swarp
+            # coadds may be made with a different subset of bands
             coadd_dir = os.path.join(
                 base_dir, stash["desrun"], tilename, "coadd")
-            coadd_file = os.path.join(
-                coadd_dir,
-                "%s_coadd_%s.fits" % (tilename, "".join(coadd_bands)))
-            weight_file = os.path.join(
-                coadd_dir,
-                "%s_coadd_weight_%s.fits" % (tilename, "".join(coadd_bands)))
-            mask_tmp_file = os.path.join(
-                coadd_dir,
-                "%s_coadd_%s_tmp.fits" % (tilename, "".join(coadd_bands)))
-            mask_file = os.path.join(
-                coadd_dir,
-                "%s_coadd_%s_msk.fits" % (tilename, "".join(coadd_bands)))
-            safe_rm(mask_tmp_file)
-            safe_rm(coadd_file)
-            safe_rm(weight_file)
-            safe_rm(mask_file)
+
+            bands = "".join(stash["bands"])
+
+            det_coadd_file_re = re.compile(f"{tilename}_coadd_det_[{bands}]+.fits")
+            coadd_file_re = re.compile(f"{tilename}_coadd_[{bands}]+.fits")
+            weight_file_re = re.compile(f"{tilename}_coadd_weight_[{bands}]+.fits")
+            mask_tmp_file_re = re.compile(f"{tilename}_coadd_[{bands}]+_tmp.fits")
+            mask_file_re = re.compile(f"{tilename}_coadd_[{bands}]+_msk.fits")
+
+            for coadd_file in os.listdir(coadd_dir):
+                if (
+                    det_coadd_file_re.fullmatch(coadd_file)
+                    or coadd_file_re.fullmatch(coadd_file)
+                    or weight_file_re.fullmatch(coadd_file)
+                    or mask_tmp_file_re.fullmatch(coadd_file)
+                    or mask_file_re.fullmatch(coadd_file)
+                 ):
+                     coadd_file_path = os.path.join(coadd_dir, coadd_file)
+                     safe_rm(coadd_file_path)
 
             self.logger.error("deleting se images for tile %s" % tilename)
             for band in stash["bands"]:
