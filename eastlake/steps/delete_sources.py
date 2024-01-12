@@ -2,7 +2,7 @@ from __future__ import print_function, absolute_import
 import os
 
 from ..step import Step
-from ..utils import safe_rm, safe_rmdir
+from ..utils import safe_rm, safe_rmdir, get_relpath
 
 
 class DeleteSources(Step):
@@ -43,6 +43,7 @@ class DeleteSources(Step):
 
             # Now the per-band coadds
             for band in stash["bands"]:
+
                 coadd_file = stash.get_filepaths(
                     "coadd_file", tilename, band=band,
                     keyerror=False,
@@ -81,6 +82,72 @@ class DeleteSources(Step):
                     if os.path.isfile(coadd_object_map_file):
                         self.logger.debug("removing file %s" % coadd_object_map_file)
                         safe_rm(coadd_object_map_file)
+
+            self.logger.error("deleting swarp files %s" % tilename)
+            coadd_bands = []
+            for band in stash["bands"]:
+                # Clean up any single-band files leftover from swarp
+                orig_coadd_path = stash.get_input_pizza_cutter_yaml(tilename, band)["image_path"]
+                coadd_path_from_imsim_data = get_relpath(
+                    orig_coadd_path, stash["imsim_data"])
+                output_coadd_path = os.path.join(
+                    base_dir, coadd_path_from_imsim_data)
+                if output_coadd_path.endswith("fits.fz"):
+                    output_coadd_path = output_coadd_path[:-3]
+                output_coadd_dir = os.path.dirname(output_coadd_path)
+
+                output_coadd_sci_file = os.path.join(
+                    output_coadd_dir, "%s_%s_sci.fits" % (tilename, band))
+                output_coadd_weight_file = os.path.join(
+                    output_coadd_dir, "%s_%s_wgt.fits" % (tilename, band))
+                output_coadd_mask_file = os.path.join(
+                    output_coadd_dir, "%s_%s_msk.fits" % (tilename, band))
+
+                safe_rm(output_coadd_sci_file)
+                safe_rm(output_coadd_weight_file)
+                safe_rm(output_coadd_mask_file)
+
+                dummy_mask_coadd = os.path.join(
+                    output_coadd_dir, "%s_%s_msk-tmp.fits" % (tilename, band))
+                safe_rm(dummy_mask_coadd)
+
+                safe_rm(output_coadd_path + ".fz")
+
+                im_file_list = os.path.join(output_coadd_dir, "im_file_list.dat")
+                wgt_file_list = os.path.join(output_coadd_dir, "wgt_file_list.dat")
+                wgt_me_file_list = os.path.join(output_coadd_dir, "wgt_me_file_list.dat")
+                msk_file_list = os.path.join(output_coadd_dir, "msk_file_list.dat")
+                safe_rm(im_file_list)
+                safe_rm(wgt_file_list)
+                safe_rm(wgt_me_file_list)
+                safe_rm(msk_file_list)
+
+                if "coadd_bands" in self.config.get("swarp", {}):
+                    if band not in self.config["swarp"]["coadd_bands"]:
+                        self.logger.error(
+                            "Not including band=%s in coadd" % (band))
+                        continue
+                coadd_bands.append(band)
+
+            # Remove swarp coadd files
+            coadd_dir = os.path.join(
+                base_dir, stash["desrun"], tilename, "coadd")
+            coadd_file = os.path.join(
+                coadd_dir,
+                "%s_coadd_%s.fits" % (tilename, "".join(coadd_bands)))
+            weight_file = os.path.join(
+                coadd_dir,
+                "%s_coadd_weight_%s.fits" % (tilename, "".join(coadd_bands)))
+            mask_tmp_file = os.path.join(
+                coadd_dir,
+                "%s_coadd_%s_tmp.fits" % (tilename, "".join(coadd_bands)))
+            mask_file = os.path.join(
+                coadd_dir,
+                "%s_coadd_%s_msk.fits" % (tilename, "".join(coadd_bands)))
+            safe_rm(mask_tmp_file)
+            safe_rm(coadd_file)
+            safe_rm(weight_file)
+            safe_rm(mask_file)
 
             self.logger.error("deleting se images for tile %s" % tilename)
             for band in stash["bands"]:
