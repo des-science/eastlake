@@ -201,11 +201,12 @@ class DeleteSources(Step):
                 self.logger.error("deleting %s-band nullwt links for %s" % (band, tilename))
 
                 for sri in pyml["src_info"]:
-                    nullwt_link = os.path.join(
-                        base_dir, stash["desrun"], tilename, f"nullwt-{band}",
-                        os.path.basename(sri["coadd_nwgint_path"])
-                    )
-                    safe_rm(nullwt_link)
+                    if "coadd_nwgint_path" in sri:
+                        nullwt_link = os.path.join(
+                            base_dir, stash["desrun"], tilename, f"nullwt-{band}",
+                            os.path.basename(sri["coadd_nwgint_path"])
+                        )
+                        safe_rm(nullwt_link)
 
                 nullwt_path = os.path.join(
                     base_dir, stash["desrun"], tilename, f"nullwt-{band}",
@@ -221,11 +222,12 @@ class DeleteSources(Step):
                 safe_rm(psf_link)
 
                 for sri in pyml["src_info"]:
-                    psf_link = os.path.join(
-                        base_dir, stash["desrun"], tilename, "psfs",
-                        os.path.basename(sri["psf_path"])
-                    )
-                    safe_rm(psf_link)
+                    if "psf_path" in sri:
+                        psf_link = os.path.join(
+                            base_dir, stash["desrun"], tilename, "psfs",
+                            os.path.basename(sri["psf_path"])
+                        )
+                        safe_rm(psf_link)
 
                 self.logger.error("deleting %s-band psfmap for %s" % (band, tilename))
                 pmap_fn = os.path.join(
