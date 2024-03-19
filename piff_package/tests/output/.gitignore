@@ -1,0 +1,5 @@
+*.fits*
+*.pdf
+*.png
+*.piff
+test_dir
