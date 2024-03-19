@@ -219,6 +219,7 @@ setup(
     },
     package_data={
         "eastlake": ["astromatic/*", "data/*", "config/*"],
+        "piff": ["piff/pupils/*"],
     },
     use_scm_version=True,
     setup_requires=['setuptools_scm', 'setuptools_scm_git_archive'],

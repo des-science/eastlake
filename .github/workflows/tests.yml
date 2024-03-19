@@ -46,12 +46,18 @@ jobs:
           eastlake-src-extractor -dd
           run-eastlake-sim --help
 
-      - name: test
+      - name: test eastlake
         shell: bash -l {0}
         run: |
           git clone https://github.com/beckermr/des-test-data
           export TEST_DESDATA=`pwd`/des-test-data
           pytest -vvs eastlake
+
+      - name: test piff
+        shell: bash -l {0}
+        run: |
+          cd piff_package/tests
+          pytest -vvs .
 
       - name: lint
         shell: bash -l {0}
