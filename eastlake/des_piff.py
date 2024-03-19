@@ -10,12 +10,54 @@ import piff
 logger = logging.getLogger(__name__)
 
 
-PSF_KWARGS = {
-    "g": {"GI_COLOR": 1.1},
-    "r": {"GI_COLOR": 1.1},
-    "i": {"GI_COLOR": 1.1},
-    "z": {"IZ_COLOR": 0.34},
+PSF_KWARGS_COLOR_RANGES = {
+    "GI_COLOR": [0.0, 3.5],
+    "IZ_COLOR": [0.0, 0.65],
 }
+PSF_COLOR_DEFAULTS = {
+    "GI_COLOR": 1.1,
+    "IZ_COLOR": 0.34,
+}
+
+PSF_KWARGS = {
+    "g": {"GI_COLOR": PSF_COLOR_DEFAULTS["GI_COLOR"]},
+    "r": {"GI_COLOR": PSF_COLOR_DEFAULTS["GI_COLOR"]},
+    "i": {"GI_COLOR": PSF_COLOR_DEFAULTS["GI_COLOR"]},
+    "z": {"IZ_COLOR": PSF_COLOR_DEFAULTS["IZ_COLOR"]},
+}
+
+
+def _process_color_kwargs(piff_psf, kwargs):
+    if "GI_COLOR" in piff_psf.interp_property_names:
+        kwargs.pop("IZ_COLOR", None)
+
+        if "GI_COLOR" in kwargs:
+            if (
+                kwargs["GI_COLOR"] is None or
+                kwargs["GI_COLOR"] == "None"
+            ):
+                kwargs["GI_COLOR"] = PSF_COLOR_DEFAULTS["GI_COLOR"]
+
+            if kwargs["GI_COLOR"] < PSF_KWARGS_COLOR_RANGES["GI_COLOR"][0]:
+                kwargs["GI_COLOR"] = PSF_KWARGS_COLOR_RANGES["GI_COLOR"][0]
+            if kwargs["GI_COLOR"] > PSF_KWARGS_COLOR_RANGES["GI_COLOR"][1]:
+                kwargs["GI_COLOR"] = PSF_KWARGS_COLOR_RANGES["GI_COLOR"][1]
+
+    elif "IZ_COLOR" in piff_psf.interp_property_names:
+        kwargs.pop("GI_COLOR", None)
+        if "IZ_COLOR" in kwargs:
+            if (
+                kwargs["IZ_COLOR"] is None or
+                kwargs["IZ_COLOR"] == "None"
+            ):
+                kwargs["IZ_COLOR"] = PSF_COLOR_DEFAULTS["IZ_COLOR"]
+
+            if kwargs["IZ_COLOR"] < PSF_KWARGS_COLOR_RANGES["IZ_COLOR"][0]:
+                kwargs["IZ_COLOR"] = PSF_KWARGS_COLOR_RANGES["IZ_COLOR"][0]
+            if kwargs["IZ_COLOR"] > PSF_KWARGS_COLOR_RANGES["IZ_COLOR"][1]:
+                kwargs["IZ_COLOR"] = PSF_KWARGS_COLOR_RANGES["IZ_COLOR"][1]
+
+    return kwargs
 
 
 @functools.lru_cache(maxsize=200)
@@ -38,10 +80,11 @@ class DES_Piff(object):
     _single_params = []
     _takes_rng = False
 
-    def __init__(self, file_name):
+    def __init__(self, file_name, use_smooth_model=False):
         self.file_name = file_name
         self._piff = _read_piff(file_name)
         self._chipnum = list(set(self._piff.wcs.keys()))[0]
+        self.use_smooth_model = use_smooth_model
         assert len(list(set(self._piff.wcs.keys()))) == 1
 
     def _draw(
@@ -84,26 +127,7 @@ class DES_Piff(object):
         # nice and big image size here cause this has been a problem
         image = galsim.ImageD(ncol=n_pix, nrow=n_pix, wcs=pixel_wcs)
 
-        if "GI_COLOR" in self.getPiff().interp_property_names:
-            psf_kwargs.pop("IZ_COLOR", None)
-            if (
-                "GI_COLOR" in psf_kwargs and (
-                    psf_kwargs["GI_COLOR"] is None or
-                    psf_kwargs["GI_COLOR"] == "None"
-                )
-            ):
-                psf_kwargs["GI_COLOR"] = 1.1
-
-        elif "IZ_COLOR" in self.getPiff().interp_property_names:
-            psf_kwargs.pop("GI_COLOR", None)
-
-            if (
-                "IZ_COLOR" in psf_kwargs and (
-                    psf_kwargs["IZ_COLOR"] is None or
-                    psf_kwargs["IZ_COLOR"] == "None"
-                )
-            ):
-                psf_kwargs["IZ_COLOR"] = 0.34
+        psf_kwargs = _process_color_kwargs(self.getPiff(), psf_kwargs)
 
         offset = (
             image_pos.x - int(image_pos.x + 0.5),
@@ -117,6 +141,7 @@ class DES_Piff(object):
             chipnum=self._chipnum,
             center=True,
             offset=offset,
+            use_smooth_model=self.use_smooth_model,
             **psf_kwargs,
         )
 
@@ -126,8 +151,8 @@ class DES_Piff(object):
         return self._piff
 
     def getPSF(
-        self, image_pos, wcs=None,
-        n_pix=None, depixelize=False,
+        self,
+        image_pos,
         gsparams=None,
         **kwargs
     ):
@@ -137,12 +162,6 @@ class DES_Piff(object):
         ----------
         image_pos : galsim.Position
             The image position for the PSF.
-        wcs : galsim.BaseWCS or subclass, optional
-            The WCS to use to draw the PSF. If not given, the WCS in the Piff model is used.
-        n_pix : int, optional
-            The image size to use when drawing without smoothing.
-        depixelize : bool, optional
-            If True, the interpolated image will be depixelized. Default is False.
         gsparams : galsim.GSParams, optional
             Optional galsim configuration data to pass along.
         **kwargs : extra keyword arguments
@@ -154,28 +173,21 @@ class DES_Piff(object):
             The PSF at the image position.
         """
 
-        psf_img, pixel_wcs, offset = self._draw(
-            image_pos,
-            wcs=wcs,
-            n_pix=n_pix,
-            gsparams=gsparams,
-            **kwargs
-        )
+        kwargs = _process_color_kwargs(self.getPiff(), kwargs)
 
-        psf = galsim.InterpolatedImage(
-            galsim.ImageD(psf_img.array),  # make sure galsim is not keeping state
-            wcs=pixel_wcs,
-            gsparams=gsparams,
-            x_interpolant='lanczos15',
-            depixelize=depixelize,
-            offset=offset,
-        ).withFlux(
-            1.0
+        psf, draw_method = self.getPiff().get_profile(
+            image_pos.x,
+            image_pos.y,
+            chipnum=self._chipnum,
+            use_smooth_model=self.use_smooth_model,
+            **kwargs
         )
         return psf
 
     def getPSFImage(
-        self, image_pos, wcs=None,
+        self,
+        image_pos,
+        wcs=None,
         n_pix=None,
         gsparams=None,
         **kwargs
@@ -210,6 +222,11 @@ class DES_Piff(object):
         return psf_img
 
 
+class DES_SmoothPiff(DES_Piff):
+    def __init__(self, file_name):
+        super().__init__(file_name, use_smooth_model=True)
+
+
 class PiffLoader(galsim.config.InputLoader):
     def getKwargs(self, config, base, logger):
         req = {'file_name': str}
@@ -230,10 +247,8 @@ def BuildDES_Piff(config, base, ignore, gsparams, logger):
     opt = {
         'flux': float,
         'image_pos': galsim.PositionD,
-        'n_pix': int,
         'gi_color': float,
         'iz_color': float,
-        'depixelize': bool,
         'file_name': str,
     }
     params, safe = galsim.config.GetAllParams(
@@ -253,11 +268,6 @@ def BuildDES_Piff(config, base, ignore, gsparams, logger):
         raise galsim.GalSimConfigError(
             "DES_Piff requested, but no image_pos defined in base.")
 
-    if 'wcs' not in base:
-        raise galsim.GalSimConfigError(
-            "DES_Piff requested, but no wcs defined in base.")
-    wcs = base['wcs']
-
     if gsparams:
         gsparams = galsim.GSParams(**gsparams)
     else:
@@ -265,11 +275,8 @@ def BuildDES_Piff(config, base, ignore, gsparams, logger):
 
     psf = des_piff.getPSF(
         image_pos,
-        wcs=wcs,
-        n_pix=params.get("n_pix", None),
         GI_COLOR=params.get("gi_color", None),
         IZ_COLOR=params.get("iz_color", None),
-        depixelize=params.get("depixelize", False),
         gsparams=gsparams,
     )
 
@@ -283,3 +290,57 @@ def BuildDES_Piff(config, base, ignore, gsparams, logger):
 
 galsim.config.RegisterObjectType(
     'DES_Piff', BuildDES_Piff, input_type='des_piff')
+
+
+# add a config input section
+galsim.config.RegisterInputType('des_smooth_piff', PiffLoader(DES_SmoothPiff))
+
+
+# and a builder
+def BuildDES_SmoothPiff(config, base, ignore, gsparams, logger):
+    opt = {
+        'flux': float,
+        'image_pos': galsim.PositionD,
+        'gi_color': float,
+        'iz_color': float,
+        'file_name': str,
+    }
+    params, safe = galsim.config.GetAllParams(
+        config, base, opt=opt, ignore=ignore
+    )
+
+    if params.get("file_name", None) is None:
+        des_piff = galsim.config.GetInputObj('des_smooth_piff', config, base, 'DES_SmoothPiff')
+    else:
+        des_piff = DES_SmoothPiff(params.get("file_name", None))
+
+    if 'image_pos' in params:
+        image_pos = params['image_pos']
+    elif 'image_pos' in base:
+        image_pos = base['image_pos']
+    else:
+        raise galsim.GalSimConfigError(
+            "DES_SmoothPiff requested, but no image_pos defined in base.")
+
+    if gsparams:
+        gsparams = galsim.GSParams(**gsparams)
+    else:
+        gsparams = None
+
+    psf = des_piff.getPSF(
+        image_pos,
+        GI_COLOR=params.get("gi_color", None),
+        IZ_COLOR=params.get("iz_color", None),
+        gsparams=gsparams,
+    )
+
+    if 'flux' in params:
+        psf = psf.withFlux(params['flux'])
+
+    # we make sure to declare the returned object as not safe for reuse
+    can_be_reused = False
+    return psf, can_be_reused
+
+
+galsim.config.RegisterObjectType(
+    'DES_SmoothPiff', BuildDES_SmoothPiff, input_type='des_smooth_piff')
