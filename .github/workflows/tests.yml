@@ -57,7 +57,7 @@ jobs:
         shell: bash -l {0}
         run: |
           cd piff_package/tests
-          pytest -vvs .
+          coverage run -m pytest -v
 
       - name: lint
         shell: bash -l {0}
