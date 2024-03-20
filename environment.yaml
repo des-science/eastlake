@@ -48,3 +48,6 @@ dependencies:
   - fftw
   - libtool
   - gnuconfig
+  # eastlake testing
+  - flake8
+  - pytest
