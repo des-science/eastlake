@@ -613,17 +613,15 @@ def _do_ngmix_fit(*, img, cen_xy, scale, ntry=10):
             irr -= pixel_var
             icc -= pixel_var
             _g1, _g2, _T = ngmix.moments.mom2g(irr, irc, icc)
-            res["pars"][2] = _g1
-            res["pars"][3] = _g2
-            res["pars"][4] = _T
         except Exception:
             _g1 = np.nan
             _g2 = np.nan
             _T = np.nan
-            res["pars"][2] = _g1
-            res["pars"][3] = _g2
-            res["pars"][4] = _T
             res["flags"] |= 2**1
+
+        res["pars"][2] = _g1
+        res["pars"][3] = _g2
+        res["pars"][4] = _T
 
         if res["flags"] == 0:
             return res["pars"], res
@@ -1022,7 +1020,6 @@ class PSF(object):
 
     def _eval_smooth_model(self, *, x, y, chipnum, **properties):
         if self._smooth_model_failed:
-            raise RuntimeError("Failed to compute smooth model")
             return galsim.Moffat(beta=2.5, fwhm=1.0, flux=1.0)
         else:
             _props = [y / 4097, x / 2049] + [
