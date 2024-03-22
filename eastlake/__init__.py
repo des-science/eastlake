@@ -11,4 +11,3 @@ except PackageNotFoundError:
 
 from .pipeline import register_pipeline_step  # noqa
 from . import des_piff  # noqa
-from . import des_smoothpiff  # noqa

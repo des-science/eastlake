@@ -6,8 +6,7 @@ import yaml
 
 import pytest
 
-from ..des_piff import PSF_KWARGS, DES_Piff
-from ..des_smoothpiff import DES_SmoothPiff
+from ..des_piff import PSF_KWARGS, DES_Piff, DES_SmoothPiff
 
 
 def _get_piff_file():
@@ -29,9 +28,10 @@ def _get_piff_file():
         'test data is at TEST_DESDATA'))
 @pytest.mark.parametrize("x_offset", [-0.3, 0.0, 0.3])
 @pytest.mark.parametrize("y_offset", [-0.3, 0.0, 0.3])
-def test_des_piff_centering(x_offset, y_offset):
+@pytest.mark.parametrize("cls", [DES_Piff, DES_SmoothPiff])
+def test_des_piff_centering(x_offset, y_offset, cls):
     piff_fname = _get_piff_file()
-    piff = DES_Piff(piff_fname)
+    piff = cls(piff_fname)
     atol = 0.01
 
     # test the image it makes
@@ -85,9 +85,10 @@ def test_des_piff_centering(x_offset, y_offset):
     reason=(
         'DES_Piff can only be tested if '
         'test data is at TEST_DESDATA'))
-def test_des_piff_color():
+@pytest.mark.parametrize("cls", [DES_Piff, DES_SmoothPiff])
+def test_des_piff_color(cls):
     piff_fname = _get_piff_file()
-    piff = DES_Piff(piff_fname)
+    piff = cls(piff_fname)
     psf_im1 = piff.getPSF(
         galsim.PositionD(20, 10),
         GI_COLOR=1.3,
@@ -116,9 +117,10 @@ def test_des_piff_color():
     reason=(
         'DES_Piff can only be tested if '
         'test data is at TEST_DESDATA'))
-def test_des_piff_raises():
+@pytest.mark.parametrize("cls", [DES_Piff, DES_SmoothPiff])
+def test_des_piff_raises(cls):
     piff_fname = _get_piff_file()
-    piff = DES_Piff(piff_fname)
+    piff = cls(piff_fname)
     with pytest.raises(Exception) as e:
         piff.getPSF(
             galsim.PositionD(20, 10),
@@ -140,9 +142,10 @@ def test_des_piff_raises():
     reason=(
         'DES_Piff can only be tested if '
         'test data is at TEST_DESDATA'))
-def test_des_piff_smoke():
+@pytest.mark.parametrize("cls", [DES_Piff, DES_SmoothPiff])
+def test_des_piff_smoke(cls):
     piff_fname = _get_piff_file()
-    piff = DES_Piff(piff_fname)
+    piff = cls(piff_fname)
     psf_im = piff.getPSF(
         galsim.PositionD(20, 10),
         **PSF_KWARGS["g"],
@@ -167,60 +170,9 @@ def test_des_piff_smoke():
 @pytest.mark.skipif(
     os.environ.get('TEST_DESDATA', None) is None,
     reason=(
-        'DES_SmoothPiff can only be tested if '
+        'DES_Piff can only be tested if '
         'test data is at TEST_DESDATA'))
-def test_des_smoothpiff_smoke():
+def test_des_smooth_piff_smoke():
     piff_fname = _get_piff_file()
-    piff = DES_SmoothPiff(piff_fname, psf_kwargs=PSF_KWARGS["g"])
-    psf_im = piff.getPSF(galsim.PositionD(20, 10)).drawImage(nx=53, ny=53, scale=0.263).array
-
-    if False:
-        import matplotlib.pyplot as plt
-        plt.figure()
-        plt.imshow(psf_im)
-        import pdb
-        pdb.set_trace()
-
-    assert np.all(np.isfinite(psf_im))
-    assert np.allclose(np.sum(psf_im), 1)
-
-    y, x = np.unravel_index(np.argmax(psf_im), psf_im.shape)
-    cen = (psf_im.shape[0]-1)/2
-    assert y == cen
-    assert x == cen
-
-
-@pytest.mark.skipif(
-    os.environ.get('TEST_DESDATA', None) is None,
-    reason=(
-        'DES_SmoothPiff can only be tested if '
-        'test data is at TEST_DESDATA'))
-def test_des_smoothpiff_smooth():
-    piff_fname = _get_piff_file()
-    piff = DES_SmoothPiff(piff_fname, psf_kwargs=PSF_KWARGS["g"])
-    psf_im = piff.getPSF(
-        galsim.PositionD(20, 10),
-    ).drawImage(nx=53, ny=53, scale=0.263).array
-
-    piff = DES_SmoothPiff(piff_fname, psf_kwargs=PSF_KWARGS["g"])
-    psf_im1 = piff.getPSF(
-        galsim.PositionD(20, 10),
-        smooth=True,
-    ).drawImage(nx=53, ny=53, scale=0.263).array
-
-    piff = DES_SmoothPiff(piff_fname, psf_kwargs=PSF_KWARGS["g"], smooth=True)
-    psf_im2 = piff.getPSF(
-        galsim.PositionD(20, 10),
-    ).drawImage(nx=53, ny=53, scale=0.263).array
-
-    for im in [psf_im, psf_im1, psf_im2]:
-        assert np.all(np.isfinite(im))
-        assert np.allclose(np.sum(im), 1)
-        y, x = np.unravel_index(np.argmax(im), im.shape)
-        cen = (im.shape[0]-1)/2
-        assert y == cen
-        assert x == cen
-
-    assert np.allclose(psf_im1, psf_im2)
-    assert not np.allclose(psf_im, psf_im1)
-    assert not np.allclose(psf_im, psf_im2)
+    piff = DES_SmoothPiff(piff_fname)
+    assert piff.use_smooth_model
