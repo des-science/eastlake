@@ -98,10 +98,11 @@ class FitvdRunner(Step):
 
         # fitvd relies on an older version of ngmix; here, we use a separate conda
         # environment to run these codes.
-        if (CONDA_PREFIX := self.config.get("conda_prefix", None)) is not None:
+        if (_conda_prefix := self.config.get("conda_prefix", None)) is not None:
+            conda_prefix = os.path.expanduser(os.path.expandvars(_conda_prefix))
             CMD_PREFIX = [
                 "conda", "run",
-                "--prefix", CONDA_PREFIX,
+                "--prefix", conda_prefix,
             ]
         else:
             CMD_PREFIX = []
