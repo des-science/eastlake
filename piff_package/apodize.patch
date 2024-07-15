@@ -1,5 +1,5 @@
 diff --git a/.github/workflows/ci.yml b/.github/workflows/ci.yml
-index 822c8447..5eb0a428 100644
+index 822c8447..db78dbfc 100644
 --- a/.github/workflows/ci.yml
 +++ b/.github/workflows/ci.yml
 @@ -16,6 +16,7 @@ jobs:
@@ -10,6 +10,15 @@ index 822c8447..5eb0a428 100644
              matrix:
                  # First all python versions in basic linux
                  os: [ ubuntu-latest ]
+@@ -81,7 +82,7 @@ jobs:
+                 python -m pip install -U pip
+
+                 # Do these first to clarify potential conflicts
+-                pip install -U setuptools numpy
++                pip install -U setuptools "numpy<2"
+
+                 # Standard dependencies
+                 pip install -U -r requirements.txt
 diff --git a/piff/_version.py b/piff/_version.py
 index 4f4c623a..c1ba101f 100644
 --- a/piff/_version.py
@@ -109,3 +118,86 @@ index f1b526d5..d1a2d9ef 100644
          return image
 
      def get_profile(self, x, y, chipnum=None, flux=1.0, logger=None, **kwargs):
+diff --git a/requirements.txt b/requirements.txt
+index d03b7b19..cfd6693b 100644
+--- a/requirements.txt
++++ b/requirements.txt
+@@ -1,10 +1,10 @@
+-numpy>=1.17
++numpy>=1.17,<2
+ scipy>=1.2
+ pyyaml>=5.1
+ lsstdesc.coord>=1.2
+ treecorr>=4.3.1
+ fitsio>=1.0
+ matplotlib>=3.3
+-galsim>=2.3
++galsim>=2.3,<2.5
+ treegp>=0.6
+ threadpoolctl>=3.1
+diff --git a/tests/test_pixel.py b/tests/test_pixel.py
+index 2cd33e73..d0b4fc22 100644
+--- a/tests/test_pixel.py
++++ b/tests/test_pixel.py
+@@ -1531,7 +1531,7 @@ def test_color():
+         # Check the convenience function that an end user would typically use
+         offset = s.center_to_offset(s.fit.center)
+         image = psf.draw(x=s['x'], y=s['y'], color=s['color'],
+-                         stamp_size=32, flux=s.fit.flux, offset=offset)
++                         stamp_size=32, flux=s.fit.flux, offset=offset, apodize=None)
+         # They may be up to 1 pixel off in either direction, so find the common bounds.
+         b = image.bounds & fit_stamp.bounds
+         np.testing.assert_allclose(image[b].array, fit_stamp[b].array, rtol=1.e-6, atol=1.e-4)
+diff --git a/tests/test_simple.py b/tests/test_simple.py
+index 57e23910..5f211b8b 100644
+--- a/tests/test_simple.py
++++ b/tests/test_simple.py
+@@ -309,7 +309,7 @@ def test_single_image():
+
+     # test that draw works
+     test_image = psf.draw(x=target['x'], y=target['y'], stamp_size=config['input']['stamp_size'],
+-                          flux=target.fit.flux, offset=target.fit.center)
++                          flux=target.fit.flux, offset=target.fit.center, apodize=None)
+     # this image should be the same values as test_star
+     assert test_image == test_star.image
+     # test that draw does not copy the image
+@@ -743,7 +743,7 @@ def test_draw():
+
+         # Now use the regular PSF.draw() command.  This version is equivalent to the above.
+         # (It's not equal all the way to machine precision, but pretty close.)
+-        im1 = psf.draw(x, y, chipnum, stamp_size=48)
++        im1 = psf.draw(x, y, chipnum, stamp_size=48, , apodize=None)
+         np.testing.assert_allclose(im1.array, star.data.image.array, rtol=1.e-14, atol=1.e-14)
+
+         # The wcs in the image is the wcs of the original image
+diff --git a/tests/test_wcs.py b/tests/test_wcs.py
+index 2a373671..9546ed7a 100644
+--- a/tests/test_wcs.py
++++ b/tests/test_wcs.py
+@@ -366,7 +366,7 @@ def test_single():
+
+             # This is the more user-friendly way to do this.
+             # Equivalent to ~machine precision.
+-            im = psf.draw(x, y, chipnum=chipnum)
++            im = psf.draw(x, y, chipnum=chipnum, apodize=None)
+             print('im = ',im)
+             print('star im = ',star.data.image)
+             print('max diff = ',np.max(np.abs(im.array - star.data.image.array)))
+@@ -612,7 +612,7 @@ def test_olddes():
+     print('area at 0,0 = ',psf.wcs[0].pixelArea(galsim.PositionD(0,0)),' = %f**2'%(
+             psf.wcs[0].pixelArea(galsim.PositionD(0,0))**0.5))
+     assert np.isclose(psf.wcs[0].pixelArea(galsim.PositionD(0,0)), 0.2628**2, rtol=1.e-3)
+-    image = psf.draw(x=103.3, y=592.0, logger=logger)
++    image = psf.draw(x=103.3, y=592.0, logger=logger, apodize=None)
+     print('image shape = ',image.array.shape)
+     print('image near center = ',image.array[23:26,23:26])
+     print('image sum = ',image.array.sum())
+@@ -668,7 +668,7 @@ def test_newdes():
+     print('area at 0,0 = ',psf.wcs[0].pixelArea(galsim.PositionD(0,0)),' = %f**2'%(
+             psf.wcs[0].pixelArea(galsim.PositionD(0,0))**0.5))
+     assert np.isclose(psf.wcs[0].pixelArea(galsim.PositionD(0,0)), 0.263021**2, rtol=1.e-3)
+-    image = psf.draw(x=103.3, y=592.0, logger=logger)
++    image = psf.draw(x=103.3, y=592.0, logger=logger, apodize=None)
+     print('image shape = ',image.array.shape)
+     print('image near center = ',image.array[23:26,23:26])
+     print('image sum = ',image.array.sum())
