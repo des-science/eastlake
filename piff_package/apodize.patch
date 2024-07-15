@@ -1,5 +1,28 @@
+diff --git a/.github/workflows/ci.yml b/.github/workflows/ci.yml
+index 822c8447..5eb0a428 100644
+--- a/.github/workflows/ci.yml
++++ b/.github/workflows/ci.yml
+@@ -16,6 +16,7 @@ jobs:
+         runs-on: ${{ matrix.os }}
+
+         strategy:
++            fail-fast: false
+             matrix:
+                 # First all python versions in basic linux
+                 os: [ ubuntu-latest ]
+diff --git a/piff/_version.py b/piff/_version.py
+index 4f4c623a..c1ba101f 100644
+--- a/piff/_version.py
++++ b/piff/_version.py
+@@ -12,5 +12,5 @@
+ #    this list of conditions and the disclaimer given in the documentation
+ #    and/or other materials provided with the distribution.
+
+-__version__ = '1.3.3'
++__version__ = '1.3.3.1'
+ __version_info__ = tuple(map(int, __version__.split('.')))
 diff --git a/piff/psf.py b/piff/psf.py
-index fbb4ccd6..baf89d8d 100644
+index f1b526d5..d1a2d9ef 100644
 --- a/piff/psf.py
 +++ b/piff/psf.py
 @@ -24,6 +24,24 @@
@@ -27,8 +50,8 @@ index fbb4ccd6..baf89d8d 100644
  class PSF(object):
      """The base class for describing a PSF model across a field of view.
 
-@@ -442,7 +460,7 @@ def fit(self, stars, wcs, pointing, logger=None, convert_funcs=None, draw_method
-         logger.warning("PSF fit did not converge.  Max iterations = %d reached.",self.max_iter)
+@@ -99,7 +117,7 @@ def parseKwargs(cls, config_psf, logger=None):
+         raise NotImplementedError("Derived classes must define the parseKwargs function")
 
      def draw(self, x, y, chipnum=None, flux=1.0, center=None, offset=None, stamp_size=48,
 -             image=None, logger=None, **kwargs):
@@ -36,7 +59,7 @@ index fbb4ccd6..baf89d8d 100644
          r"""Draws an image of the PSF at a given location.
 
          The normal usage would be to specify (chipnum, x, y), in which case Piff will use the
-@@ -504,6 +522,11 @@ def draw(self, x, y, chipnum=None, flux=1.0, center=None, offset=None, stamp_siz
+@@ -161,6 +179,11 @@ def draw(self, x, y, chipnum=None, flux=1.0, center=None, offset=None, stamp_siz
                              [default: 48]
          :param image:       An existing image on which to draw, if desired. [default: None]
          :param logger:      A logger object for logging debug info. [default: None]
@@ -48,7 +71,7 @@ index fbb4ccd6..baf89d8d 100644
          :param \**kwargs:   Any additional properties required for the interpolation.
 
          :returns:           A GalSim Image of the PSF
-@@ -544,6 +567,37 @@ def draw(self, x, y, chipnum=None, flux=1.0, center=None, offset=None, stamp_siz
+@@ -201,6 +224,37 @@ def draw(self, x, y, chipnum=None, flux=1.0, center=None, offset=None, stamp_siz
 
          prof.drawImage(image, method=method, center=center)
 
