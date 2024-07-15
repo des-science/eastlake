@@ -80,11 +80,10 @@ class DES_Piff(object):
     _single_params = []
     _takes_rng = False
 
-    def __init__(self, file_name, use_smooth_model=False):
+    def __init__(self, file_name):
         self.file_name = file_name
         self._piff = _read_piff(file_name)
         self._chipnum = list(set(self._piff.wcs.keys()))[0]
-        self.use_smooth_model = use_smooth_model
         assert len(list(set(self._piff.wcs.keys()))) == 1
 
     def _draw(
@@ -141,7 +140,6 @@ class DES_Piff(object):
             chipnum=self._chipnum,
             center=True,
             offset=offset,
-            use_smooth_model=self.use_smooth_model,
             **psf_kwargs,
         )
 
@@ -179,7 +177,6 @@ class DES_Piff(object):
             image_pos.x,
             image_pos.y,
             chipnum=self._chipnum,
-            use_smooth_model=self.use_smooth_model,
             **kwargs
         )
         return psf
@@ -220,11 +217,6 @@ class DES_Piff(object):
             **kwargs
         )
         return psf_img
-
-
-class DES_SmoothPiff(DES_Piff):
-    def __init__(self, file_name):
-        super().__init__(file_name, use_smooth_model=True)
 
 
 class PiffLoader(galsim.config.InputLoader):
@@ -290,57 +282,3 @@ def BuildDES_Piff(config, base, ignore, gsparams, logger):
 
 galsim.config.RegisterObjectType(
     'DES_Piff', BuildDES_Piff, input_type='des_piff')
-
-
-# add a config input section
-galsim.config.RegisterInputType('des_smooth_piff', PiffLoader(DES_SmoothPiff))
-
-
-# and a builder
-def BuildDES_SmoothPiff(config, base, ignore, gsparams, logger):
-    opt = {
-        'flux': float,
-        'image_pos': galsim.PositionD,
-        'gi_color': float,
-        'iz_color': float,
-        'file_name': str,
-    }
-    params, safe = galsim.config.GetAllParams(
-        config, base, opt=opt, ignore=ignore
-    )
-
-    if params.get("file_name", None) is None:
-        des_piff = galsim.config.GetInputObj('des_smooth_piff', config, base, 'DES_SmoothPiff')
-    else:
-        des_piff = DES_SmoothPiff(params.get("file_name", None))
-
-    if 'image_pos' in params:
-        image_pos = params['image_pos']
-    elif 'image_pos' in base:
-        image_pos = base['image_pos']
-    else:
-        raise galsim.GalSimConfigError(
-            "DES_SmoothPiff requested, but no image_pos defined in base.")
-
-    if gsparams:
-        gsparams = galsim.GSParams(**gsparams)
-    else:
-        gsparams = None
-
-    psf = des_piff.getPSF(
-        image_pos,
-        GI_COLOR=params.get("gi_color", None),
-        IZ_COLOR=params.get("iz_color", None),
-        gsparams=gsparams,
-    )
-
-    if 'flux' in params:
-        psf = psf.withFlux(params['flux'])
-
-    # we make sure to declare the returned object as not safe for reuse
-    can_be_reused = False
-    return psf, can_be_reused
-
-
-galsim.config.RegisterObjectType(
-    'DES_SmoothPiff', BuildDES_SmoothPiff, input_type='des_smooth_piff')
