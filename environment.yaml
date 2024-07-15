@@ -17,7 +17,6 @@ dependencies:
   - meds
   - ngmix
   - numpy
-  - piff
   - pixmappy
   - psfex
   - pyyaml
