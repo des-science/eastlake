@@ -6,7 +6,7 @@ import yaml
 
 import pytest
 
-from ..des_piff import PSF_KWARGS, DES_Piff, DES_SmoothPiff
+from ..des_piff import PSF_KWARGS, DES_Piff
 
 
 def _get_piff_file():
@@ -28,7 +28,7 @@ def _get_piff_file():
         'test data is at TEST_DESDATA'))
 @pytest.mark.parametrize("x_offset", [-0.3, 0.0, 0.3])
 @pytest.mark.parametrize("y_offset", [-0.3, 0.0, 0.3])
-@pytest.mark.parametrize("cls", [DES_Piff, DES_SmoothPiff])
+@pytest.mark.parametrize("cls", [DES_Piff])
 def test_des_piff_centering(x_offset, y_offset, cls):
     piff_fname = _get_piff_file()
     piff = cls(piff_fname)
@@ -85,7 +85,7 @@ def test_des_piff_centering(x_offset, y_offset, cls):
     reason=(
         'DES_Piff can only be tested if '
         'test data is at TEST_DESDATA'))
-@pytest.mark.parametrize("cls", [DES_Piff, DES_SmoothPiff])
+@pytest.mark.parametrize("cls", [DES_Piff])
 def test_des_piff_color(cls):
     piff_fname = _get_piff_file()
     piff = cls(piff_fname)
@@ -117,7 +117,7 @@ def test_des_piff_color(cls):
     reason=(
         'DES_Piff can only be tested if '
         'test data is at TEST_DESDATA'))
-@pytest.mark.parametrize("cls", [DES_Piff, DES_SmoothPiff])
+@pytest.mark.parametrize("cls", [DES_Piff])
 def test_des_piff_raises(cls):
     piff_fname = _get_piff_file()
     piff = cls(piff_fname)
@@ -142,7 +142,7 @@ def test_des_piff_raises(cls):
     reason=(
         'DES_Piff can only be tested if '
         'test data is at TEST_DESDATA'))
-@pytest.mark.parametrize("cls", [DES_Piff, DES_SmoothPiff])
+@pytest.mark.parametrize("cls", [DES_Piff])
 def test_des_piff_smoke(cls):
     piff_fname = _get_piff_file()
     piff = cls(piff_fname)
@@ -165,14 +165,3 @@ def test_des_piff_smoke(cls):
     cen = (psf_im.shape[0]-1)/2
     assert y == cen
     assert x == cen
-
-
-@pytest.mark.skipif(
-    os.environ.get('TEST_DESDATA', None) is None,
-    reason=(
-        'DES_Piff can only be tested if '
-        'test data is at TEST_DESDATA'))
-def test_des_smooth_piff_smoke():
-    piff_fname = _get_piff_file()
-    piff = DES_SmoothPiff(piff_fname)
-    assert piff.use_smooth_model
