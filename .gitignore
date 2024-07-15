@@ -132,3 +132,8 @@ eastlake/astromatic/swarp
 eastlake/astromatic/src-extractor
 src/sextractor*/*
 src/swarp*/*
+
+piff_package/*
+!piff_package/apodize.patch
+!piff_package/README.md
+!piff_package/Piff-1.3.3.tar.gz
