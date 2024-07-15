@@ -181,6 +181,30 @@ class build_ext(setuptools.command.build_ext.build_ext):
         _build_src_ext()
         super().run()
 
+# unpack and patch Piff
+for fname in os.listdir("piff_package"):
+    if fname not in ["Piff-1.3.3.tar.gz", "apodize.patch", "README.md"]:
+        subprocess.run(
+            ["rm", "-rf", fname],
+            check=True,
+            cwd="piff_package",
+        )
+
+subprocess.run(
+    ["tar", "--strip-components=1", "-xzvf", "Piff-1.3.3.tar.gz"],
+    check=True,
+    cwd="piff_package",
+)
+subprocess.run(
+    ["patch", "-p1", "-i", "apodize.patch"],
+    check=True,
+    cwd="piff_package",
+)
+subprocess.run(
+    ["rm", "-f", "piff/psf.py.orig"],
+    check=True,
+    cwd="piff_package",
+)
 
 scripts = glob.glob('./bin/*')
 scripts = [os.path.basename(f) for f in scripts if f[-1] != '~']

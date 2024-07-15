@@ -137,3 +137,4 @@ piff_package/*
 !piff_package/apodize.patch
 !piff_package/README.md
 !piff_package/Piff-1.3.3.tar.gz
+!piff_package/LICENSE
