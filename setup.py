@@ -196,12 +196,7 @@ subprocess.run(
     cwd="piff_package",
 )
 subprocess.run(
-    ["patch", "-p1", "-i", "apodize.patch"],
-    check=True,
-    cwd="piff_package",
-)
-subprocess.run(
-    ["rm", "-f", "piff/psf.py.orig"],
+    ["patch", "-p1", "-u", "-i", "apodize.patch"],
     check=True,
     cwd="piff_package",
 )
