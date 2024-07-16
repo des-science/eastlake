@@ -183,7 +183,7 @@ class build_ext(setuptools.command.build_ext.build_ext):
 
 # unpack and patch Piff
 for fname in os.listdir("piff_package"):
-    if fname not in ["Piff-1.3.3.tar.gz", "apodize.patch", "README.md"]:
+    if fname not in ["Piff-1.3.3.tar.gz", "apodize.patch", "README.md", "LICENSE"]:
         subprocess.run(
             ["rm", "-rf", fname],
             check=True,
