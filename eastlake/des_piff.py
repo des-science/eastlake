@@ -151,6 +151,9 @@ class DES_Piff(object):
     def getPSF(
         self,
         image_pos,
+        wcs=None,
+        n_pix=None,
+        depixelize=False,
         gsparams=None,
         **kwargs
     ):
@@ -160,6 +163,12 @@ class DES_Piff(object):
         ----------
         image_pos : galsim.Position
             The image position for the PSF.
+        wcs : galsim.BaseWCS or subclass, optional
+            The WCS to use to draw the PSF. If not given, the WCS in the Piff model is used.
+        n_pix : int, optional
+            The image size to use when drawing without smoothing.
+        depixelize : bool, optional
+            If True, the interpolated image will be depixelized. Default is False.
         gsparams : galsim.GSParams, optional
             Optional galsim configuration data to pass along.
         **kwargs : extra keyword arguments
@@ -171,13 +180,23 @@ class DES_Piff(object):
             The PSF at the image position.
         """
 
-        kwargs = _process_color_kwargs(self.getPiff(), kwargs)
-
-        psf, draw_method = self.getPiff().get_profile(
-            image_pos.x,
-            image_pos.y,
-            chipnum=self._chipnum,
+        psf_img, pixel_wcs, offset = self._draw(
+            image_pos,
+            wcs=wcs,
+            n_pix=n_pix,
+            gsparams=gsparams,
             **kwargs
+        )
+
+        psf = galsim.InterpolatedImage(
+            galsim.ImageD(psf_img.array),  # make sure galsim is not keeping state
+            wcs=pixel_wcs,
+            gsparams=gsparams,
+            x_interpolant='lanczos15',
+            depixelize=depixelize,
+            offset=offset,
+        ).withFlux(
+            1.0
         )
         return psf
 
@@ -239,8 +258,10 @@ def BuildDES_Piff(config, base, ignore, gsparams, logger):
     opt = {
         'flux': float,
         'image_pos': galsim.PositionD,
+        'n_pix': int,
         'gi_color': float,
         'iz_color': float,
+        'depixelize': bool,
         'file_name': str,
     }
     params, safe = galsim.config.GetAllParams(
@@ -260,6 +281,11 @@ def BuildDES_Piff(config, base, ignore, gsparams, logger):
         raise galsim.GalSimConfigError(
             "DES_Piff requested, but no image_pos defined in base.")
 
+    if 'wcs' not in base:
+        raise galsim.GalSimConfigError(
+            "DES_Piff requested, but no wcs defined in base.")
+    wcs = base['wcs']
+
     if gsparams:
         gsparams = galsim.GSParams(**gsparams)
     else:
@@ -267,8 +293,11 @@ def BuildDES_Piff(config, base, ignore, gsparams, logger):
 
     psf = des_piff.getPSF(
         image_pos,
+        wcs=wcs,
+        n_pix=params.get("n_pix", None),
         GI_COLOR=params.get("gi_color", None),
         IZ_COLOR=params.get("iz_color", None),
+        depixelize=params.get("depixelize", False),
         gsparams=gsparams,
     )
 
