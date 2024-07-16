@@ -535,7 +535,10 @@ class MEDSRunner(Step):
     def _make_psf_data_piff(
         self, stash, coadd_wcs, tilename, band, is_rejectlisted, img_files, img_ext, head_files,
     ):
-        smooth = stash["psf_config"].get("smooth", False)
+        smooth = (
+            stash["psf_config"].get("smooth", False)
+            or stash["psf_config"].get("type") == "DES_SmoothPiff"
+        )
         if smooth:
             assert stash["draw_method"] == "auto"
         else:

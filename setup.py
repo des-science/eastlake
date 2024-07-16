@@ -30,13 +30,13 @@ def _get_cc_flags_prefix():
     if "CONDA_BUILD" in os.environ:
         print(">>>  building in conda build", flush=True)
         cc = "${CC}"
-        cldflags = "\"${CFLAGS} -fcommon\""
+        cldflags = "\"${CFLAGS} -fcommon -Wno-implicit-function-declaration\""
         prefix_var = "PREFIX"
     elif all(v in os.environ for v in ["CONDA_PREFIX", "CC", "CFLAGS", "LDFLAGS"]):
         # assume compilers package is installed
         print(">>>  building w/ conda-forge compilers package", flush=True)
         cc = os.environ["CC"]
-        cldflags = "\"" + os.environ["CFLAGS"] + " -fcommon\""
+        cldflags = "\"" + os.environ["CFLAGS"] + " -fcommon -Wno-implicit-function-declaration\""
         prefix_var = "CONDA_PREFIX"
     elif sys.platform == "linux":
         if "CONDA_PREFIX" in os.environ:
@@ -47,6 +47,7 @@ def _get_cc_flags_prefix():
                 "-Wl,-rpath,${CONDA_PREFIX}/lib "
                 "-Wl,-rpath-link,${CONDA_PREFIX}/lib "
                 "-L${CONDA_PREFIX}/lib "
+                "-Wno-implicit-function-declaration "
                 "-ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 "
                 "-ffunction-sections -pipe -fcommon\""
             )
@@ -66,6 +67,7 @@ def _get_cc_flags_prefix():
                 "-Wl,-rpath,${CONDA_PREFIX}/lib "
                 "-L${CONDA_PREFIX}/lib "
                 "-Wl,-pie -Wl,-headerpad_max_install_names "
+                "-Wno-implicit-function-declaration "
                 "-Wl,-dead_strip_dylibs -fcommon\""
             )
             prefix_var = "CONDA_PREFIX"
@@ -82,6 +84,23 @@ def _get_cc_flags_prefix():
     return cc, cldflags, prefix_var
 
 
+def _update_autotools():
+    if (
+        "CONDA_BUILD" in os.environ
+        and "BUILD_PREFIX" in os.environ
+        and os.path.exists(os.path.expandvars("${BUILD_PREFIX}/share/gnuconfig"))
+    ):
+        print(">>> updating config.sub and config.guess", flush=True)
+        _run_shell("mkdir -p autoconf && cp ${BUILD_PREFIX}/share/gnuconfig/config.* autoconf/.")
+
+    elif (
+        "CONDA_PREFIX" in os.environ
+        and os.path.exists(os.path.expandvars("${CONDA_PREFIX}/share/gnuconfig"))
+    ):
+        print(">>> updating config.sub and config.guess", flush=True)
+        _run_shell("mkdir -p autoconf && cp ${CONDA_PREFIX}/share/gnuconfig/config.* autoconf/.")
+
+
 def _build_swarp():
     cc, cldflags, prefix_var = _get_cc_flags_prefix()
     cwd = os.path.abspath(os.getcwd())
@@ -90,14 +109,20 @@ def _build_swarp():
             _run_shell("cp %s/src/swarp-2.40.1.tar.gz ." % cwd)
             _run_shell("tar -xzvf swarp-2.40.1.tar.gz")
             with pushd("swarp-2.40.1"):
-                if cc is not None and cldflags is not None:
-                    _run_shell(
-                        "CC=%s "
-                        "CFLAGS=%s "
-                        "./configure --prefix=%s" % (cc, cldflags, tmpdir)
-                    )
-                else:
-                    _run_shell("./configure --prefix=%s" % tmpdir)
+                try:
+                    _update_autotools()
+                    if cc is not None and cldflags is not None:
+                        _run_shell(
+                            "CC=%s "
+                            "CFLAGS=%s "
+                            "./configure --prefix=%s" % (cc, cldflags, tmpdir)
+                        )
+                    else:
+                        _run_shell("./configure --prefix=%s" % tmpdir)
+                except Exception:
+                    _run_shell("cat config.log")
+                    raise
+
                 _run_shell("make")
                 _run_shell("make install")
             _run_shell("cp bin/swarp %s/eastlake/astromatic/." % cwd)
@@ -112,6 +137,7 @@ def _build_src_ext():
             _run_shell("tar -xzvf src-extractor-2.24.4.tar.gz")
             with pushd("sextractor-2.24.4"):
                 try:
+                    _update_autotools()
                     _run_shell("sh autogen.sh")
                     if cc is not None and cldflags is not None:
                         _run_shell(
@@ -155,22 +181,64 @@ class build_ext(setuptools.command.build_ext.build_ext):
         _build_src_ext()
         super().run()
 
+# unpack and patch Piff
+for fname in os.listdir("piff_package"):
+    if fname not in ["Piff-1.3.3.tar.gz", "apodize.patch", "README.md", "LICENSE"]:
+        subprocess.run(
+            ["rm", "-rf", fname],
+            check=True,
+            cwd="piff_package",
+        )
+
+subprocess.run(
+    ["tar", "--strip-components=1", "-xzvf", "Piff-1.3.3.tar.gz"],
+    check=True,
+    cwd="piff_package",
+)
+subprocess.run(
+    ["patch", "-p1", "-u", "-i", "apodize.patch"],
+    check=True,
+    cwd="piff_package",
+)
 
 scripts = glob.glob('./bin/*')
 scripts = [os.path.basename(f) for f in scripts if f[-1] != '~']
 scripts = [os.path.join('bin', s) for s in scripts]
 
+piff_scripts = [
+    os.path.join("piff_package", "scripts", s)
+    for s in ['piffify', 'plotify', 'meanify']
+]
+
+pkgs = find_packages(
+    where=".",
+    include=["eastlake", "eastlake.*", "piff", "piff.*"],
+    exclude=[
+        "tests", "tests.*",
+        "docs", "docs.*",
+        "devel", "devel.*",
+        "examples", "examples.*",
+        "scripts", "scripts.*"
+    ],
+)
+
+print("\n\nfind_packages: %r\n\n" % pkgs, flush=True)
+
+assert "piff" in pkgs
+assert "eastlake" in pkgs
+
 setup(
     name='eastlake',
-    packages=find_packages(),
+    packages=pkgs,
     include_package_data=True,
-    scripts=scripts,
+    scripts=scripts + piff_scripts,
     cmdclass={
         'build_py': build_py,
         'build_ext': build_ext,
     },
     package_data={
         "eastlake": ["astromatic/*", "data/*", "config/*"],
+        "piff": ["piff/pupils/*"],
     },
     use_scm_version=True,
     setup_requires=['setuptools_scm', 'setuptools_scm_git_archive'],

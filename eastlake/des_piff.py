@@ -10,12 +10,54 @@ import piff
 logger = logging.getLogger(__name__)
 
 
-PSF_KWARGS = {
-    "g": {"GI_COLOR": 1.1},
-    "r": {"GI_COLOR": 1.1},
-    "i": {"GI_COLOR": 1.1},
-    "z": {"IZ_COLOR": 0.34},
+PSF_KWARGS_COLOR_RANGES = {
+    "GI_COLOR": [0.0, 3.5],
+    "IZ_COLOR": [0.0, 0.65],
 }
+PSF_COLOR_DEFAULTS = {
+    "GI_COLOR": 1.1,
+    "IZ_COLOR": 0.34,
+}
+
+PSF_KWARGS = {
+    "g": {"GI_COLOR": PSF_COLOR_DEFAULTS["GI_COLOR"]},
+    "r": {"GI_COLOR": PSF_COLOR_DEFAULTS["GI_COLOR"]},
+    "i": {"GI_COLOR": PSF_COLOR_DEFAULTS["GI_COLOR"]},
+    "z": {"IZ_COLOR": PSF_COLOR_DEFAULTS["IZ_COLOR"]},
+}
+
+
+def _process_color_kwargs(piff_psf, kwargs):
+    if "GI_COLOR" in piff_psf.interp_property_names:
+        kwargs.pop("IZ_COLOR", None)
+
+        if "GI_COLOR" in kwargs:
+            if (
+                kwargs["GI_COLOR"] is None or
+                kwargs["GI_COLOR"] == "None"
+            ):
+                kwargs["GI_COLOR"] = PSF_COLOR_DEFAULTS["GI_COLOR"]
+
+            if kwargs["GI_COLOR"] < PSF_KWARGS_COLOR_RANGES["GI_COLOR"][0]:
+                kwargs["GI_COLOR"] = PSF_KWARGS_COLOR_RANGES["GI_COLOR"][0]
+            if kwargs["GI_COLOR"] > PSF_KWARGS_COLOR_RANGES["GI_COLOR"][1]:
+                kwargs["GI_COLOR"] = PSF_KWARGS_COLOR_RANGES["GI_COLOR"][1]
+
+    elif "IZ_COLOR" in piff_psf.interp_property_names:
+        kwargs.pop("GI_COLOR", None)
+        if "IZ_COLOR" in kwargs:
+            if (
+                kwargs["IZ_COLOR"] is None or
+                kwargs["IZ_COLOR"] == "None"
+            ):
+                kwargs["IZ_COLOR"] = PSF_COLOR_DEFAULTS["IZ_COLOR"]
+
+            if kwargs["IZ_COLOR"] < PSF_KWARGS_COLOR_RANGES["IZ_COLOR"][0]:
+                kwargs["IZ_COLOR"] = PSF_KWARGS_COLOR_RANGES["IZ_COLOR"][0]
+            if kwargs["IZ_COLOR"] > PSF_KWARGS_COLOR_RANGES["IZ_COLOR"][1]:
+                kwargs["IZ_COLOR"] = PSF_KWARGS_COLOR_RANGES["IZ_COLOR"][1]
+
+    return kwargs
 
 
 @functools.lru_cache(maxsize=200)
@@ -84,26 +126,7 @@ class DES_Piff(object):
         # nice and big image size here cause this has been a problem
         image = galsim.ImageD(ncol=n_pix, nrow=n_pix, wcs=pixel_wcs)
 
-        if "GI_COLOR" in self.getPiff().interp_property_names:
-            psf_kwargs.pop("IZ_COLOR", None)
-            if (
-                "GI_COLOR" in psf_kwargs and (
-                    psf_kwargs["GI_COLOR"] is None or
-                    psf_kwargs["GI_COLOR"] == "None"
-                )
-            ):
-                psf_kwargs["GI_COLOR"] = 1.1
-
-        elif "IZ_COLOR" in self.getPiff().interp_property_names:
-            psf_kwargs.pop("GI_COLOR", None)
-
-            if (
-                "IZ_COLOR" in psf_kwargs and (
-                    psf_kwargs["IZ_COLOR"] is None or
-                    psf_kwargs["IZ_COLOR"] == "None"
-                )
-            ):
-                psf_kwargs["IZ_COLOR"] = 0.34
+        psf_kwargs = _process_color_kwargs(self.getPiff(), psf_kwargs)
 
         offset = (
             image_pos.x - int(image_pos.x + 0.5),
@@ -126,8 +149,11 @@ class DES_Piff(object):
         return self._piff
 
     def getPSF(
-        self, image_pos, wcs=None,
-        n_pix=None, depixelize=False,
+        self,
+        image_pos,
+        wcs=None,
+        n_pix=None,
+        depixelize=False,
         gsparams=None,
         **kwargs
     ):
@@ -175,7 +201,9 @@ class DES_Piff(object):
         return psf
 
     def getPSFImage(
-        self, image_pos, wcs=None,
+        self,
+        image_pos,
+        wcs=None,
         n_pix=None,
         gsparams=None,
         **kwargs

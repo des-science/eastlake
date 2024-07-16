@@ -128,7 +128,7 @@ class PizzaCutterRunner(Step):
         with open(pzyml_pth, "r") as fp:
             pzyml = yaml.safe_load(fp.read())
 
-        if stash["psf_config"]["type"] in ["DES_Piff"]:
+        if stash["psf_config"]["type"] in ["DES_Piff", "DES_SmoothPiff"]:
             # this is the default and let's make sure
             assert pzyml["single_epoch"]["psf_type"] == "piff"
         else:

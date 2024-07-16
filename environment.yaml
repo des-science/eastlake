@@ -10,20 +10,33 @@ dependencies:
   - des-pizza-cutter-metadetect
   - esutil
   - fitsio
-  - galsim
+  - galsim<2.5
   - importlib_metadata
   - joblib
   - lsstdesc-coord
   - meds
   - ngmix
   - numpy
-  - piff
   - pixmappy
   - psfex
   - pyyaml
   - scipy
   - setuptools
+  # piff stuff
+  - lsstdesc-coord>=1.2
+  - treecorr>=4.3.1
+  - fitsio>=1.0
+  - matplotlib-base>=3.3
+  - galsim>=2.3
+  - treegp>=0.6
+  - threadpoolctl>=3.1
+  - nose
+  - coverage
+  - pytest<8
+  - nbval
+  - ipykernel
   # host setup.py
+  - pip
   - setuptools_scm
   - setuptools_scm_git_archive
   # host build
@@ -33,3 +46,7 @@ dependencies:
   - compilers
   - fftw
   - libtool
+  - gnuconfig
+  # eastlake testing
+  - flake8
+  - pytest
